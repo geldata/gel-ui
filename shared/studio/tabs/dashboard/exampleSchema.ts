@@ -790,7 +790,7 @@ insert default::Account {
   username := 'Cameron',
   watchlist := (
     select Content
-    filter .actors.name in {'Josh Brolin', 'Patrick Stewart'}
+    filter any(.actors.name in {'Josh Brolin', 'Patrick Stewart'})
   ),
 };
 
