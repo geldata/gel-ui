@@ -76,15 +76,17 @@ describe("clientSettings:", () => {
     await driver.findElement(ByUIClass("sessionState_openPanel")).click();
 
     // remove the implicit limit setting
-    await driver
-      .findElement(
-        By.css(
-          `${uiClass("sessionState_group")}:nth-child(3) ${uiClass(
-            "sessionState_item"
-          )} ${uiClass("toggleSwitch_track")}`
+    await (
+      await driver.wait(
+        until.elementLocated(
+          By.css(
+            `${uiClass("sessionState_group")}:nth-child(3) ${uiClass(
+              "sessionState_item"
+            )} ${uiClass("toggleSwitch_track")}`
+          )
         )
       )
-      .click();
+    ).click();
 
     // close panel
     await driver.findElement(ByUIClass("sessionState_closePanel")).click();
