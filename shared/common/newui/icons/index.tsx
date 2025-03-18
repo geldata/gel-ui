@@ -209,6 +209,28 @@ export function ArrowRightIcon({className}: {className?: string}) {
   );
 }
 
+export function ArrowLeftIcon({className}: {className?: string}) {
+  return (
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        transform="rotate(180, 12, 12)"
+        d="M12 6L18 12L12 18M6 12H18"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function ExternalLinkIcon({className}: {className?: string}) {
   return (
     <svg
