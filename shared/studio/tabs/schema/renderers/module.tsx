@@ -23,7 +23,7 @@ export function ModuleRenderer({
   const [isStuck, setIsStuck] = useState(false);
 
   useEffect(() => {
-    if (isSticky) {
+    if (ref.current && isSticky) {
       const observer = new IntersectionObserver(
         ([e]) => {
           if (
@@ -36,7 +36,7 @@ export function ModuleRenderer({
         {threshold: [1]}
       );
 
-      setTimeout(() => observer.observe(ref.current!), 0);
+      observer.observe(ref.current);
 
       return () => {
         observer.disconnect();

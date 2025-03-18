@@ -280,18 +280,23 @@ const ListItemRenderer = observer(function ListItemRenderer({
 
   const resizeRef = useRef<HTMLDivElement>(null);
 
-  const {item, matches} = state.renderListItems.itemsList[index];
-  const TypeRenderer = renderers[item.schemaType] as any;
+  const listItem = state.renderListItems.itemsList[index];
 
   useResize(
     resizeRef,
     ({height}) => {
-      if (height && item.schemaType !== "Module") {
-        state.setRenderHeight(index, item, height);
+      if (listItem && height && listItem.item.schemaType !== "Module") {
+        state.setRenderHeight(index, listItem.item, height);
       }
     },
-    [item, index]
+    [listItem, index]
   );
+
+  if (!listItem) return null;
+
+  const {item, matches} = listItem;
+
+  const TypeRenderer = renderers[item.schemaType] as any;
 
   return (
     <div style={{position: "relative", height: "0px", top: style.top}}>
