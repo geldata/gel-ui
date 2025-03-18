@@ -83,7 +83,7 @@ export function LoginUIPreview({
   let emailFactorForm = (
     <>
       <label htmlFor="preview_email">Email</label>
-      <input id="preview_email" name="email" type="email" />
+      <input id="preview_email" readOnly />
     </>
   );
   const passwordInput = (
@@ -94,7 +94,7 @@ export function LoginUIPreview({
           Forgot password?
         </a>
       </div>
-      <input id="preview_password" name="password" type="password" />
+      <input id="preview_password" readOnly />
     </>
   );
   if (hasWebAuthnProvider && hasMagicLinkProvider) {
