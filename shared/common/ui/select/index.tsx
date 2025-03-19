@@ -33,6 +33,7 @@ export type SelectProps<T = any> = {
   actions?: {label: string | JSX.Element; action: () => void}[];
   searchable?: boolean;
   disabled?: boolean;
+  label?: string;
 } & (
   | {
       placeholder?: undefined;
@@ -68,6 +69,7 @@ export function Select<T extends any>({
   searchable,
   disabled,
   placeholder,
+  label,
   ...dropdown
 }: SelectProps<T>) {
   const selectRef = useRef<HTMLDivElement>(null);
@@ -183,6 +185,7 @@ export function Select<T extends any>({
       className={cn(styles.select, className)}
       onClick={!disabled ? () => setDropdownOpen(true) : undefined}
       data-disabled={disabled}
+      data-testid={label}
     >
       {title ?? selectedItem?.fullLabel ?? selectedItem?.label ?? (
         <span className={styles.placeholder}>{placeholder}</span>
