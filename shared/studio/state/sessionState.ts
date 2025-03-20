@@ -344,7 +344,7 @@ export class SessionState extends Model({
     const result = await conn.query(
       `select cfg::Config {${this.configNames.join(", ")}}`,
       undefined,
-      {ignoreSessionConfig: true, ignoreForceDatabaseError: true}
+      {ignoreSessionConfig: true}
     );
 
     if (result.result) {

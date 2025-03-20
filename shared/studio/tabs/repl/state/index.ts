@@ -499,7 +499,7 @@ export class Repl extends Model({
                 implicitLimitConfig != null
                   ? implicitLimitConfig + BigInt(1)
                   : undefined,
-              replQueryTag: true,
+              userQuery: true,
             },
             (this._runningQuery as AbortController).signal,
             lang
