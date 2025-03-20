@@ -793,7 +793,7 @@ export class QueryEditor extends Model({
                 implicitLimitConfig != null
                   ? implicitLimitConfig + BigInt(1)
                   : undefined,
-              replQueryTag: true,
+              userQuery: true,
             },
             this.runningQueryAbort?.signal,
             lang

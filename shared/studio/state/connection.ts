@@ -74,8 +74,7 @@ type QueryOpts = {
   newCodec?: boolean;
   ignoreSessionConfig?: boolean;
   implicitLimit?: bigint;
-  ignoreForceDatabaseError?: boolean;
-  replQueryTag?: boolean;
+  userQuery?: boolean;
 };
 
 type PendingQuery = {
@@ -285,11 +284,10 @@ export class Connection extends Model({
       if (opts.ignoreSessionConfig) {
         state = setQueryTag(baseOptions.withGlobals(state.globals), "gel/ui");
       }
-      if (opts.ignoreForceDatabaseError) {
-        state = state.withConfig({force_database_error: "false"});
-      }
-      if (opts.replQueryTag) {
+      if (opts.userQuery) {
         state = setQueryTag(state, "gel/webrepl");
+      } else {
+        state = state.withConfig({force_database_error: "false"});
       }
 
       if (kind === "execute") {
