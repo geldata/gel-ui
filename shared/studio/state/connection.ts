@@ -9,7 +9,7 @@ import {
   Frozen,
 } from "mobx-keystone";
 
-import {AuthenticationError} from "edgedb";
+import {AuthenticationError, ClientError} from "edgedb";
 import {Options} from "edgedb/dist/options";
 import LRU from "edgedb/dist/primitives/lru";
 import {Capabilities} from "edgedb/dist/baseConn";
@@ -362,6 +362,11 @@ export class Connection extends Model({
         params,
         abortSignal
       );
+
+      if (resultBuf.length > 2 ** 28) {
+        throw new ClientError("Result is too large to display");
+      }
+
       const newOutCodec = (
         (this.conn as any).queryCodecCache as LRU<
           string,
