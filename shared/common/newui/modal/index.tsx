@@ -133,11 +133,5 @@ export function ModalContent({
   className,
   ...props
 }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) {
-  return (
-    <div
-      data-testid="payment-form"
-      className={cn(styles.content, className)}
-      {...props}
-    />
-  );
+  return <div className={cn(styles.content, className)} {...props} />;
 }
