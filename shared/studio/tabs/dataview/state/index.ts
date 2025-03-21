@@ -1209,7 +1209,7 @@ export class DataInspector extends Model({
             const typeUnionNames = resolveObjectTypeUnion(
               this.objectType!
             ).map((t) => t.escapedName);
-            return `__count_${field.queryName} := (for g in (
+            return `__count_${field.queryName} := assert_distinct((for g in (
               group ${
                 field.targetHasSelectAccessPolicy && field.required
                   ? `(
@@ -1229,7 +1229,7 @@ export class DataInspector extends Model({
             ) union {
               typename := g.key.typename,
               count := <std::float64>count(g.elements)
-            })`;
+          }))`;
           }
         })
         .filter((line) => !!line)
