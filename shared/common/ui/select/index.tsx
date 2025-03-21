@@ -37,6 +37,8 @@ export type SelectProps<T = any> = {
   | {
       placeholder?: undefined;
       items: null;
+      selectedItemId?: undefined;
+      onChange?: undefined;
     }
   | ((
       | {placeholder?: undefined; selectedItemId: T}
@@ -68,7 +70,10 @@ export function Select<T extends any>({
   searchable,
   disabled,
   placeholder,
-  ...dropdown
+  items,
+  selectedItemId,
+  onChange,
+  ...props
 }: SelectProps<T>) {
   const selectRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -79,23 +84,23 @@ export function Select<T extends any>({
 
   const [searchFilter, setSearchFilter] = useState("");
 
-  const hasDropdown = !!dropdown.items || !!actions;
+  const hasDropdown = !!items || !!actions;
 
   const isMobile = useIsMobile();
   const isFullscreenMobile = useIsMobile() && !!fullScreen;
 
   const flattenedItems = useMemo(() => {
-    if (!dropdown.items) {
+    if (!items) {
       return null;
     }
-    if (Array.isArray(dropdown.items)) {
-      return dropdown.items.map((item) => ({
+    if (Array.isArray(items)) {
+      return items.map((item) => ({
         type: "item",
         item,
         depth: 0,
       })) as FlattenedItems;
     }
-    const list: FlattenedItems = dropdown.items.items.map((item) => ({
+    const list: FlattenedItems = items.items.map((item) => ({
       type: "item",
       item,
       depth: 0,
@@ -113,9 +118,9 @@ export function Select<T extends any>({
         flatten(group.groups, depth + 1);
       }
     };
-    flatten(dropdown.items.groups, 0);
+    flatten(items.groups, 0);
     return list;
-  }, [dropdown.items]);
+  }, [items]);
 
   const searchIndex = useMemo(() => {
     return searchable && flattenedItems
@@ -139,10 +144,9 @@ export function Select<T extends any>({
       : null;
   }, [searchFilter, searchIndex]);
 
-  const selectedItemIndex = dropdown.items
+  const selectedItemIndex = items
     ? flattenedItems!.findIndex(
-        (item) =>
-          item.type === "item" && item.item.id === dropdown.selectedItemId
+        (item) => item.type === "item" && item.item.id === selectedItemId
       )
     : null;
   const selectedItem =
@@ -183,6 +187,7 @@ export function Select<T extends any>({
       className={cn(styles.select, className)}
       onClick={!disabled ? () => setDropdownOpen(true) : undefined}
       data-disabled={disabled}
+      {...props}
     >
       {title ?? selectedItem?.fullLabel ?? selectedItem?.label ?? (
         <span className={styles.placeholder}>{placeholder}</span>
@@ -233,20 +238,20 @@ export function Select<T extends any>({
                   onChange={(e) => setSearchFilter(e.target.value)}
                 />
               ))}
-            {dropdown.items
+            {items
               ? filteredItems
                 ? filteredItems.map((result) => (
                     <div
                       key={result.target}
                       className={cn(styles.dropdownItem, {
                         [styles.dropdownItemSelected]:
-                          dropdown.selectedItemId === result.obj.item.item.id,
+                          selectedItemId === result.obj.item.item.id,
                         [styles.disabled]: !!result.obj.item.item.disabled,
                         [styles.fullScreen]: isFullscreenMobile,
                       })}
                       onClick={() => {
                         setDropdownOpen(false);
-                        dropdown.onChange(result.obj.item.item);
+                        onChange(result.obj.item.item);
                       }}
                     >
                       {highlightString(
@@ -264,7 +269,7 @@ export function Select<T extends any>({
                         item.type === "item"
                           ? {
                               [styles.dropdownItemSelected]:
-                                dropdown.selectedItemId === item.item.id,
+                                selectedItemId === item.item.id,
                               [styles.disabled]: !!item.item.disabled,
                               [styles.fullScreen]: isFullscreenMobile,
                             }
@@ -279,7 +284,7 @@ export function Select<T extends any>({
                         item.type === "item"
                           ? () => {
                               setDropdownOpen(false);
-                              dropdown.onChange(item.item);
+                              onChange(item.item);
                             }
                           : undefined
                       }
@@ -287,9 +292,7 @@ export function Select<T extends any>({
                       {item.type === "item" ? (
                         <div className={styles.itemContent}>
                           <span>{item.item.label}</span>
-                          {dropdown.selectedItemId === item.item.id && (
-                            <CheckIcon />
-                          )}
+                          {selectedItemId === item.item.id && <CheckIcon />}
                         </div>
                       ) : (
                         item.label
