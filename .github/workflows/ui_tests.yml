@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 50
+          fetch-depth: 2
           submodules: true
 
       - name: Set up Node
@@ -25,18 +25,15 @@ jobs:
         with:
           server-version: nightly
 
-      - name: Set up chrome
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
-
-      - name: Set up chromedriver
-        uses: nanasess/setup-chromedriver@v2
-
       - name: Install dev deps
         working-directory: web
         run: |
           yarn
+
+      - name: Install Playwright Browsers
+        working-directory: web
+        run: |
+          yarn playwright install --with-deps chromium
 
       - name: Run tests
         working-directory: web
