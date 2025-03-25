@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 2
+          fetch-depth: 1
           submodules: true
 
       - name: Set up Node
@@ -20,8 +20,8 @@ jobs:
         with:
           node-version: lts/*
 
-      - name: Install EdgeDB
-        uses: edgedb/setup-edgedb@v1
+      - name: Install Gel
+        uses: geldata/setup-gel@v1
         with:
           server-version: nightly
 
