@@ -19,9 +19,7 @@ test.describe("schema", () => {
     await expect(filters).toHaveCount(2);
 
     // there is search input rendered
-    await expect(
-      filterControls.locator("//input[@placeholder='search...']")
-    ).toBeVisible();
+    await expect(filterControls.getByPlaceholder("search...")).toBeVisible();
 
     // search filter with expected options
     await expect(
