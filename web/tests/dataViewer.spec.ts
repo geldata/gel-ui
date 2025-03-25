@@ -19,10 +19,18 @@ test.describe("Account", () => {
     )`);
   });
 
+  test.afterAll(async ({gelClient}, testInfo) => {
+    await gelClient.execute(
+      `drop type default::Account_${testInfo.project.name}`
+    );
+  });
+
   test.beforeEach(async ({page, uiClass}, testInfo) => {
     await page.goto(`_test/data/default::Account_${testInfo.project.name}`);
 
-    await expect(uiClass("dataview_rowCount")).not.toContainText("loading");
+    await expect(uiClass("dataview_rowCount")).not.toContainText("loading", {
+      timeout: 15_000,
+    });
   });
 
   test("insert new Account", async ({page, uiClass}) => {

@@ -1,7 +1,9 @@
 import {test, expect} from "../playwright";
 
 test.describe("queryEditor", () => {
-  test.beforeEach(async ({page, uiClass}) => {
+  test.beforeEach(async ({page, uiClass, mockClipboard}) => {
+    mockClipboard;
+
     await page.goto("_test/editor");
 
     // wait until schema and data loaded
@@ -49,6 +51,7 @@ test.describe("queryEditor", () => {
     test("enter valid query, get results, copy and view them", async ({
       page,
       uiClass,
+      mockClipboard,
     }) => {
       const editor = page.locator(".cm-content");
 
@@ -75,16 +78,16 @@ test.describe("queryEditor", () => {
       await copyButtons.first().click();
       await expect(copyButtons.first()).toContainText("Copied");
 
-      //       expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-      //         `[
-      //   {
-      //     "title": "Ant-Man"
-      //   },
-      //   {
-      //     "title": "Avengers: Age of Ultron"
-      //   }
-      // ]`
-      //       );
+      expect(mockClipboard.getClipboardData()).toBe(
+        `[
+  {
+    "title": "Ant-Man"
+  },
+  {
+    "title": "Avengers: Age of Ultron"
+  }
+]`
+      );
 
       // when clicking on view button, new window is opened
       const viewButtons = await inspector.locator(
