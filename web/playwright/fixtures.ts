@@ -8,7 +8,7 @@ type Fixtures = {
 
 export const test = base.extend<Fixtures>({
   gelClient: ({}, use) => {
-    use(createClient({port: 5656, tlsSecurity: "insecure"}));
+    use(createClient({port: 5656, tlsSecurity: "insecure", branch: "_test"}));
   },
   uiClass: ({page}, use) => {
     use((className: string) => page.locator(`[class*=${className}__]`));

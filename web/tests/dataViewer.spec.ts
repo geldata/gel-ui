@@ -3,8 +3,24 @@ import {test, expect} from "../playwright";
 test.describe("Account", () => {
   test.describe.configure({mode: "serial"});
 
-  test.beforeEach(async ({page, uiClass}) => {
-    await page.goto("_test/data/default::Account");
+  test.beforeAll(async ({gelClient}, testInfo) => {
+    await gelClient.withConfig({allow_bare_ddl: "AlwaysAllow"})
+      .execute(`create type default::Account_${testInfo.project.name} {
+      create required property username -> std::str {
+        create constraint std::exclusive;
+      }
+    };
+
+    for username in {'Alice', 'Billie', 'Cameron', 'Dana'}
+    union (
+      insert default::Account_${testInfo.project.name} {
+        username := username
+      }
+    )`);
+  });
+
+  test.beforeEach(async ({page, uiClass}, testInfo) => {
+    await page.goto(`_test/data/default::Account_${testInfo.project.name}`);
 
     await expect(uiClass("dataview_rowCount")).not.toContainText("loading");
   });
@@ -76,8 +92,6 @@ test.describe("Account", () => {
 });
 
 test.describe("Movie", () => {
-  test.describe.configure({mode: "serial"});
-
   test.beforeEach(async ({page, uiClass}) => {
     await page.goto("_test/data/default::Movie");
 
