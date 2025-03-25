@@ -2,6 +2,7 @@ import {test, expect} from "../playwright";
 
 test.describe("queryEditor", () => {
   test.beforeEach(async ({page, uiClass, mockClipboard}) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     mockClipboard;
 
     await page.goto("_test/editor");

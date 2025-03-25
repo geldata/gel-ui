@@ -103,7 +103,9 @@ test.describe("Movie", () => {
   test.beforeEach(async ({page, uiClass}) => {
     await page.goto("_test/data/default::Movie");
 
-    await expect(uiClass("dataview_rowCount")).not.toContainText("loading");
+    await expect(uiClass("dataview_rowCount")).not.toContainText("loading", {
+      timeout: 15_000,
+    });
   });
 
   test("filter all movies that includes the specific actor and then clear the filter", async ({
