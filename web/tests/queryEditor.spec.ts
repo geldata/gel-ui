@@ -47,7 +47,6 @@ test.describe("queryEditor", () => {
     });
 
     test("enter valid query, get results, copy and view them", async ({
-      context,
       page,
       uiClass,
     }) => {

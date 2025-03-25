@@ -33,7 +33,7 @@ jobs:
       - name: Install Playwright Browsers
         working-directory: web
         run: |
-          yarn playwright install --with-deps chromium
+          yarn playwright install --with-deps chromium firefox webkit
 
       - name: Run tests
         working-directory: web
