@@ -352,13 +352,15 @@ export class Connection extends Model({
 
       this.checkAborted(abortSignal);
 
-      if (!opts.userQuery && !(capabilities & Capabilities.MODIFICATONS)) {
-        const serverVersion = this.serverVersion.data;
-        if (!serverVersion || serverVersion.major >= 6) {
-          state = state.withConfig({
-            default_transaction_isolation: "RepeatableRead",
-          });
-        }
+      const serverVersion = this.serverVersion.data;
+      if (
+        (!serverVersion || serverVersion.major >= 6) &&
+        !(capabilities & Capabilities.MODIFICATONS) &&
+        (!opts.userQuery || !state.config.has("default_transaction_isolation"))
+      ) {
+        state = state.withConfig({
+          default_transaction_isolation: "RepeatableRead",
+        });
       }
 
       const resultBuf = await this.conn.rawExecute(
