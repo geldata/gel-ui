@@ -352,6 +352,12 @@ export class Connection extends Model({
 
       this.checkAborted(abortSignal);
 
+      if (!opts.userQuery && !(capabilities & Capabilities.MODIFICATONS)) {
+        state = state.withConfig({
+          default_transaction_isolation: "RepeatableRead",
+        });
+      }
+
       const resultBuf = await this.conn.rawExecute(
         language,
         queryString,
