@@ -353,7 +353,7 @@ export class Connection extends Model({
       this.checkAborted(abortSignal);
 
       if (!opts.userQuery && !(capabilities & Capabilities.MODIFICATONS)) {
-        const serverVersion = instanceCtx.get(this)!.serverVersion;
+        const serverVersion = this.serverVersion.data;
         if (!serverVersion || serverVersion.major >= 6) {
           state = state.withConfig({
             default_transaction_isolation: "RepeatableRead",
