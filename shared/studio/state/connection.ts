@@ -353,9 +353,12 @@ export class Connection extends Model({
       this.checkAborted(abortSignal);
 
       if (!opts.userQuery && !(capabilities & Capabilities.MODIFICATONS)) {
-        state = state.withConfig({
-          default_transaction_isolation: "RepeatableRead",
-        });
+        const serverVersion = instanceCtx.get(this)!.serverVersion;
+        if (!serverVersion || serverVersion.major >= 6) {
+          state = state.withConfig({
+            default_transaction_isolation: "RepeatableRead",
+          });
+        }
       }
 
       const resultBuf = await this.conn.rawExecute(
