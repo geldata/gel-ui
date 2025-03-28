@@ -177,7 +177,6 @@ export class Connection extends Model({
   @computed
   get sessionConfig() {
     const sessionState = sessionStateCtx.get(this);
-    let config = {};
     if (sessionState === undefined) {
       return {}
     } else {
