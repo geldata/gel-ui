@@ -1158,6 +1158,15 @@ export class DataInspector extends Model({
     }
   }
 
+  fieldNeedsAccessPolicyWorkaround(field: ObjectLinkField): boolean {
+    const config = connCtx.get(this)!.sessionConfig;
+    return (
+      (config["apply_access_policies"] ?? true) &&
+      field.required &&
+      field.targetHasSelectAccessPolicy
+    );
+  }
+
   @computed
   get dataQuery() {
     if (!this.selectedFields.length) {
@@ -1211,7 +1220,7 @@ export class DataInspector extends Model({
             ).map((t) => t.escapedName);
             return `__count_${field.queryName} := (for g in (
               group ${
-                field.targetHasSelectAccessPolicy && field.required
+                this.fieldNeedsAccessPolicyWorkaround(field)
                   ? `(
                 with sourceId := .id
                 select ${field.escapedTypename}
@@ -1476,6 +1485,15 @@ class ExpandedInspector extends Model({
     );
   }
 
+  linkNeedsAccessPolicyWorkaround(link: SchemaLink): boolean {
+    const config = connCtx.get(this)!.sessionConfig;
+    return (
+      (config["apply_access_policies"] ?? true) &&
+      link.required &&
+      pointerTargetHasSelectAccessPolicy(link)
+    );
+  }
+
   @computed
   get dataQuery() {
     const schemaData = dbCtx.get(this)!.schemaData!;
@@ -1506,7 +1524,7 @@ class ExpandedInspector extends Model({
               \`__count___${link.name}\` := 0`;
           }
           const accessPolicyWorkaround =
-            link.required && pointerTargetHasSelectAccessPolicy(link);
+            this.linkNeedsAccessPolicyWorkaround(link);
           const singleLink = link.cardinality === "One";
           const linkName = accessPolicyWorkaround
             ? `__${link.name}`
