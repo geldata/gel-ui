@@ -174,6 +174,19 @@ export class Connection extends Model({
     return setQueryTag(state, "gel/ui");
   }
 
+  @computed
+  get sessionConfig() {
+    const sessionState = sessionStateCtx.get(this);
+    if (sessionState === undefined) {
+      return {}
+    } else {
+      return sessionState.activeState.config.reduce((configs, config) => {
+        configs[config.name] = config.value;
+        return configs;
+      }, {} as {[key: string]: any})
+    }
+  }
+
   query(
     query: string,
     params?: QueryParams,
