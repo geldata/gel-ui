@@ -365,6 +365,17 @@ export class Connection extends Model({
 
       this.checkAborted(abortSignal);
 
+      const serverVersion = this.serverVersion.data;
+      if (
+        (!serverVersion || serverVersion.major >= 6) &&
+        !(capabilities & Capabilities.MODIFICATONS) &&
+        (!opts.userQuery || !state.config.has("default_transaction_isolation"))
+      ) {
+        state = state.withConfig({
+          default_transaction_isolation: "RepeatableRead",
+        });
+      }
+
       const resultBuf = await this.conn.rawExecute(
         language,
         queryString,
