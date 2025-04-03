@@ -30,6 +30,7 @@ export function ModalPanel({
   footerDetails,
   footerButtons,
   footerExtra,
+  ...props
 }: PropsWithChildren<
   | ({noHeader?: false} & Omit<ModalProps, "noCloseOnOverlayClick">)
   | ({
@@ -56,6 +57,7 @@ export function ModalPanel({
           : undefined
       }
       autoComplete="off"
+      {...props}
     >
       {!noHeader ? (
         <div className={styles.header}>
@@ -66,9 +68,13 @@ export function ModalPanel({
             ) : null}
           </div>
           {onClose ? (
-            <div className={styles.closeButton} onClick={onClose}>
+            <button
+              className={styles.closeButton}
+              onClick={onClose}
+              aria-label="Close"
+            >
               <CrossIcon />
-            </div>
+            </button>
           ) : null}
         </div>
       ) : null}
@@ -109,6 +115,7 @@ export function ModalOverlay({
             }
           : undefined
       }
+      role="dialog"
     >
       {children}
     </div>

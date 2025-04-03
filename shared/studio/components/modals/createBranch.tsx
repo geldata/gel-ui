@@ -56,10 +56,10 @@ export default function CreateBranchModal({
         legacy
           ? `create database \`${branchName}\``
           : fromBranch != null
-          ? `create ${
-              copyData ? "data" : "schema"
-            } branch \`${branchName}\` from \`${fromBranch}\``
-          : `create empty branch \`${branchName}\``
+            ? `create ${
+                copyData ? "data" : "schema"
+              } branch \`${branchName}\` from \`${fromBranch}\``
+            : `create empty branch \`${branchName}\``
       );
     } catch (e) {
       setError((e as any).toString());
