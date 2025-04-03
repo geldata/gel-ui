@@ -563,7 +563,6 @@ export class AIAdminState extends Model({
 
   async _handleSSEStream(stream: SSEStream) {
     for await (const event of stream) {
-      console.log(event);
       switch (event.type) {
         case "message_start":
           if (this._currentMessage) {

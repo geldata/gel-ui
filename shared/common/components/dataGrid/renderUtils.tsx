@@ -19,21 +19,26 @@ export function renderCellValue(
   codec: ICodec,
   nested = false
 ): JSX.Element {
-  switch (codec.getKind()) {
-    case "scalar":
-    case "range":
-    case "multirange":
-      return renderValue(
-        value,
-        codec.getKnownTypeName(),
-        codec instanceof EnumCodec,
-        codec instanceof RangeCodec || codec instanceof MultiRangeCodec
-          ? codec.getSubcodecs()[0].getKnownTypeName()
-          : undefined,
-        false,
-        !nested ? inspectorOverrideStyles : undefined,
-        100
-      ).body;
+  const kind = codec.getKind();
+  if (
+    value === null ||
+    kind === "scalar" ||
+    kind === "range" ||
+    kind === "multirange"
+  ) {
+    return renderValue(
+      value,
+      codec.getKnownTypeName(),
+      codec instanceof EnumCodec,
+      codec instanceof RangeCodec || codec instanceof MultiRangeCodec
+        ? codec.getSubcodecs()[0].getKnownTypeName()
+        : undefined,
+      false,
+      !nested ? inspectorOverrideStyles : undefined,
+      100
+    ).body;
+  }
+  switch (kind) {
     case "set":
       return (
         <>

@@ -9,7 +9,7 @@ import {
   Frozen,
 } from "mobx-keystone";
 
-import {AuthenticationError} from "edgedb";
+import {AuthenticationError, ClientError} from "edgedb";
 import {Options} from "edgedb/dist/options";
 import LRU from "edgedb/dist/primitives/lru";
 import {Capabilities} from "edgedb/dist/baseConn";
@@ -74,8 +74,7 @@ type QueryOpts = {
   newCodec?: boolean;
   ignoreSessionConfig?: boolean;
   implicitLimit?: bigint;
-  ignoreForceDatabaseError?: boolean;
-  replQueryTag?: boolean;
+  userQuery?: boolean;
 };
 
 type PendingQuery = {
@@ -173,6 +172,19 @@ export class Connection extends Model({
       );
     }
     return setQueryTag(state, "gel/ui");
+  }
+
+  @computed
+  get sessionConfig() {
+    const sessionState = sessionStateCtx.get(this);
+    if (sessionState === undefined) {
+      return {};
+    } else {
+      return sessionState.activeState.config.reduce((configs, config) => {
+        configs[config.name] = config.value;
+        return configs;
+      }, {} as {[key: string]: any});
+    }
   }
 
   query(
@@ -285,11 +297,10 @@ export class Connection extends Model({
       if (opts.ignoreSessionConfig) {
         state = setQueryTag(baseOptions.withGlobals(state.globals), "gel/ui");
       }
-      if (opts.ignoreForceDatabaseError) {
-        state = state.withConfig({force_database_error: "false"});
-      }
-      if (opts.replQueryTag) {
+      if (opts.userQuery) {
         state = setQueryTag(state, "gel/webrepl");
+      } else {
+        state = state.withConfig({force_database_error: "false"});
       }
 
       if (kind === "execute") {
@@ -354,6 +365,22 @@ export class Connection extends Model({
 
       this.checkAborted(abortSignal);
 
+      const serverVersion = this.serverVersion.data;
+      if (
+        (!serverVersion || serverVersion.major >= 6) &&
+        !(
+          capabilities &
+          (Capabilities.MODIFICATONS |
+            Capabilities.DDL |
+            Capabilities.PERSISTENT_CONFIG)
+        ) &&
+        (!opts.userQuery || !state.config.has("default_transaction_isolation"))
+      ) {
+        state = state.withConfig({
+          default_transaction_isolation: "RepeatableRead",
+        });
+      }
+
       const resultBuf = await this.conn.rawExecute(
         language,
         queryString,
@@ -364,6 +391,11 @@ export class Connection extends Model({
         params,
         abortSignal
       );
+
+      if (resultBuf.length > 2 ** 28) {
+        throw new ClientError("Result is too large to display");
+      }
+
       const newOutCodec = (
         (this.conn as any).queryCodecCache as LRU<
           string,

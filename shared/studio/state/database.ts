@@ -222,7 +222,7 @@ export class DatabaseState extends Model({
     const {result} = await this.connection.query(
       `select count(std::Object)`,
       undefined,
-      {ignoreSessionConfig: true, ignoreForceDatabaseError: true}
+      {ignoreSessionConfig: true}
     );
     if (result) {
       runInAction(() => {
@@ -257,7 +257,7 @@ export class DatabaseState extends Model({
                 versionStr := sys::get_version_as_str(),
               }`,
               undefined,
-              {ignoreSessionConfig: true, ignoreForceDatabaseError: true}
+              {ignoreSessionConfig: true}
             )
             .then(({result}) => ({
               schemaId: `${result![0].versionStr}__${
@@ -300,7 +300,6 @@ export class DatabaseState extends Model({
             conn
               .query(getIntrospectionQuery(edgedbVersion), undefined, {
                 ignoreSessionConfig: true,
-                ignoreForceDatabaseError: true,
               })
               .then(({result}) => {
                 return result![0] as RawIntrospectionResult;
