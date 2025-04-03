@@ -178,12 +178,12 @@ export class Connection extends Model({
   get sessionConfig() {
     const sessionState = sessionStateCtx.get(this);
     if (sessionState === undefined) {
-      return {}
+      return {};
     } else {
       return sessionState.activeState.config.reduce((configs, config) => {
         configs[config.name] = config.value;
         return configs;
-      }, {} as {[key: string]: any})
+      }, {} as {[key: string]: any});
     }
   }
 
@@ -368,7 +368,12 @@ export class Connection extends Model({
       const serverVersion = this.serverVersion.data;
       if (
         (!serverVersion || serverVersion.major >= 6) &&
-        !(capabilities & Capabilities.MODIFICATONS) &&
+        !(
+          capabilities &
+          (Capabilities.MODIFICATONS |
+            Capabilities.DDL |
+            Capabilities.PERSISTENT_CONFIG)
+        ) &&
         (!opts.userQuery || !state.config.has("default_transaction_isolation"))
       ) {
         state = state.withConfig({
