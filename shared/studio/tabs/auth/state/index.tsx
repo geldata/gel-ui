@@ -571,6 +571,7 @@ export class AuthAdminState extends Model({
           [is cfg::SMTPProviderConfig].port,
           [is cfg::SMTPProviderConfig].username,
           [is cfg::SMTPProviderConfig].security,
+          [is cfg::SMTPProviderConfig].validate_certs,
           timeout_per_email_seconds := <str>duration_get([is cfg::SMTPProviderConfig].timeout_per_email, 'totalseconds'),
           timeout_per_attempt_seconds := <str>duration_get([is cfg::SMTPProviderConfig].timeout_per_attempt, 'totalseconds'),
         }`
@@ -1225,7 +1226,7 @@ export class DraftSMTPConfig
             if (typeof val === "string") {
               val = val.trim();
             }
-            if (val == null || val == "") {
+            if (val == null || val === "") {
               return null;
             }
             return `${name} := ${cast ? `<${cast}>` : ""}${JSON.stringify(
@@ -1234,7 +1235,7 @@ export class DraftSMTPConfig
           })
           .filter((s) => s != null)
           .join("\n")}
-      }
+      };
     `
       : fields
           .map(({name, cast}) => {
@@ -1254,7 +1255,7 @@ export class DraftSMTPConfig
       await conn.execute(query);
       await state.refreshConfig();
       if (newSMTPSchema) {
-        state.cancelDraftSMTPProvider();
+        state.cancelDraftSMTPProvider(this.currentConfig?.name);
       } else {
         this.clearForm();
       }
