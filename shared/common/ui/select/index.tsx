@@ -187,6 +187,7 @@ export function Select<T extends any>({
       className={cn(styles.select, className)}
       onClick={!disabled ? () => setDropdownOpen(true) : undefined}
       data-disabled={disabled}
+      role="combobox"
       {...props}
     >
       {title ?? selectedItem?.fullLabel ?? selectedItem?.label ?? (
@@ -207,6 +208,7 @@ export function Select<T extends any>({
             })}
             style={isMobile ? {} : {maxHeight}}
             onClick={(e) => e.stopPropagation()}
+            role="listbox"
           >
             {isFullscreenMobile && (
               <>
@@ -253,6 +255,10 @@ export function Select<T extends any>({
                         setDropdownOpen(false);
                         onChange(result.obj.item.item);
                       }}
+                      role="option"
+                      aria-disabled={
+                        !!result.obj.item.item.disabled || undefined
+                      }
                     >
                       {highlightString(
                         result.target,
@@ -287,6 +293,11 @@ export function Select<T extends any>({
                               onChange(item.item);
                             }
                           : undefined
+                      }
+                      role="option"
+                      aria-disabled={
+                        (item.type === "item" && !!item.item.disabled) ||
+                        undefined
                       }
                     >
                       {item.type === "item" ? (
