@@ -1,10 +1,12 @@
 import * as http from "node:http";
 import {ChildProcess, spawn} from "node:child_process";
 
-import createClient, {AccessError, UnknownDatabaseError} from "edgedb";
-import Event from "edgedb/dist/primitives/event";
+import {createClient, AccessError, UnknownDatabaseError} from "edgedb";
+import _event from "edgedb/dist/primitives/event.js";
 
-import {schemaScript} from "@edgedb/studio/tabs/dashboard/exampleSchema";
+import {schemaScript} from "@edgedb/studio/tabs/dashboard/exampleSchema.mts";
+
+class Event extends ((_event as any).default as typeof _event) {}
 
 const STARTUP_TIMEOUT = 5 * 60_000;
 
