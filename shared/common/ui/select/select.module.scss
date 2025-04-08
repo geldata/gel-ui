@@ -195,7 +195,7 @@
     pointer-events: none;
   }
 
-  &:hover {
+  &.dropdownItemHighlighted {
     background: var(--app-accent-green);
     color: #fff;
 
