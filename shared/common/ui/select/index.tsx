@@ -7,6 +7,7 @@ import cn from "@edgedb/common/utils/classNames";
 
 import styles from "./select.module.scss";
 import {useIsMobile} from "../../hooks/useMobile";
+import {useKeyboardShortcut} from "../../hooks/useKeyboardShortcut";
 import {CrossIcon, DropdownIcon, SearchIcon, CheckIcon} from "../icons";
 
 export interface SelectItem<T = any> {
@@ -182,6 +183,8 @@ export function Select<T extends any>({
     }
   }, [dropdownOpen]);
 
+  useKeyboardShortcut("p", () => setDropdownOpen((prev) => !prev));
+
   function navigateFilter(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Escape") {
       return setDropdownOpen(false);
@@ -257,14 +260,19 @@ export function Select<T extends any>({
                   />
                 </div>
               ) : (
-                <input
-                  ref={searchRef}
-                  className={styles.searchInput}
-                  placeholder="Search..."
-                  value={searchFilter}
-                  onKeyDown={(e) => navigateFilter(e)}
-                  onChange={(e) => setSearchFilter(e.target.value)}
-                />
+                <span className={styles.searchInputWrapper}>
+                  <input
+                    ref={searchRef}
+                    className={styles.searchInput}
+                    placeholder="Search..."
+                    value={searchFilter}
+                    onKeyDown={(e) => navigateFilter(e)}
+                    onChange={(e) => setSearchFilter(e.target.value)}
+                  />
+                  <kbd className={styles.keyboardDiscovery}>
+                    <span className={styles.modifier}>⌘</span>P
+                  </kbd>
+                </span>
               ))}
             {items
               ? filteredItems
