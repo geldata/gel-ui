@@ -192,6 +192,7 @@ export function Select<T extends any>({
       setDropdownOpen(false);
       return onChange?.(highlightedItem);
     } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    e.preventDefault();
       const applicableList: SelectItem[] = filteredItems
         ? filteredItems.map((item) => item.obj.item.item)
         : (flattenedItems || [])
@@ -203,7 +204,7 @@ export function Select<T extends any>({
           (item) => item.id === prev?.id
         );
         return applicableList.at(
-          prevSelectedItemIndex + (e.key === "ArrowDown" ? 1 : -1)
+          (prevSelectedItemIndex + (e.key === "ArrowDown" ? 1 : -1)) % applicableList.length
         );
       });
     }
