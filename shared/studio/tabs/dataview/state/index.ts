@@ -1274,13 +1274,23 @@ export class DataInspector extends Model({
 
   _getStrippedFilter() {
     const filter = this.filterEditStr.toString();
+    // strip out first lines starting with a comment as we know the # symbol
+    // can't be part of the filter expr in a string yet, and we need the actual
+    // start of the expr to remove any 'filter' keyword prefix
+    const lines = filter.split("\n");
+    const start = lines.findIndex((line) => !/^\s*#/.test(line));
     return [
-      filter
-        .replace(/#.*/g, "")
-        .trimStart()
-        .replace(/^filter\s/i, "")
-        .trimEnd()
-        .replace(/;+$/, ""),
+      // wrap with newlines so any further comments can't break the query this
+      // filter gets embedded into, and the compiler will handle them correctly
+      "\n" +
+        lines
+          .slice(start == -1 ? 0 : start)
+          .join("\n")
+          .trimStart()
+          .replace(/^filter\s/i, "")
+          .trimEnd()
+          .replace(/;+$/, "") +
+        "\n",
       filter,
     ] as [string, string];
   }
