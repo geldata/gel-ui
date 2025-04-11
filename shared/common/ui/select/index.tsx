@@ -7,6 +7,7 @@ import cn from "@edgedb/common/utils/classNames";
 
 import styles from "./select.module.scss";
 import {useIsMobile} from "../../hooks/useMobile";
+import {useKeyboardShortcut} from "../../hooks/useKeyboardShortcut";
 import {CrossIcon, DropdownIcon, SearchIcon, CheckIcon} from "../icons";
 
 export interface SelectItem<T = any> {
@@ -83,6 +84,9 @@ export function Select<T extends any>({
   const [maxHeight, setMaxHeight] = useState<number | undefined>(undefined);
 
   const [searchFilter, setSearchFilter] = useState("");
+  const [highlightedItem, setHighlightedItem] = useState<
+    SelectItem | undefined
+  >();
 
   const hasDropdown = !!items || !!actions;
 
@@ -179,6 +183,33 @@ export function Select<T extends any>({
     }
   }, [dropdownOpen]);
 
+  useKeyboardShortcut("p", () => setDropdownOpen((prev) => !prev));
+
+  function navigateFilter(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Escape") {
+      return setDropdownOpen(false);
+    } else if (e.key === "Enter" && highlightedItem) {
+      setDropdownOpen(false);
+      return onChange?.(highlightedItem);
+    } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    e.preventDefault();
+      const applicableList: SelectItem[] = filteredItems
+        ? filteredItems.map((item) => item.obj.item.item)
+        : (flattenedItems || [])
+            .filter((item) => item.type === "item")
+            .map((item) => item.item);
+
+      setHighlightedItem((prev) => {
+        const prevSelectedItemIndex = applicableList.findIndex(
+          (item) => item.id === prev?.id
+        );
+        return applicableList.at(
+          (prevSelectedItemIndex + (e.key === "ArrowDown" ? 1 : -1)) % applicableList.length
+        );
+      });
+    }
+  }
+
   const defaultItemPaddingLeft = isMobile ? 24 : 12;
 
   return (
@@ -230,13 +261,19 @@ export function Select<T extends any>({
                   />
                 </div>
               ) : (
-                <input
-                  ref={searchRef}
-                  className={styles.searchInput}
-                  placeholder="Search..."
-                  value={searchFilter}
-                  onChange={(e) => setSearchFilter(e.target.value)}
-                />
+                <span className={styles.searchInputWrapper}>
+                  <input
+                    ref={searchRef}
+                    className={styles.searchInput}
+                    placeholder="Search..."
+                    value={searchFilter}
+                    onKeyDown={(e) => navigateFilter(e)}
+                    onChange={(e) => setSearchFilter(e.target.value)}
+                  />
+                  <kbd className={styles.keyboardDiscovery}>
+                    <span className={styles.modifier}>⌘</span>P
+                  </kbd>
+                </span>
               ))}
             {items
               ? filteredItems
@@ -244,11 +281,16 @@ export function Select<T extends any>({
                     <div
                       key={result.target}
                       className={cn(styles.dropdownItem, {
+                        [styles.dropdownItemHighlighted]:
+                          result.obj.item.item.id == highlightedItem?.id,
                         [styles.dropdownItemSelected]:
                           selectedItemId === result.obj.item.item.id,
                         [styles.disabled]: !!result.obj.item.item.disabled,
                         [styles.fullScreen]: isFullscreenMobile,
                       })}
+                      onMouseEnter={() =>
+                        setHighlightedItem(result.obj.item.item)
+                      }
                       onClick={() => {
                         setDropdownOpen(false);
                         onChange(result.obj.item.item);
@@ -268,6 +310,8 @@ export function Select<T extends any>({
                         styles.dropdownItem,
                         item.type === "item"
                           ? {
+                              [styles.dropdownItemHighlighted]:
+                                item.item.id == highlightedItem?.id,
                               [styles.dropdownItemSelected]:
                                 selectedItemId === item.item.id,
                               [styles.disabled]: !!item.item.disabled,
@@ -280,6 +324,9 @@ export function Select<T extends any>({
                           defaultItemPaddingLeft + 10 * item.depth
                         }px`,
                       }}
+                      onMouseEnter={() =>
+                        item.type == "item" && setHighlightedItem(item.item)
+                      }
                       onClick={
                         item.type === "item"
                           ? () => {
