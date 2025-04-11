@@ -4,7 +4,7 @@ export function useKeyboardShortcut(key: string, callback: Function) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-      const isKeyPressed = event.key.toLowerCase() === key.toLowerCase();
+      const isKeyPressed = event.key === key;
 
       if (
         (isMac && event.metaKey && isKeyPressed) ||
