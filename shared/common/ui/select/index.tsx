@@ -34,6 +34,7 @@ export type SelectProps<T = any> = {
   actions?: {label: string | JSX.Element; action: () => void}[];
   searchable?: boolean;
   disabled?: boolean;
+  shortcutKey?: string | null;
 } & (
   | {
       placeholder?: undefined;
@@ -74,6 +75,7 @@ export function Select<T extends any>({
   items,
   selectedItemId,
   onChange,
+  shortcutKey = null,
   ...props
 }: SelectProps<T>) {
   const selectRef = useRef<HTMLDivElement>(null);
@@ -183,7 +185,7 @@ export function Select<T extends any>({
     }
   }, [dropdownOpen]);
 
-  useKeyboardShortcut("p", () => setDropdownOpen((prev) => !prev));
+  useKeyboardShortcut(shortcutKey, () => setDropdownOpen((prev) => !prev));
 
   function navigateFilter(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Escape") {
@@ -192,7 +194,7 @@ export function Select<T extends any>({
       setDropdownOpen(false);
       return onChange?.(highlightedItem);
     } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-    e.preventDefault();
+      e.preventDefault();
       const applicableList: SelectItem[] = filteredItems
         ? filteredItems.map((item) => item.obj.item.item)
         : (flattenedItems || [])
@@ -204,7 +206,8 @@ export function Select<T extends any>({
           (item) => item.id === prev?.id
         );
         return applicableList.at(
-          (prevSelectedItemIndex + (e.key === "ArrowDown" ? 1 : -1)) % applicableList.length
+          (prevSelectedItemIndex + (e.key === "ArrowDown" ? 1 : -1)) %
+            applicableList.length
         );
       });
     }

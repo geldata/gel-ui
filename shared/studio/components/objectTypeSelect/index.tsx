@@ -91,6 +91,7 @@ export function ObjectTypeSelect({
       selectedItemId={selectedObjectType}
       onChange={(item) => action(item.id)}
       searchable
+      shortcutKey="p"
     />
   );
 }

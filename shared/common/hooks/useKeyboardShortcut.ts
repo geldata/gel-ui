@@ -1,7 +1,9 @@
 import {useEffect} from "react";
 
-export function useKeyboardShortcut(key: string, callback: Function) {
+export function useKeyboardShortcut(key: string | null, callback: Function) {
   useEffect(() => {
+    if (key == null) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
       const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
       const isKeyPressed = event.key === key;
