@@ -32,7 +32,7 @@ export const DatabaseDashboard = observer(function DatabaseDashboard() {
 
   useEffect(() => {
     if (dbState.schemaId != null) {
-      dbState.updateObjectCount();
+      return dbState.updateObjectCount();
     }
   }, [dbState.schemaId]);
 
