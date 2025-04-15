@@ -218,17 +218,30 @@ export class DatabaseState extends Model({
     };
   }
 
-  async updateObjectCount() {
-    const {result} = await this.connection.query(
-      `select count(std::Object)`,
-      undefined,
-      {ignoreSessionConfig: true}
-    );
-    if (result) {
-      runInAction(() => {
-        this.objectCount = Number(result[0]);
+  updateObjectCount() {
+    const abortController = new AbortController();
+    this.connection
+      .query(
+        `select count(std::Object)`,
+        undefined,
+        {ignoreSessionConfig: true},
+        abortController.signal
+      )
+      .then(({result}) => {
+        if (result) {
+          runInAction(() => {
+            this.objectCount = Number(result[0]);
+          });
+        }
+      })
+      .catch((err) => {
+        if (!(err instanceof DOMException && err.name === "AbortError")) {
+          throw err;
+        }
       });
-    }
+    return () => {
+      abortController.abort();
+    };
   }
 
   @modelFlow
@@ -257,7 +270,7 @@ export class DatabaseState extends Model({
                 versionStr := sys::get_version_as_str(),
               }`,
               undefined,
-              {ignoreSessionConfig: true}
+              {ignoreSessionConfig: true, blocking: true}
             )
             .then(({result}) => ({
               schemaId: `${result![0].versionStr}__${
@@ -300,6 +313,7 @@ export class DatabaseState extends Model({
             conn
               .query(getIntrospectionQuery(edgedbVersion), undefined, {
                 ignoreSessionConfig: true,
+                blocking: true,
               })
               .then(({result}) => {
                 return result![0] as RawIntrospectionResult;
