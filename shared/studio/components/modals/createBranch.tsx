@@ -52,7 +52,7 @@ export default function CreateBranchModal({
 
   const onSubmit = handleSubmit(async ({branchName, fromBranch, copyData}) => {
     try {
-      await instanceState.defaultConnection?.query(
+      await instanceState.defaultConnection?.execute(
         legacy
           ? `create database \`${branchName}\``
           : fromBranch != null

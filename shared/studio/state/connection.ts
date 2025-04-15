@@ -75,6 +75,7 @@ type QueryOpts = {
   ignoreSessionConfig?: boolean;
   implicitLimit?: bigint;
   userQuery?: boolean;
+  blocking?: boolean;
 };
 
 type PendingQuery = {
@@ -121,6 +122,24 @@ export function createAuthenticatedFetch({
   };
 }
 
+function initConnPool(
+  config: ConnectConfig,
+  serverVersion: {major: number; minor: number} | null,
+  size = 3
+): AdminUIFetchConnection[] {
+  const authedFetch = createAuthenticatedFetch(config);
+
+  return Array(size)
+    .fill(null)
+    .map(() =>
+      AdminUIFetchConnection.create(
+        authedFetch,
+        codecsRegistry,
+        serverVersion ? [serverVersion.major, serverVersion.minor] : undefined
+      )
+    );
+}
+
 function setQueryTag(options: Options, tag: string) {
   const annos = new Map((options as any).annotations as Map<string, string>);
   annos.set("tag", tag);
@@ -134,15 +153,9 @@ export class Connection extends Model({
   config: prop<Frozen<ConnectConfig>>(),
   serverVersion: prop<Frozen<{major: number; minor: number} | null>>(),
 }) {
-  conn = AdminUIFetchConnection.create(
-    createAuthenticatedFetch(this.config.data),
-    codecsRegistry,
-    this.serverVersion.data
-      ? [this.serverVersion.data.major, this.serverVersion.data.minor]
-      : undefined
-  );
+  private _connPool = initConnPool(this.config.data, this.serverVersion.data);
 
-  private _runningQuery = false;
+  private _runningBlockingQuery = false;
 
   private _codecCache = new LRU<string, [any, any, Uint8Array, number]>({
     capacity: 200,
@@ -234,7 +247,7 @@ export class Connection extends Model({
     opts: QueryOpts = {}
   ) {
     return new Promise<any>((resolve, reject) => {
-      this._queryQueue.push({
+      const pendingQuery: PendingQuery = {
         kind,
         language,
         query,
@@ -243,21 +256,32 @@ export class Connection extends Model({
         abortSignal,
         resolve,
         reject,
+      };
+      this._queryQueue.push(pendingQuery);
+
+      abortSignal?.addEventListener("abort", () => {
+        const queueIndex = this._queryQueue.indexOf(pendingQuery);
+        if (queueIndex !== -1) {
+          this._queryQueue.splice(queueIndex, 1);
+          reject(new DOMException("The operation was aborted.", "AbortError"));
+        }
       });
 
-      if (!this._runningQuery) {
-        this._processQueryQueue();
-      }
+      this._processQueryQueue();
     });
   }
 
   @action
   async _processQueryQueue() {
-    const query = this._queryQueue.shift();
-    if (query) {
-      this._runningQuery = true;
+    if (this._runningBlockingQuery) return;
+
+    if (this._queryQueue.length && this._connPool.length) {
+      const query = this._queryQueue.shift()!;
+      this._runningBlockingQuery = query.opts.blocking ?? false;
+      const conn = this._connPool.pop()!;
       try {
         const result = await this._query(
+          conn,
           query.kind,
           query.language,
           query.query,
@@ -269,9 +293,9 @@ export class Connection extends Model({
       } catch (e: any) {
         query.reject(e);
       }
+      this._connPool.push(conn);
+      this._runningBlockingQuery = false;
       this._processQueryQueue();
-    } else {
-      this._runningQuery = false;
     }
   }
 
@@ -282,6 +306,7 @@ export class Connection extends Model({
   }
 
   async _query(
+    conn: AdminUIFetchConnection,
     kind: QueryKind,
     language: Language,
     queryString: string,
@@ -304,7 +329,7 @@ export class Connection extends Model({
       }
 
       if (kind === "execute") {
-        await this.conn.rawExecute(
+        await conn.rawExecute(
           language,
           queryString,
           state,
@@ -337,7 +362,7 @@ export class Connection extends Model({
           this._codecCache.get(queryString)!;
       } else {
         [inCodec, outCodec, _, outCodecBuf, _, capabilities] =
-          await this.conn.rawParse(
+          await conn.rawParse(
             language,
             queryString,
             state,
@@ -358,7 +383,7 @@ export class Connection extends Model({
         return {
           inCodec,
           outCodecBuf,
-          protoVer: this.conn.protocolVersion,
+          protoVer: conn.protocolVersion,
           duration: Math.round(parseEndTime - startTime),
         };
       }
@@ -381,7 +406,7 @@ export class Connection extends Model({
         });
       }
 
-      const resultBuf = await this.conn.rawExecute(
+      const resultBuf = await conn.rawExecute(
         language,
         queryString,
         state,
@@ -397,12 +422,12 @@ export class Connection extends Model({
       }
 
       const newOutCodec = (
-        (this.conn as any).queryCodecCache as LRU<
+        (conn as any).queryCodecCache as LRU<
           string,
           [number, ICodec, ICodec, number]
         >
       ).get(
-        (this.conn as any)._getQueryCacheKey(
+        (conn as any)._getQueryCacheKey(
           queryString,
           OutputFormat.BINARY,
           Cardinality.MANY
@@ -411,7 +436,7 @@ export class Connection extends Model({
       if (newOutCodec && newOutCodec?.tid !== outCodec.tid) {
         this.checkAborted(abortSignal);
         [inCodec, outCodec, _, outCodecBuf, _, capabilities] =
-          await this.conn.rawParse(
+          await conn.rawParse(
             language,
             queryString,
             state,
@@ -438,15 +463,15 @@ export class Connection extends Model({
           outCodecBuf,
           resultBuf,
           state,
-          this.conn.protocolVersion,
+          conn.protocolVersion,
           opts.newCodec
         ),
         duration,
         outCodecBuf,
         resultBuf,
-        protoVer: this.conn.protocolVersion,
+        protoVer: conn.protocolVersion,
         capabilities,
-        status: (this.conn as any).lastStatus,
+        status: (conn as any).lastStatus,
       };
     } catch (err) {
       if (err instanceof AuthenticationError) {
