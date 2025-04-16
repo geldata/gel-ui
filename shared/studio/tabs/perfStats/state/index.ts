@@ -10,7 +10,7 @@ import {
   paramsQueryCtx,
   QueryParamsEditor,
 } from "../../queryEditor/state/parameters";
-import {Language} from "edgedb/dist/ifaces";
+import {Language} from "gel/dist/ifaces";
 import {calculateHistogram} from "../utils";
 
 export type QueryType = "EdgeQL" | "SQL";

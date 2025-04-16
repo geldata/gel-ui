@@ -64,12 +64,12 @@ import {ExplainStateType} from "../../components/explainVis/state";
 import {LabelsSwitch, switchState} from "@edgedb/common/ui/switch";
 import {useIsMobile} from "@edgedb/common/hooks/useMobile";
 import {EdgeDBSet} from "@edgedb/common/decodeRawBuffer";
-import {ObjectCodec} from "edgedb/dist/codecs/object";
-import {ICodec} from "edgedb/dist/codecs/ifaces";
+import {ObjectCodec} from "gel/dist/codecs/object";
+import {ICodec} from "gel/dist/codecs/ifaces";
 import {SplitViewDirection} from "@edgedb/common/ui/splitView/model";
 import {createPortal} from "react-dom";
 import {RelativeTime} from "@edgedb/common/utils/relativeTime";
-import {RecordCodec} from "edgedb/dist/codecs/record";
+import {RecordCodec} from "gel/dist/codecs/record";
 
 export const QueryEditorView = observer(function QueryEditorView() {
   const editorState = useTabState(QueryEditor);

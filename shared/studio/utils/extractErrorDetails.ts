@@ -1,6 +1,6 @@
-import {EdgeDBError} from "edgedb";
-import {Language} from "edgedb/dist/ifaces";
-import {utf8Decoder} from "edgedb/dist/primitives/buffer";
+import {GelError} from "gel";
+import {Language} from "gel/dist/ifaces";
+import {utf8Decoder} from "gel/dist/primitives/buffer";
 
 enum ErrorField {
   hint = 0x0001,
@@ -48,7 +48,7 @@ export function extractErrorDetails(
     msg: (err as any)._message ?? err.message,
   };
 
-  if (err instanceof EdgeDBError && (err as any)._attrs) {
+  if (err instanceof GelError && (err as any)._attrs) {
     const attrs = (err as any)._attrs as Map<number, Uint8Array>;
     const hint = attrs.get(ErrorField.hint);
     if (hint) {

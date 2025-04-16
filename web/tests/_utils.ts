@@ -1,4 +1,4 @@
-import {createClient} from "edgedb";
+import {createClient} from "gel";
 import type {Locator, WebElement} from "selenium-webdriver";
 
 export const client = createClient({port: 5656, tlsSecurity: "insecure"});

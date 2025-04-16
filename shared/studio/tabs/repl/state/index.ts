@@ -47,10 +47,10 @@ import {
   createResultGridState,
   ResultGridState,
 } from "@edgedb/common/components/resultGrid";
-import LRU from "edgedb/dist/primitives/lru";
+import LRU from "gel/dist/primitives/lru";
 import {Completer} from "../../../utils/completer";
 import {OutputMode} from "../../queryEditor/state";
-import {Language} from "edgedb/dist/ifaces";
+import {Language} from "gel/dist/ifaces";
 
 export const defaultItemHeight = 85;
 

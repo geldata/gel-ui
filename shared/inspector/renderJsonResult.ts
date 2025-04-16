@@ -1,6 +1,6 @@
-import {Float16Array, SparseVector, type _ICodec as ICodec} from "edgedb";
-import type {ObjectCodec} from "edgedb/dist/codecs/object";
-import type {NamedTupleCodec} from "edgedb/dist/codecs/namedtuple";
+import {Float16Array, SparseVector, type _ICodec as ICodec} from "gel";
+import type {ObjectCodec} from "gel/dist/codecs/object";
+import type {NamedTupleCodec} from "gel/dist/codecs/namedtuple";
 import {
   float16ArrayToString,
   float32ArrayToString,
