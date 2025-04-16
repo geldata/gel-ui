@@ -4,23 +4,24 @@ import {createContext, _async, _await} from "mobx-keystone";
 import {
   AuthenticationError,
   ClientError,
-  EdgeDBError,
+  GelError,
   SHOULD_RETRY,
   TransactionConflictError,
-} from "edgedb";
-import {Options} from "edgedb/dist/options";
-import LRU from "edgedb/dist/primitives/lru";
-import {Capabilities} from "edgedb/dist/baseConn";
-import {AdminUIFetchConnection} from "edgedb/dist/fetchConn";
+} from "gel";
+import {Options} from "gel/dist/options";
+import LRU from "gel/dist/primitives/lru";
+import {Capabilities} from "gel/dist/baseConn";
+import {AdminUIFetchConnection} from "gel/dist/fetchConn";
+
 import {
   Cardinality,
   Language,
   OutputFormat,
   ProtocolVersion,
   QueryOptions,
-} from "edgedb/dist/ifaces";
-import {ICodec} from "edgedb/dist/codecs/ifaces";
-import {sleep} from "edgedb/dist/utils";
+} from "gel/dist/ifaces";
+import {ICodec} from "gel/dist/codecs/ifaces";
+import {sleep} from "gel/dist/utils";
 
 import {
   decode,
@@ -188,24 +189,18 @@ export class Connection {
 
     if (this.sessionState?.activeState.globals.length) {
       state = state.withGlobals(
-        this.sessionState.activeState.globals.reduce(
-          (globals, global) => {
-            globals[global.name] = global.value;
-            return globals;
-          },
-          {} as {[key: string]: any}
-        )
+        this.sessionState.activeState.globals.reduce((globals, global) => {
+          globals[global.name] = global.value;
+          return globals;
+        }, {} as {[key: string]: any})
       );
     }
     if (this.sessionState?.activeState.config.length) {
       state = state.withConfig(
-        this.sessionState.activeState.config.reduce(
-          (configs, config) => {
-            configs[config.name] = config.value;
-            return configs;
-          },
-          {} as {[key: string]: any}
-        )
+        this.sessionState.activeState.config.reduce((configs, config) => {
+          configs[config.name] = config.value;
+          return configs;
+        }, {} as {[key: string]: any})
       );
     }
     return setQueryTag(state, "gel/ui");
@@ -214,13 +209,10 @@ export class Connection {
   @computed
   get sessionConfig() {
     return (
-      this.sessionState?.activeState.config.reduce(
-        (configs, config) => {
-          configs[config.name] = config.value;
-          return configs;
-        },
-        {} as {[key: string]: any}
-      ) ?? {}
+      this.sessionState?.activeState.config.reduce((configs, config) => {
+        configs[config.name] = config.value;
+        return configs;
+      }, {} as {[key: string]: any}) ?? {}
     );
   }
 
@@ -340,7 +332,7 @@ export class Connection {
           throw error;
         }
         if (
-          ((error instanceof EdgeDBError && error.hasTag(SHOULD_RETRY)) ||
+          ((error instanceof GelError && error.hasTag(SHOULD_RETRY)) ||
             error instanceof TypeError) &&
           (capabilities === 0 || error instanceof TransactionConflictError)
         ) {
@@ -421,7 +413,7 @@ export class Connection {
         [inCodec, outCodec, outCodecBuf, capabilities] =
           this._codecCache.get(queryString)!;
       } else {
-        [inCodec, outCodec, _, outCodecBuf, _, capabilities] =
+        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf] =
           await conn.rawParse(
             language,
             queryString,
@@ -432,7 +424,7 @@ export class Connection {
         this._codecCache.set(queryString, [
           inCodec,
           outCodec,
-          outCodecBuf,
+          outCodecBuf!,
           capabilities,
         ]);
       }
@@ -442,7 +434,7 @@ export class Connection {
       if (kind === "parse") {
         return {
           inCodec,
-          outCodecBuf,
+          outCodecBuf: outCodecBuf!,
           protoVer: conn.protocolVersion,
           duration: Math.round(parseEndTime - startTime),
         };
@@ -466,7 +458,7 @@ export class Connection {
         });
       }
 
-      const resultBuf = await conn.rawExecute(
+      const [resultBuf] = await conn.rawExecute(
         language,
         queryString,
         state,
@@ -495,7 +487,7 @@ export class Connection {
       )?.[2];
       if (newOutCodec && newOutCodec?.tid !== outCodec.tid) {
         this.checkAborted(abortSignal);
-        [inCodec, outCodec, _, outCodecBuf, _, capabilities] =
+        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf] =
           await conn.rawParse(
             language,
             queryString,
@@ -506,7 +498,7 @@ export class Connection {
         this._codecCache.set(queryString, [
           inCodec,
           outCodec,
-          outCodecBuf,
+          outCodecBuf!,
           capabilities,
         ]);
       }
@@ -520,14 +512,14 @@ export class Connection {
 
       return {
         result: decode(
-          outCodecBuf,
+          outCodecBuf!,
           resultBuf,
           state,
           conn.protocolVersion,
           opts.newCodec
         ),
         duration,
-        outCodecBuf,
+        outCodecBuf: outCodecBuf!,
         resultBuf,
         protoVer: conn.protocolVersion,
         capabilities,

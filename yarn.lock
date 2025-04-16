@@ -183,7 +183,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@edgedb/common@workspace:shared/common"
   peerDependencies:
-    edgedb: 1.6.0-canary.20250120T111308
+    gel: ^2.0.2
     react: ^18.0.0
     react-dom: ^18.0.0
   languageName: unknown
@@ -200,7 +200,7 @@ __metadata:
     mobx-react-lite: ^4.0.0
     react-window: ^1.8.10
   peerDependencies:
-    edgedb: 1.6.0-canary.20250120T111308
+    gel: ^2.0.2
     react: ^18.0.0
     react-dom: ^18.0.0
   languageName: unknown
@@ -229,7 +229,7 @@ __metadata:
     react-transition-group: ^4.4.1
     webcola: ^3.4.0
   peerDependencies:
-    edgedb: 1.6.0-canary.20250120T111308
+    gel: ^2.0.2
     react: ^18.0.0
     react-dom: ^18.0.0
   languageName: unknown
@@ -266,7 +266,7 @@ __metadata:
     react-markdown: ^9.0.1
     react-window: ^1.8.10
   peerDependencies:
-    edgedb: 1.6.0-canary.20250120T111308
+    gel: ^2.0.2
     react: ^18.0.0
     react-dom: ^18.0.0
   languageName: unknown
@@ -2294,22 +2294,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"edgedb@npm:1.6.0-canary.20250120T111308":
-  version: 1.6.0-canary.20250120T111308
-  resolution: "edgedb@npm:1.6.0-canary.20250120T111308"
-  dependencies:
-    "@petamoriken/float16": ^3.8.7
-    debug: ^4.3.4
-    env-paths: ^3.0.0
-    semver: ^7.6.2
-    shell-quote: ^1.8.1
-    which: ^4.0.0
-  bin:
-    edgedb: dist/cli.mjs
-  checksum: 014a5daf756b9f4ed1a917c0bdb3563ac1d2522939b8a9b214819962ac09531c056f4003f7c2af763ece1d72ba928aa5a82192305c4cc59863eca81209ea57b5
-  languageName: node
-  linkType: hard
-
 "emoji-regex@npm:^8.0.0":
   version: 8.0.0
   resolution: "emoji-regex@npm:8.0.0"
@@ -2796,6 +2780,22 @@ __metadata:
     strip-ansi: ^6.0.1
     wide-align: ^1.1.5
   checksum: baf982238a5270def90a4895f2e083b5cf8e6f7df20b53b24a932845aec363a6cf411f88b33dcb016a43c9334fdfccd956e4514ee875d70af016bf6fead3d3ae
+  languageName: node
+  linkType: hard
+
+"gel@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "gel@npm:2.0.2"
+  dependencies:
+    "@petamoriken/float16": ^3.8.7
+    debug: ^4.3.4
+    env-paths: ^3.0.0
+    semver: ^7.6.2
+    shell-quote: ^1.8.1
+    which: ^4.0.0
+  bin:
+    gel: dist/cli.mjs
+  checksum: cbd7dd4e90ec12b17fb7ef1b5eb81170d4e87a7f523528206ef1dfdcddd2d45943e2e58809cab209c1422c6e2ee761cccf2f7bd974d26cb839baea105fa63219
   languageName: node
   linkType: hard
 
@@ -5390,10 +5390,10 @@ __metadata:
     "@types/react": ^18.3.1
     "@types/react-dom": ^18.3.1
     "@vitejs/plugin-react-swc": ^3.5.0
-    edgedb: 1.6.0-canary.20250120T111308
     eslint: ^9.13.0
     eslint-plugin-react-hooks: ^5.0.0
     eslint-plugin-react-refresh: ^0.4.14
+    gel: ^2.0.2
     generic-names: ^4.0.0
     globals: ^15.11.0
     mobx: ^6.5.0

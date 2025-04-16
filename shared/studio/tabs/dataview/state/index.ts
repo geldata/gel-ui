@@ -17,8 +17,8 @@ import {NavigateFunction} from "../../../hooks/dbRoute";
 
 import {Text} from "@codemirror/state";
 
-import {CardinalityViolationError, _ICodec} from "edgedb";
-import {ObjectCodec} from "edgedb/dist/codecs/object";
+import {CardinalityViolationError, _ICodec} from "gel";
+import {ObjectCodec} from "gel/dist/codecs/object";
 
 import {EdgeDBSet} from "../../../utils/decodeRawBuffer";
 

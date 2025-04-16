@@ -14,7 +14,7 @@ import {
   ModelTypeInfo,
 } from "mobx-keystone";
 
-import {DuplicateDatabaseDefinitionError} from "edgedb";
+import {DuplicateDatabaseDefinitionError} from "gel";
 
 import {cleanupOldSchemaDataForInstance} from "../idbStore";
 
@@ -87,7 +87,7 @@ export class InstanceState extends Model({
   private async _sysConnFetch(query: string, single = false) {
     const data = (await this.getConnection("__edgedbsys__").query(query))
       .result;
-    return data && single ? (data[0] ?? null) : data;
+    return data && single ? data[0] ?? null : data;
   }
 
   private get databasesQuery() {

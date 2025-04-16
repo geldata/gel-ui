@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 
-import {getHTTPSCRAMAuth} from "edgedb/dist/httpScram";
-import {cryptoUtils} from "edgedb/dist/browserCrypto";
+import {getHTTPSCRAMAuth} from "gel/dist/httpScram";
+import {cryptoUtils} from "gel/dist/browserCrypto";
 
 import {
   ModalPanel,

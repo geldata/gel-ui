@@ -10,7 +10,7 @@ import {
 import {observable, computed, action, autorun} from "mobx";
 import {Text} from "@codemirror/state";
 
-import {Language} from "edgedb/dist/ifaces";
+import {Language} from "gel/dist/ifaces";
 
 import {
   deserializeResolvedParameter,

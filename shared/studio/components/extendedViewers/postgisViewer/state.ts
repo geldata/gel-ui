@@ -9,7 +9,7 @@ import {lightLayers, darkLayers} from "./styles/layers";
 import {Theme} from "@edgedb/common/hooks/useTheme";
 import {assertNever} from "@edgedb/common/utils/assertNever";
 
-import * as PostGIS from "edgedb/dist/datatypes/postgis";
+import * as PostGIS from "gel/dist/datatypes/postgis";
 import * as geojson from "./editableGeom/geojsonTypes";
 import {
   EditableGeometry,

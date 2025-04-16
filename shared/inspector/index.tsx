@@ -1,6 +1,6 @@
 import {observer} from "mobx-react-lite";
 import {VariableSizeList as List, ListChildComponentProps} from "react-window";
-import {_ICodec} from "edgedb";
+import {_ICodec} from "gel";
 
 import cn from "@edgedb/common/utils/classNames";
 

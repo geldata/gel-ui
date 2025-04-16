@@ -7,7 +7,7 @@ import cn from "@edgedb/common/utils/classNames";
 
 import styles from "./postgisViewer.module.scss";
 import {useTheme} from "@edgedb/common/hooks/useTheme";
-import {Geometry, Box2D, Box3D} from "edgedb/dist/datatypes/postgis";
+import {Geometry, Box2D, Box3D} from "gel/dist/datatypes/postgis";
 import {
   createPostgisEditorState,
   MAX_M_RADIUS,

@@ -1,10 +1,10 @@
-import {ICodec} from "edgedb/dist/codecs/ifaces";
-import {ObjectCodec} from "edgedb/dist/codecs/object";
-import {SetCodec} from "edgedb/dist/codecs/set";
+import {ICodec} from "gel/dist/codecs/ifaces";
+import {ObjectCodec} from "gel/dist/codecs/object";
+import {SetCodec} from "gel/dist/codecs/set";
 import {DataGridState} from "../dataGrid/state";
 import {assertNever} from "../../utils/assertNever";
-import {NamedTupleCodec} from "edgedb/dist/codecs/namedtuple";
-import {RecordCodec} from "edgedb/dist/codecs/record";
+import {NamedTupleCodec} from "gel/dist/codecs/namedtuple";
+import {RecordCodec} from "gel/dist/codecs/record";
 
 export function createResultGridState(codec: ICodec, data: any[]) {
   return new ResultGridState(codec, data);
