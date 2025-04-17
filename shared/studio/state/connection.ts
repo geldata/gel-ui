@@ -408,11 +408,11 @@ export class Connection {
 
       const startTime = performance.now();
 
-      // @ts-ignore - Ignore _ is declared but not used error
       let inCodec: ICodec,
         outCodec: ICodec,
         outCodecBuf: Uint8Array | null,
         warnings: GelError[],
+        // @ts-ignore - Ignore _ is declared but not used error
         _;
 
       if (kind !== "parse" && this._codecCache.has(queryString)) {
