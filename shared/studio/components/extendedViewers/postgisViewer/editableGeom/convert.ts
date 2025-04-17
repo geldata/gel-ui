@@ -1,4 +1,4 @@
-import * as PostGIS from "edgedb/dist/datatypes/postgis";
+import * as PostGIS from "gel/dist/datatypes/postgis";
 import {
   Geometry,
   Point,

@@ -1,8 +1,8 @@
 import * as http from "node:http";
 import {ChildProcess, spawn} from "node:child_process";
 
-import createClient, {AccessError, UnknownDatabaseError} from "edgedb";
-import Event from "edgedb/dist/primitives/event";
+import createClient, {AccessError, UnknownDatabaseError} from "gel";
+import Event from "gel/dist/primitives/event";
 
 import {schemaScript} from "@edgedb/studio/tabs/dashboard/exampleSchema";
 

@@ -1,9 +1,9 @@
 import {Fragment} from "react";
 
-import {ICodec} from "edgedb/dist/codecs/ifaces";
-import {EnumCodec} from "edgedb/dist/codecs/enum";
-import {NamedTupleCodec} from "edgedb/dist/codecs/namedtuple";
-import {MultiRangeCodec, RangeCodec} from "edgedb/dist/codecs/range";
+import {ICodec} from "gel/dist/codecs/ifaces";
+import {EnumCodec} from "gel/dist/codecs/enum";
+import {NamedTupleCodec} from "gel/dist/codecs/namedtuple";
+import {MultiRangeCodec, RangeCodec} from "gel/dist/codecs/range";
 
 import {renderValue} from "@edgedb/inspector/buildScalar";
 

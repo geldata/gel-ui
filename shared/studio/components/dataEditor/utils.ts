@@ -1,4 +1,4 @@
-import {MultiRange, Range} from "edgedb";
+import {MultiRange, Range} from "gel";
 
 import {SchemaScalarType} from "@edgedb/common/schemaData";
 import {assertNever} from "@edgedb/common/utils/assertNever";
