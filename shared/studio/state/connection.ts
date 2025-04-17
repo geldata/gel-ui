@@ -72,11 +72,18 @@ type QueryKind = "query" | "parse" | "execute";
 
 type QueryOpts = {
   newCodec?: boolean;
-  ignoreSessionConfig?: boolean;
   implicitLimit?: bigint;
-  userQuery?: boolean;
   blocking?: boolean;
-};
+} & (
+  | {
+      userQuery?: undefined;
+      ignoreSessionConfig?: boolean;
+    }
+  | {
+      userQuery?: boolean;
+      ignoreSessionConfig?: undefined;
+    }
+);
 
 type PendingQuery = {
   language: Language;
@@ -320,7 +327,12 @@ export class Connection extends Model({
       let state = this._state;
 
       if (opts.ignoreSessionConfig) {
-        state = setQueryTag(baseOptions.withGlobals(state.globals), "gel/ui");
+        state = setQueryTag(
+          baseOptions
+            .withConfig({apply_access_policies: false})
+            .withGlobals(state.globals),
+          "gel/ui"
+        );
       }
       if (opts.userQuery) {
         state = setQueryTag(state, "gel/webrepl");
