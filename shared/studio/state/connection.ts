@@ -72,11 +72,18 @@ type QueryKind = "query" | "parse" | "execute";
 
 type QueryOpts = {
   newCodec?: boolean;
-  ignoreSessionConfig?: boolean;
   implicitLimit?: bigint;
-  userQuery?: boolean;
   blocking?: boolean;
-};
+} & (
+  | {
+      userQuery?: undefined;
+      ignoreSessionConfig?: boolean;
+    }
+  | {
+      userQuery?: boolean;
+      ignoreSessionConfig?: undefined;
+    }
+);
 
 type PendingQuery = {
   language: Language;
