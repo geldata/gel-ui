@@ -9,7 +9,7 @@ import {
   Frozen,
 } from "mobx-keystone";
 
-import {AuthenticationError, ClientError} from "gel";
+import {AuthenticationError, ClientError, GelError} from "gel";
 import {Options} from "gel/dist/options";
 import LRU from "gel/dist/primitives/lru";
 import {Capabilities} from "gel/dist/baseConn";
@@ -59,6 +59,7 @@ interface QueryResult {
   protoVer: ProtocolVersion;
   capabilities: number;
   status: string;
+  warnings: GelError[];
 }
 
 interface ParseResult {
@@ -66,6 +67,7 @@ interface ParseResult {
   outCodecBuf: Uint8Array;
   protoVer: ProtocolVersion;
   duration: number;
+  warnings: GelError[];
 }
 
 type QueryKind = "query" | "parse" | "execute";
@@ -157,7 +159,10 @@ export class Connection extends Model({
 
   private _runningBlockingQuery = false;
 
-  private _codecCache = new LRU<string, [any, any, Uint8Array, number]>({
+  private _codecCache = new LRU<
+    string,
+    [any, any, Uint8Array, number, GelError[]]
+  >({
     capacity: 200,
   });
   private _queryQueue: PendingQuery[] = [];
@@ -355,13 +360,18 @@ export class Connection extends Model({
       const startTime = performance.now();
 
       // @ts-ignore - Ignore _ is declared but not used error
-      let inCodec, outCodec, outCodecBuf, capabilities, _;
+      let inCodec: ICodec,
+        outCodec: ICodec,
+        outCodecBuf: Uint8Array | null,
+        capabilities: number,
+        warnings: GelError[],
+        _;
 
       if (kind !== "parse" && this._codecCache.has(queryString)) {
-        [inCodec, outCodec, outCodecBuf, capabilities] =
+        [inCodec, outCodec, outCodecBuf, capabilities, warnings] =
           this._codecCache.get(queryString)!;
       } else {
-        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf] =
+        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf, warnings] =
           await conn.rawParse(
             language,
             queryString,
@@ -374,6 +384,7 @@ export class Connection extends Model({
           outCodec,
           outCodecBuf!,
           capabilities,
+          warnings,
         ]);
       }
 
@@ -385,6 +396,7 @@ export class Connection extends Model({
           outCodecBuf: outCodecBuf!,
           protoVer: conn.protocolVersion,
           duration: Math.round(parseEndTime - startTime),
+          warnings,
         };
       }
 
@@ -435,7 +447,7 @@ export class Connection extends Model({
       )?.[2];
       if (newOutCodec && newOutCodec?.tid !== outCodec.tid) {
         this.checkAborted(abortSignal);
-        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf] =
+        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf, warnings] =
           await conn.rawParse(
             language,
             queryString,
@@ -448,6 +460,7 @@ export class Connection extends Model({
           outCodec,
           outCodecBuf!,
           capabilities,
+          warnings,
         ]);
       }
 
@@ -472,6 +485,7 @@ export class Connection extends Model({
         protoVer: conn.protocolVersion,
         capabilities,
         status: (conn as any).lastStatus,
+        warnings,
       };
     } catch (err) {
       if (err instanceof AuthenticationError) {

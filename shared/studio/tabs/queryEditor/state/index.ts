@@ -111,6 +111,7 @@ export class QueryHistoryResultItem extends ExtendedModel(QueryHistoryItem, {
   status: prop<string>(),
   hasResult: prop<boolean>(),
   implicitLimit: prop<number | null>(),
+  warnings: prop<Frozen<ErrorDetails[]> | null>(null),
 }) {
   get queryEditor() {
     return queryEditorCtx.get(this)!;
@@ -633,6 +634,7 @@ export class QueryEditor extends Model({
         protoVer: ProtocolVersion;
         status: string;
         implicitLimit: number | null;
+        warnings: ErrorDetails[];
       }
     | {
         error: ErrorDetails;
@@ -659,6 +661,7 @@ export class QueryEditor extends Model({
         hasResult: data.result !== null,
         status: data.status,
         implicitLimit: data.implicitLimit,
+        warnings: frozen(data.warnings),
       });
       if (data.result) {
         this.resultDataCache.set(
@@ -780,25 +783,32 @@ export class QueryEditor extends Model({
     const lang =
       this.selectedEditor === EditorKind.SQL ? Language.SQL : Language.EDGEQL;
     try {
-      const {result, outCodecBuf, resultBuf, protoVer, capabilities, status} =
-        yield* _await(
-          conn.query(
-            query,
-            this.selectedEditor === EditorKind.EdgeQL ||
-              this.selectedEditor === EditorKind.SQL
-              ? this.paramsEditor!.getQueryArgs()
-              : undefined,
-            {
-              implicitLimit:
-                implicitLimitConfig != null
-                  ? implicitLimitConfig + BigInt(1)
-                  : undefined,
-              userQuery: true,
-            },
-            this.runningQueryAbort?.signal,
-            lang
-          )
-        );
+      const {
+        result,
+        outCodecBuf,
+        resultBuf,
+        protoVer,
+        capabilities,
+        status,
+        warnings,
+      } = yield* _await(
+        conn.query(
+          query,
+          this.selectedEditor === EditorKind.EdgeQL ||
+            this.selectedEditor === EditorKind.SQL
+            ? this.paramsEditor!.getQueryArgs()
+            : undefined,
+          {
+            implicitLimit:
+              implicitLimitConfig != null
+                ? implicitLimitConfig + BigInt(1)
+                : undefined,
+            userQuery: true,
+          },
+          this.runningQueryAbort?.signal,
+          lang
+        )
+      );
 
       const implicitLimit =
         implicitLimitConfig != null ? Number(implicitLimitConfig) : null;
@@ -812,6 +822,11 @@ export class QueryEditor extends Model({
         protoVer,
         status,
         implicitLimit,
+        warnings: warnings.map((w) =>
+          extractErrorDetails(w, query, lang, () => [
+            ...(dbCtx.get(this)?.schemaData?.objectsByName.keys() ?? []),
+          ])
+        ),
       });
       return {success: true, capabilities, status};
     } catch (e: any) {
