@@ -1,21 +1,7 @@
 import {GelError} from "gel";
+import {ErrorAttr} from "gel/dist/errors/base";
 import {Language} from "gel/dist/ifaces";
 import {utf8Decoder} from "gel/dist/primitives/buffer";
-
-enum ErrorField {
-  hint = 0x0001,
-  details = 0x0002,
-  positionStart = 0xfff1 - 2 ** 16,
-  positionEnd = 0xfff2 - 2 ** 16,
-  lineStart = 0xfff3 - 2 ** 16,
-  columnStart = 0xfff4 - 2 ** 16,
-  utf16ColumnStart = 0xfff5 - 2 ** 16,
-  lineEnd = 0xfff6 - 2 ** 16,
-  columnEnd = 0xfff7 - 2 ** 16,
-  utf16ColumnEnd = 0xfff8 - 2 ** 16,
-  characterStart = 0xfff9 - 2 ** 16,
-  characterEnd = 0xfffa - 2 ** 16,
-}
 
 export interface ErrorDetails {
   name: string;
@@ -25,13 +11,20 @@ export interface ErrorDetails {
   range?: [number, number];
 }
 
-function tryParseInt(val: any) {
-  if (val instanceof Uint8Array) {
-    try {
-      return parseInt(utf8Decoder.decode(val), 10);
-    } catch {}
+function tryParseInt(val: Uint8Array | string | undefined) {
+  if (val == null) return null;
+  try {
+    return parseInt(
+      val instanceof Uint8Array ? utf8Decoder.decode(val) : val,
+      10
+    );
+  } catch {
+    return null;
   }
-  return null;
+}
+
+function readAttrStr(val: Uint8Array | string | undefined) {
+  return val instanceof Uint8Array ? utf8Decoder.decode(val) : val ?? "";
 }
 
 export function extractErrorDetails(
@@ -49,24 +42,24 @@ export function extractErrorDetails(
   };
 
   if (err instanceof GelError && (err as any)._attrs) {
-    const attrs = (err as any)._attrs as Map<number, Uint8Array>;
-    const hint = attrs.get(ErrorField.hint);
+    const attrs = (err as any)._attrs as Map<number, Uint8Array | string>;
+    const hint = attrs.get(ErrorAttr.hint);
     if (hint) {
-      errDetails.hint = utf8Decoder.decode(hint);
+      errDetails.hint = readAttrStr(hint);
     }
-    const details = attrs.get(ErrorField.details);
+    const details = attrs.get(ErrorAttr.details);
     if (details) {
-      errDetails.details = utf8Decoder.decode(details);
+      errDetails.details = readAttrStr(details);
     }
 
     if (!query) {
       return errDetails;
     }
 
-    const lineStart = tryParseInt(attrs.get(ErrorField.lineStart));
-    const lineEnd = tryParseInt(attrs.get(ErrorField.lineEnd));
-    const colStart = tryParseInt(attrs.get(ErrorField.utf16ColumnStart));
-    const colEnd = tryParseInt(attrs.get(ErrorField.utf16ColumnEnd));
+    const lineStart = tryParseInt(attrs.get(ErrorAttr.lineStart));
+    const lineEnd = tryParseInt(attrs.get(ErrorAttr.lineEnd));
+    const colStart = tryParseInt(attrs.get(ErrorAttr.utf16ColumnStart));
+    const colEnd = tryParseInt(attrs.get(ErrorAttr.utf16ColumnEnd));
 
     if (
       lineStart != null &&
@@ -90,6 +83,13 @@ export function extractErrorDetails(
       const endPos = endLinesLength + colEnd;
 
       errDetails.range = [startPos, endPos];
+    } else {
+      const charStart = tryParseInt(attrs.get(ErrorAttr.characterStart));
+      const charEnd = tryParseInt(attrs.get(ErrorAttr.characterEnd));
+
+      if (charStart != null && charEnd != null) {
+        errDetails.range = [charStart, charEnd];
+      }
     }
   }
 

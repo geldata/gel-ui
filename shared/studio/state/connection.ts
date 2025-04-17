@@ -57,6 +57,7 @@ interface QueryResult {
   protoVer: ProtocolVersion;
   capabilities: number;
   status: string;
+  warnings: GelError[];
 }
 
 interface ParseResult {
@@ -64,6 +65,7 @@ interface ParseResult {
   outCodecBuf: Uint8Array;
   protoVer: ProtocolVersion;
   duration: number;
+  warnings: GelError[];
 }
 
 type QueryKind = "query" | "parse" | "execute";
@@ -168,7 +170,7 @@ export class Connection {
 
   private readonly _codecCache = new LRU<
     string,
-    [any, any, Uint8Array, number]
+    [any, any, Uint8Array, number, GelError[]]
   >({
     capacity: 200,
   });
@@ -407,13 +409,17 @@ export class Connection {
       const startTime = performance.now();
 
       // @ts-ignore - Ignore _ is declared but not used error
-      let inCodec, outCodec, outCodecBuf, _;
+      let inCodec: ICodec,
+        outCodec: ICodec,
+        outCodecBuf: Uint8Array | null,
+        warnings: GelError[],
+        _;
 
       if (kind !== "parse" && this._codecCache.has(queryString)) {
-        [inCodec, outCodec, outCodecBuf, capabilities] =
+        [inCodec, outCodec, outCodecBuf, capabilities, warnings] =
           this._codecCache.get(queryString)!;
       } else {
-        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf] =
+        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf, warnings] =
           await conn.rawParse(
             language,
             queryString,
@@ -426,6 +432,7 @@ export class Connection {
           outCodec,
           outCodecBuf!,
           capabilities,
+          warnings,
         ]);
       }
 
@@ -437,6 +444,7 @@ export class Connection {
           outCodecBuf: outCodecBuf!,
           protoVer: conn.protocolVersion,
           duration: Math.round(parseEndTime - startTime),
+          warnings,
         };
       }
 
@@ -487,7 +495,7 @@ export class Connection {
       )?.[2];
       if (newOutCodec && newOutCodec?.tid !== outCodec.tid) {
         this.checkAborted(abortSignal);
-        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf] =
+        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf, warnings] =
           await conn.rawParse(
             language,
             queryString,
@@ -500,6 +508,7 @@ export class Connection {
           outCodec,
           outCodecBuf!,
           capabilities,
+          warnings,
         ]);
       }
 
@@ -524,6 +533,7 @@ export class Connection {
         protoVer: conn.protocolVersion,
         capabilities,
         status: (conn as any).lastStatus,
+        warnings,
       };
     } catch (err) {
       return {
