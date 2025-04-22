@@ -1,15 +1,13 @@
-import {action, computed} from "mobx";
-import {
-  createContext,
-  model,
-  Model,
-  prop,
-  _async,
-  _await,
-  Frozen,
-} from "mobx-keystone";
+import {action, computed, makeObservable} from "mobx";
+import {createContext, _async, _await} from "mobx-keystone";
 
-import {AuthenticationError, ClientError} from "edgedb";
+import {
+  AuthenticationError,
+  ClientError,
+  EdgeDBError,
+  SHOULD_RETRY,
+  TransactionConflictError,
+} from "edgedb";
 import {Options} from "edgedb/dist/options";
 import LRU from "edgedb/dist/primitives/lru";
 import {Capabilities} from "edgedb/dist/baseConn";
@@ -22,6 +20,7 @@ import {
   QueryOptions,
 } from "edgedb/dist/ifaces";
 import {ICodec} from "edgedb/dist/codecs/ifaces";
+import {sleep} from "edgedb/dist/utils";
 
 import {
   decode,
@@ -30,8 +29,7 @@ import {
   codecsRegistry,
   baseOptions,
 } from "../utils/decodeRawBuffer";
-import {instanceCtx} from "./instance";
-import {sessionStateCtx} from "./sessionState";
+import {SessionState} from "./sessionState";
 import {splitQueryIntoStatements} from "../utils/syntaxTree";
 
 export {Capabilities};
@@ -46,9 +44,8 @@ export const connCtx = createContext<Connection>();
 
 export interface ConnectConfig {
   serverUrl: string;
-  authToken: string;
   database: string;
-  user: string;
+  authProvider: AuthProvider;
 }
 
 interface QueryResult {
@@ -97,11 +94,16 @@ const queryOptions: QueryOptions = {
   injectObjectids: true,
 };
 
+export interface AuthProvider {
+  getAuthToken(): string;
+  getAuthUser?(): string;
+  invalidateToken(): void;
+}
+
 export function createAuthenticatedFetch({
   serverUrl,
   database,
-  user,
-  authToken,
+  authProvider,
 }: ConnectConfig) {
   const databaseUrl = `${serverUrl}/db/${encodeURIComponent(database)}/`;
 
@@ -112,8 +114,11 @@ export function createAuthenticatedFetch({
     );
 
     const headers = new Headers(init?.headers);
-    headers.append("X-EdgeDB-User", user);
-    headers.append("Authorization", `Bearer ${authToken}`);
+    const user = authProvider.getAuthUser?.();
+    if (user) {
+      headers.append("X-EdgeDB-User", user);
+    }
+    headers.append("Authorization", `Bearer ${authProvider.getAuthToken()}`);
 
     return fetch(url, {
       ...init,
@@ -148,40 +153,52 @@ function setQueryTag(options: Options, tag: string) {
   return clone as Options;
 }
 
-@model("Connection")
-export class Connection extends Model({
-  config: prop<Frozen<ConnectConfig>>(),
-  serverVersion: prop<Frozen<{major: number; minor: number} | null>>(),
-}) {
-  private _connPool = initConnPool(this.config.data, this.serverVersion.data);
+export class Connection {
+  private readonly _connPool: AdminUIFetchConnection[];
 
   private _runningBlockingQuery = false;
 
-  private _codecCache = new LRU<string, [any, any, Uint8Array, number]>({
+  private readonly _codecCache = new LRU<
+    string,
+    [any, any, Uint8Array, number]
+  >({
     capacity: 200,
   });
-  private _queryQueue: PendingQuery[] = [];
+  private readonly _queryQueue: PendingQuery[] = [];
+
+  constructor(
+    public readonly config: ConnectConfig,
+    private readonly serverVersion: {major: number; minor: number} | null,
+    private readonly sessionState: SessionState | null
+  ) {
+    makeObservable(this);
+    this._connPool = initConnPool(config, serverVersion);
+  }
 
   @computed
   get _state() {
-    const sessionState = sessionStateCtx.get(this);
-
     let state = baseOptions;
 
-    if (sessionState?.activeState.globals.length) {
+    if (this.sessionState?.activeState.globals.length) {
       state = state.withGlobals(
-        sessionState.activeState.globals.reduce((globals, global) => {
-          globals[global.name] = global.value;
-          return globals;
-        }, {} as {[key: string]: any})
+        this.sessionState.activeState.globals.reduce(
+          (globals, global) => {
+            globals[global.name] = global.value;
+            return globals;
+          },
+          {} as {[key: string]: any}
+        )
       );
     }
-    if (sessionState?.activeState.config.length) {
+    if (this.sessionState?.activeState.config.length) {
       state = state.withConfig(
-        sessionState.activeState.config.reduce((configs, config) => {
-          configs[config.name] = config.value;
-          return configs;
-        }, {} as {[key: string]: any})
+        this.sessionState.activeState.config.reduce(
+          (configs, config) => {
+            configs[config.name] = config.value;
+            return configs;
+          },
+          {} as {[key: string]: any}
+        )
       );
     }
     return setQueryTag(state, "gel/ui");
@@ -189,15 +206,15 @@ export class Connection extends Model({
 
   @computed
   get sessionConfig() {
-    const sessionState = sessionStateCtx.get(this);
-    if (sessionState === undefined) {
-      return {};
-    } else {
-      return sessionState.activeState.config.reduce((configs, config) => {
-        configs[config.name] = config.value;
-        return configs;
-      }, {} as {[key: string]: any});
-    }
+    return (
+      this.sessionState?.activeState.config.reduce(
+        (configs, config) => {
+          configs[config.name] = config.value;
+          return configs;
+        },
+        {} as {[key: string]: any}
+      ) ?? {}
+    );
   }
 
   query(
@@ -280,15 +297,7 @@ export class Connection extends Model({
       this._runningBlockingQuery = query.opts.blocking ?? false;
       const conn = this._connPool.pop()!;
       try {
-        const result = await this._query(
-          conn,
-          query.kind,
-          query.language,
-          query.query,
-          query.opts,
-          query.params,
-          query.abortSignal
-        );
+        const result = await this._retryingQuery(conn, query);
         query.resolve(result as any);
       } catch (e: any) {
         query.reject(e);
@@ -305,6 +314,42 @@ export class Connection extends Model({
     }
   }
 
+  async _retryingQuery(conn: AdminUIFetchConnection, query: PendingQuery) {
+    let iter = 1;
+    while (true) {
+      const result = await this._query(
+        conn,
+        query.kind,
+        query.language,
+        query.query,
+        query.opts,
+        query.params,
+        query.abortSignal
+      );
+      if (result && "error" in result) {
+        const {error, capabilities} = result;
+        if (error instanceof AuthenticationError) {
+          this.config.authProvider.invalidateToken();
+          throw error;
+        }
+        if (
+          ((error instanceof EdgeDBError && error.hasTag(SHOULD_RETRY)) ||
+            error instanceof TypeError) &&
+          (capabilities === 0 || error instanceof TransactionConflictError)
+        ) {
+          if (iter >= baseOptions.retryOptions.default.attempts) {
+            throw error;
+          }
+          await sleep(baseOptions.retryOptions.default.backoff(iter));
+          iter += 1;
+          continue;
+        }
+        throw error;
+      }
+      return result;
+    }
+  }
+
   async _query(
     conn: AdminUIFetchConnection,
     kind: QueryKind,
@@ -313,7 +358,10 @@ export class Connection extends Model({
     opts: QueryOpts,
     params: QueryParams | undefined,
     abortSignal: AbortSignal | null
-  ): Promise<QueryResult | ParseResult | void> {
+  ): Promise<
+    QueryResult | ParseResult | void | {error: unknown; capabilities: number}
+  > {
+    let capabilities: number = 0;
     try {
       this.checkAborted(abortSignal);
 
@@ -355,7 +403,7 @@ export class Connection extends Model({
       const startTime = performance.now();
 
       // @ts-ignore - Ignore _ is declared but not used error
-      let inCodec, outCodec, outCodecBuf, capabilities, _;
+      let inCodec, outCodec, outCodecBuf, _;
 
       if (kind !== "parse" && this._codecCache.has(queryString)) {
         [inCodec, outCodec, outCodecBuf, capabilities] =
@@ -390,7 +438,7 @@ export class Connection extends Model({
 
       this.checkAborted(abortSignal);
 
-      const serverVersion = this.serverVersion.data;
+      const serverVersion = this.serverVersion;
       if (
         (!serverVersion || serverVersion.major >= 6) &&
         !(
@@ -474,13 +522,13 @@ export class Connection extends Model({
         status: (conn as any).lastStatus,
       };
     } catch (err) {
-      if (err instanceof AuthenticationError) {
-        instanceCtx.get(this)!._refreshAuthToken?.();
-      }
-      if (err instanceof DOMException && err.name === "AbortError") {
-        throw new DOMException("Query was canceled by user.", "AbortError");
-      }
-      throw err;
+      return {
+        error:
+          err instanceof DOMException && err.name === "AbortError"
+            ? new DOMException("Query was canceled by user.", "AbortError")
+            : err,
+        capabilities,
+      };
     }
   }
 }
