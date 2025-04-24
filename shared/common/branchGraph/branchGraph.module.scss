@@ -479,13 +479,13 @@
         vector-effect: non-scaling-stroke;
       }
 
-      &.up-to-date {
+      &.status-up-to-date {
         color: #70b53a;
       }
-      &.error {
+      &.status-error {
         color: #e55e5e;
       }
-      &.updating {
+      &.status-updating {
         color: #3b8be8;
       }
 

@@ -696,7 +696,10 @@ function BranchGraphButton({
           >
             <GithubLogo className={styles.githubIcon} />
             <div
-              className={cn(styles.githubStatus, styles[githubBranch.status])}
+              className={cn(
+                styles.githubStatus,
+                styles[`status-${githubBranch.status}`]
+              )}
             >
               {statusIcon}
               {statusIcon}
