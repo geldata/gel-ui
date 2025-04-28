@@ -57,7 +57,7 @@ export const TextInput = forwardRef(function TextInput(
         />
         {suffixEl}
         {error != null ? (
-          <div className={styles.error}>
+          <div className={styles.error} role="alert">
             <InfoIcon />
             <div>{error}</div>
           </div>
