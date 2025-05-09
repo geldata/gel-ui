@@ -68,7 +68,7 @@ import {useIsMobile} from "@edgedb/common/hooks/useMobile";
 import {RunButton} from "@edgedb/common/ui/mobile";
 import {InspectorState} from "@edgedb/inspector/state";
 import {InspectorContext} from "@edgedb/inspector/context";
-import {outputModeToggle} from "../queryEditor";
+import {outputModeToggle, QueryError} from "../queryEditor";
 import {
   ResultGrid,
   ResultGridState,
@@ -689,18 +689,7 @@ const ReplHistoryItem = observer(function ReplHistoryItem({
 
   if (item.error) {
     output = (
-      <div className={styles.queryError}>
-        <span className={styles.errorName}>{item.error.data.name}</span>:{" "}
-        {item.error.data.msg}
-        {item.error.data.details ? (
-          <div className={styles.errorHint}>
-            Details: {item.error.data.details}
-          </div>
-        ) : null}
-        {item.error.data.hint ? (
-          <div className={styles.errorHint}>Hint: {item.error.data.hint}</div>
-        ) : null}
-      </div>
+      <QueryError className={styles.queryError} error={item.error.data} />
     );
   } else if (item.status) {
     if (item.hasResult) {
@@ -903,6 +892,23 @@ const ReplHistoryItem = observer(function ReplHistoryItem({
             {new Date(item.timestamp).toLocaleTimeString()}
           </div>
         </div>
+        {item.warnings?.data.length ? (
+          <div
+            className={styles.queryWarnings}
+            style={{
+              paddingLeft: marginLeftRepl,
+            }}
+          >
+            {item.warnings.data.map((warning, i) => (
+              <QueryError
+                key={i}
+                className={styles.queryError}
+                error={warning}
+                errorName="Warning"
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
       {output ? (
         !hasScroll ? (
@@ -992,16 +998,20 @@ const QueryCodeBlock = observer(function QueryCodeBlock({
     <CodeBlock
       className={cn(styles.code)}
       code={item.query}
-      customRanges={
-        item.error?.data.range
+      customRanges={[
+        ...(item.error?.data.range
           ? [
               {
                 range: item.error.data.range,
                 style: styles.errorUnderline,
               },
             ]
-          : undefined
-      }
+          : []),
+        ...(item.warnings?.data
+          .filter((w) => w.range != null)
+          .map((w) => ({range: w.range!, style: styles.warningUnderline})) ??
+          []),
+      ]}
     />
   );
 });

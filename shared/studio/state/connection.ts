@@ -9,19 +9,19 @@ import {
   Frozen,
 } from "mobx-keystone";
 
-import {AuthenticationError, ClientError} from "edgedb";
-import {Options} from "edgedb/dist/options";
-import LRU from "edgedb/dist/primitives/lru";
-import {Capabilities} from "edgedb/dist/baseConn";
-import {AdminUIFetchConnection} from "edgedb/dist/fetchConn";
+import {AuthenticationError, ClientError, GelError} from "gel";
+import {Options} from "gel/dist/options";
+import LRU from "gel/dist/primitives/lru";
+import {Capabilities} from "gel/dist/baseConn";
+import {AdminUIFetchConnection} from "gel/dist/fetchConn";
 import {
   Cardinality,
   Language,
   OutputFormat,
   ProtocolVersion,
   QueryOptions,
-} from "edgedb/dist/ifaces";
-import {ICodec} from "edgedb/dist/codecs/ifaces";
+} from "gel/dist/ifaces";
+import {ICodec} from "gel/dist/codecs/ifaces";
 
 import {
   decode,
@@ -59,6 +59,7 @@ interface QueryResult {
   protoVer: ProtocolVersion;
   capabilities: number;
   status: string;
+  warnings: GelError[];
 }
 
 interface ParseResult {
@@ -66,6 +67,7 @@ interface ParseResult {
   outCodecBuf: Uint8Array;
   protoVer: ProtocolVersion;
   duration: number;
+  warnings: GelError[];
 }
 
 type QueryKind = "query" | "parse" | "execute";
@@ -157,7 +159,10 @@ export class Connection extends Model({
 
   private _runningBlockingQuery = false;
 
-  private _codecCache = new LRU<string, [any, any, Uint8Array, number]>({
+  private _codecCache = new LRU<
+    string,
+    [any, any, Uint8Array, number, GelError[]]
+  >({
     capacity: 200,
   });
   private _queryQueue: PendingQuery[] = [];
@@ -354,14 +359,19 @@ export class Connection extends Model({
 
       const startTime = performance.now();
 
-      // @ts-ignore - Ignore _ is declared but not used error
-      let inCodec, outCodec, outCodecBuf, capabilities, _;
+      let inCodec: ICodec,
+        outCodec: ICodec,
+        outCodecBuf: Uint8Array | null,
+        capabilities: number,
+        warnings: GelError[],
+        // @ts-ignore - Ignore _ is declared but not used error
+        _;
 
       if (kind !== "parse" && this._codecCache.has(queryString)) {
-        [inCodec, outCodec, outCodecBuf, capabilities] =
+        [inCodec, outCodec, outCodecBuf, capabilities, warnings] =
           this._codecCache.get(queryString)!;
       } else {
-        [inCodec, outCodec, _, outCodecBuf, _, capabilities] =
+        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf, warnings] =
           await conn.rawParse(
             language,
             queryString,
@@ -372,8 +382,9 @@ export class Connection extends Model({
         this._codecCache.set(queryString, [
           inCodec,
           outCodec,
-          outCodecBuf,
+          outCodecBuf!,
           capabilities,
+          warnings,
         ]);
       }
 
@@ -382,9 +393,10 @@ export class Connection extends Model({
       if (kind === "parse") {
         return {
           inCodec,
-          outCodecBuf,
+          outCodecBuf: outCodecBuf!,
           protoVer: conn.protocolVersion,
           duration: Math.round(parseEndTime - startTime),
+          warnings,
         };
       }
 
@@ -406,7 +418,7 @@ export class Connection extends Model({
         });
       }
 
-      const resultBuf = await conn.rawExecute(
+      const [resultBuf] = await conn.rawExecute(
         language,
         queryString,
         state,
@@ -435,7 +447,7 @@ export class Connection extends Model({
       )?.[2];
       if (newOutCodec && newOutCodec?.tid !== outCodec.tid) {
         this.checkAborted(abortSignal);
-        [inCodec, outCodec, _, outCodecBuf, _, capabilities] =
+        [_, _, inCodec, outCodec, capabilities, _, outCodecBuf, warnings] =
           await conn.rawParse(
             language,
             queryString,
@@ -446,8 +458,9 @@ export class Connection extends Model({
         this._codecCache.set(queryString, [
           inCodec,
           outCodec,
-          outCodecBuf,
+          outCodecBuf!,
           capabilities,
+          warnings,
         ]);
       }
 
@@ -460,18 +473,19 @@ export class Connection extends Model({
 
       return {
         result: decode(
-          outCodecBuf,
+          outCodecBuf!,
           resultBuf,
           state,
           conn.protocolVersion,
           opts.newCodec
         ),
         duration,
-        outCodecBuf,
+        outCodecBuf: outCodecBuf!,
         resultBuf,
         protoVer: conn.protocolVersion,
         capabilities,
         status: (conn as any).lastStatus,
+        warnings,
       };
     } catch (err) {
       if (err instanceof AuthenticationError) {

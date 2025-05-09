@@ -15,11 +15,11 @@ import {
   frozen,
 } from "mobx-keystone";
 
-import {AuthenticationError, DuplicateDatabaseDefinitionError} from "edgedb";
+import {AuthenticationError, DuplicateDatabaseDefinitionError} from "gel";
 
-import {Options} from "edgedb/dist/options";
-import {AdminUIFetchConnection} from "edgedb/dist/fetchConn";
-import {OutputFormat, Cardinality} from "edgedb/dist/ifaces";
+import {Options} from "gel/dist/options";
+import {AdminUIFetchConnection} from "gel/dist/fetchConn";
+import {OutputFormat, Cardinality} from "gel/dist/ifaces";
 import {codecsRegistry} from "../utils/decodeRawBuffer";
 
 import {cleanupOldSchemaDataForInstance} from "../idbStore";

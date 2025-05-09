@@ -1,10 +1,10 @@
 import cn from "@edgedb/common/utils/classNames";
 
-import {_ICodec} from "edgedb";
-import {CodecKind} from "edgedb/dist/codecs/ifaces";
-import {ObjectCodec} from "edgedb/dist/codecs/object";
-import {NamedTupleCodec} from "edgedb/dist/codecs/namedtuple";
-import {RecordCodec} from "edgedb/dist/codecs/record";
+import {_ICodec} from "gel";
+import {CodecKind} from "gel/dist/codecs/ifaces";
+import {ObjectCodec} from "gel/dist/codecs/object";
+import {NamedTupleCodec} from "gel/dist/codecs/namedtuple";
+import {RecordCodec} from "gel/dist/codecs/record";
 
 import {buildScalarItem} from "./buildScalar";
 

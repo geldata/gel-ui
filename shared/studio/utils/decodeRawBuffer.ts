@@ -1,8 +1,8 @@
-import {_CodecsRegistry, Codecs, LocalDateTime} from "edgedb";
-import {Options} from "edgedb/dist/options";
-import {ProtocolVersion, QueryArgs} from "edgedb/dist/ifaces";
+import {_CodecsRegistry, Codecs, LocalDateTime} from "gel";
+import {Options} from "gel/dist/options";
+import {ProtocolVersion, QueryArgs} from "gel/dist/ifaces";
 import {decode as _decode, EdgeDBSet} from "@edgedb/common/decodeRawBuffer";
-import {localDateInstances} from "edgedb/dist/datatypes/datetime";
+import {localDateInstances} from "gel/dist/datatypes/datetime";
 
 export type {EdgeDBSet};
 

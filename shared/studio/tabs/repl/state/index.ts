@@ -47,10 +47,10 @@ import {
   createResultGridState,
   ResultGridState,
 } from "@edgedb/common/components/resultGrid";
-import LRU from "edgedb/dist/primitives/lru";
+import LRU from "gel/dist/primitives/lru";
 import {Completer} from "../../../utils/completer";
 import {OutputMode} from "../../queryEditor/state";
-import {Language} from "edgedb/dist/ifaces";
+import {Language} from "gel/dist/ifaces";
 
 export const defaultItemHeight = 85;
 
@@ -70,6 +70,7 @@ export class ReplHistoryItem extends Model({
   hasResult: prop<boolean | null>(null),
   error: prop<Frozen<ErrorDetails> | null>(null),
   commandResult: prop<Frozen<CommandResult> | null>(null),
+  warnings: prop<Frozen<ErrorDetails[]> | null>(null),
 }) {
   renderHeight: number | null = null;
   showDateHeader: boolean = false;
@@ -114,10 +115,16 @@ export class ReplHistoryItem extends Model({
   }
 
   @modelAction
-  setResult(status: string, hasResult: boolean, implicitLimit: number | null) {
+  setResult(
+    status: string,
+    hasResult: boolean,
+    implicitLimit: number | null,
+    warnings: ErrorDetails[]
+  ) {
     this.hasResult = hasResult;
     this.status = status;
     this.implicitLimit = implicitLimit;
+    this.warnings = frozen(warnings);
   }
 
   @modelAction
@@ -490,6 +497,7 @@ export class Repl extends Model({
           protoVer,
           capabilities,
           status,
+          warnings,
         } = yield* _await(
           conn.query(
             query,
@@ -510,7 +518,16 @@ export class Repl extends Model({
 
         const implicitLimit =
           implicitLimitConfig != null ? Number(implicitLimitConfig) : null;
-        historyItem.setResult(status, !!result, implicitLimit);
+        historyItem.setResult(
+          status,
+          !!result,
+          implicitLimit,
+          warnings.map((w) =>
+            extractErrorDetails(w, query, lang, () => [
+              ...(dbCtx.get(this)?.schemaData?.objectsByName.keys() ?? []),
+            ])
+          )
+        );
         if (result) {
           this.resultDataCache.set(
             historyItem.$modelId,
