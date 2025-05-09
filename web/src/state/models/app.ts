@@ -55,14 +55,19 @@ export class App extends Model({
     () =>
       new InstanceState({
         serverUrl,
-        authToken,
-        authUsername,
       })
   ),
 }) {
   onInit() {
-    this.instanceState.fetchInstanceInfo();
-    this.instanceState._refreshAuthToken = clearAuthToken;
+    this.instanceState._authProvider = {
+      getAuthToken: () => authToken!,
+      getAuthUser: () => authUsername!,
+      invalidateToken: () => clearAuthToken(),
+    };
+
+    if (authToken) {
+      this.instanceState.fetchInstanceInfo();
+    }
     appCtx.set(this, this);
   }
 }

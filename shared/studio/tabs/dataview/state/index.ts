@@ -303,12 +303,15 @@ function serialiseColWidths(
   fields?: Map<string, ObjectField>
 ): string {
   return JSON.stringify(
-    [...colWidths.entries()].reduce((widths, [id, width]) => {
-      if (id !== "_indexCol" && (!fields || fields.has(id))) {
-        widths[id] = width;
-      }
-      return widths;
-    }, {} as {[id: string]: number})
+    [...colWidths.entries()].reduce(
+      (widths, [id, width]) => {
+        if (id !== "_indexCol" && (!fields || fields.has(id))) {
+          widths[id] = width;
+        }
+        return widths;
+      },
+      {} as {[id: string]: number}
+    )
   );
 }
 function deserialiseColWidths(rawWidths: string): {[id: string]: number} {
@@ -1108,8 +1111,8 @@ export class DataInspector extends Model({
     return this.parentObject
       ? `<${typeUnionNames.join(" | ")}>{}`
       : typeUnionNames.length > 1
-      ? `{${typeUnionNames.join(", ")}}`
-      : typeUnionNames[0];
+        ? `{${typeUnionNames.join(", ")}}`
+        : typeUnionNames[0];
   }
 
   getBaseObjectsQuery() {
@@ -1187,14 +1190,14 @@ export class DataInspector extends Model({
     rows := (SELECT baseObjects ${
       this.filter[0] ? `FILTER ${this.filter[0]}` : ""
     } ORDER BY ${inEditMode ? `.__isLinked DESC THEN` : ""}${
-        sortField
-          ? `${
-              sortField.escapedSubtypeName
-                ? `[IS ${sortField.escapedSubtypeName}]`
-                : ""
-            }.${sortField.escapedName} ${this.sortBy!.direction} THEN`
-          : ""
-      } .id OFFSET <int32>$offset LIMIT ${fetchBlockSize})
+      sortField
+        ? `${
+            sortField.escapedSubtypeName
+              ? `[IS ${sortField.escapedSubtypeName}]`
+              : ""
+          }.${sortField.escapedName} ${this.sortBy!.direction} THEN`
+        : ""
+    } .id OFFSET <int32>$offset LIMIT ${fetchBlockSize})
     SELECT rows {
       id,
       ${inEditMode ? "__isLinked," : ""}
@@ -1435,7 +1438,7 @@ class ExpandedInspector extends Model({
         ].join(",\n")}
       }`;
 
-    const {result} = await dbState.connection.query(
+    const {result} = await dbState.connection!.query(
       query,
       {
         id: parentObjectId,
@@ -1563,14 +1566,14 @@ class ExpandedInspector extends Model({
         }${accessPolicyWorkaround ? "" : " limit 10"}`;
           return `${linkSelect},
         \`__count_${linkName}\` := count(${
-            accessPolicyWorkaround
-              ? `(
+          accessPolicyWorkaround
+            ? `(
           with sourceId := .id
           select ${link.target!.escapedName}
           filter .<${link.escapedName}.id = sourceId
         )`
-              : `.\`${linkName}\``
-          })`;
+            : `.\`${linkName}\``
+        })`;
         }),
       ].join(",\n")}
     } filter .id = <uuid><str>$objectId`;

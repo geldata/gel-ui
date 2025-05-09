@@ -218,23 +218,26 @@ export class AIAdminState extends Model({
       obj.ancestors.some((anc) => anc.name === "ext::ai::TextGenerationModel")
     );
     return modelTypeObjs.length
-      ? modelTypeObjs.reduce((models, obj) => {
-          const modelName = obj.annotations.find(
-            (ann) => ann.name === "ext::ai::model_name"
-          )?.["@value"];
-          const providerName = obj.annotations.find(
-            (ann) => ann.name === "ext::ai::model_provider"
-          )?.["@value"];
-          if (!modelName || !providerName) return models;
-          if (!models[providerName]) {
-            models[providerName] = [];
-          }
-          models[providerName].push({
-            modelName,
-            providerName,
-          });
-          return models;
-        }, {} as {[providerName: string]: TextGenModel[]})
+      ? modelTypeObjs.reduce(
+          (models, obj) => {
+            const modelName = obj.annotations.find(
+              (ann) => ann.name === "ext::ai::model_name"
+            )?.["@value"];
+            const providerName = obj.annotations.find(
+              (ann) => ann.name === "ext::ai::model_provider"
+            )?.["@value"];
+            if (!modelName || !providerName) return models;
+            if (!models[providerName]) {
+              models[providerName] = [];
+            }
+            models[providerName].push({
+              modelName,
+              providerName,
+            });
+            return models;
+          },
+          {} as {[providerName: string]: TextGenModel[]}
+        )
       : null;
   }
 
@@ -334,8 +337,8 @@ export class AIAdminState extends Model({
         a.name.startsWith("builtin::") === b.name.startsWith("builtin::")
           ? a.name.localeCompare(b.name)
           : a.name.startsWith("builtin::")
-          ? -1
-          : 1
+            ? -1
+            : 1
       );
       this.prompts = prompts;
     });
@@ -514,7 +517,7 @@ export class AIAdminState extends Model({
     try {
       const stream: SSEStream = yield* _await(
         runRAGQuery(
-          connectConfig.data,
+          connectConfig,
           request,
           this._runningPlaygroundAbortController
         )

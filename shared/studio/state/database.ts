@@ -1,6 +1,6 @@
 import {createContext, useContext} from "react";
 
-import {action, autorun, observable, runInAction, when} from "mobx";
+import {action, observable, reaction, runInAction, when} from "mobx";
 import {
   AnyModel,
   createContext as createMobxContext,
@@ -15,7 +15,6 @@ import {
   prop,
   _async,
   _await,
-  frozen,
   modelAction,
 } from "mobx-keystone";
 
@@ -77,12 +76,16 @@ export class DatabaseState extends Model({
   $modelId: idProp,
   name: prop<string>(),
 
-  connection: prop<Connection>(null!).withSetter(),
   sessionState: prop(() => new SessionState({})),
   tabStates: prop<ObjectMap<AnyModel>>(),
 }) {
-  @observable
-  currentRole: string | null = null;
+  @observable.ref
+  connection: Connection | null = null;
+
+  @action
+  _setConnection(conn: Connection) {
+    this.connection = conn;
+  }
 
   _getTabState(modelType: string, stateClass: ModelClass<AnyModel>) {
     if (!this.tabStates.has(modelType)) {
@@ -140,7 +143,7 @@ export class DatabaseState extends Model({
   onInit() {
     dbCtx.set(this, this);
     sessionStateCtx.set(this, this.sessionState);
-    connCtx.setComputed(this, () => this.connection);
+    connCtx.setComputed(this, () => this.connection!);
   }
 
   onAttachedToRootStore() {
@@ -151,36 +154,20 @@ export class DatabaseState extends Model({
       () => this.fetchSchemaData()
     );
 
-    const roleUpdateDisposer = autorun(() => {
-      if (instanceState.authUsername) {
-        runInAction(() => (this.currentRole = instanceState.authUsername));
-      } else {
-        const roles = instanceState.roles;
-        if (roles && !roles.includes(this.currentRole!)) {
-          runInAction(() => (this.currentRole = roles[0]));
+    const connectionDisposer = reaction(
+      () => instanceState.roles?.[0],
+      (currentRole) => {
+        if (currentRole) {
+          this._setConnection(
+            instanceState.getConnection(this.name, this.sessionState)
+          );
         }
-      }
-    });
-
-    const connectionDisposer = autorun(() => {
-      if (this.currentRole) {
-        this.setConnection(
-          new Connection({
-            config: frozen({
-              serverUrl: instanceState.serverUrl,
-              authToken: instanceState.authToken!,
-              database: this.name,
-              user: this.currentRole,
-            }),
-            serverVersion: frozen(instanceState.serverVersion),
-          })
-        );
-      }
-    });
+      },
+      {fireImmediately: true}
+    );
 
     return () => {
       fetchSchemaDisposer();
-      roleUpdateDisposer();
       connectionDisposer();
     };
   }
@@ -221,7 +208,7 @@ export class DatabaseState extends Model({
   updateObjectCount() {
     const abortController = new AbortController();
     this.connection
-      .query(
+      ?.query(
         `select count(std::Object)`,
         undefined,
         {ignoreSessionConfig: true},
@@ -246,7 +233,7 @@ export class DatabaseState extends Model({
 
   @modelFlow
   fetchSchemaData = _async(function* (this: DatabaseState) {
-    if (this.fetchingSchemaData) {
+    if (this.fetchingSchemaData || !this.connection) {
       return;
     }
 

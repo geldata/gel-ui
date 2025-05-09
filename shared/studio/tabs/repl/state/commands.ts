@@ -261,7 +261,7 @@ async function handleListCommand(
         const pattern = args[0];
 
         let names = (
-          await dbState.connection.query(
+          await dbState.connection!.query(
             `select names := ${
               type === "roles" ? "sys::Role.name" : "schema::Module.name"
             } order by names`
@@ -296,7 +296,7 @@ async function handleListCommand(
         const pattern = args[0];
 
         let casts = (
-          await dbState.connection.query(
+          await dbState.connection!.query(
             `select schema::Cast {
               from_type_name := .from_type.name,
               to_type_name := .to_type.name,
