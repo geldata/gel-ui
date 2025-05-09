@@ -47,8 +47,8 @@ export function createInspector(
         : null,
     noMultiline: true,
   });
-  inspector.extendedViewIds = extendedViewerIds;
-  inspector.openExtendedView = openExtendedView;
+  inspector._extendedViewIds = extendedViewerIds;
+  inspector._openExtendedView = openExtendedView;
   inspector.initData({data: result, codec: result._codec});
   return inspector;
 }
@@ -113,8 +113,24 @@ export class InspectorState extends Model({
     }
   }
 
-  extendedViewIds: Set<string> | null = null;
-  openExtendedView: ((item: Item) => void) | null = null;
+  _extendedViewIds: Set<string> | null = null;
+  _openExtendedView: ((item: Item) => void) | null = null;
+
+  hasExtendedView(item: Item | null): boolean {
+    return (
+      (this._openExtendedView != null &&
+        item?.type === ItemType.Scalar &&
+        (item.parent as any).data[item.index] != null &&
+        this._extendedViewIds?.has(item.codec.getKnownTypeName())) ??
+      false
+    );
+  }
+
+  openExtendedView(item: Item | null) {
+    if (this.hasExtendedView(item)) {
+      this._openExtendedView!(item!);
+    }
+  }
 
   loadNestedData: NestedDataGetter | null = null;
 

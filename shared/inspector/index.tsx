@@ -75,13 +75,7 @@ export function useInspectorKeybindings(state: InspectorState) {
           const item = state.selectedIndex
             ? state._items[state.selectedIndex]
             : null;
-          if (
-            state.openExtendedView &&
-            item?.type === ItemType.Scalar &&
-            state.extendedViewIds?.has(item.codec.getKnownTypeName())
-          ) {
-            state.openExtendedView(item);
-          }
+          state.openExtendedView(item);
           break;
         }
       }
@@ -388,12 +382,10 @@ export const InspectorRow = observer(function InspectorRow({
             [styles.multiline]: (item.height ?? 0) > 1,
           })}
         >
-          {state.openExtendedView &&
-          item.type === ItemType.Scalar &&
-          state.extendedViewIds?.has(item.codec.getKnownTypeName()) ? (
+          {state.hasExtendedView(item) ? (
             <div
               className={cn(styles.viewButton)}
-              onClick={() => state.openExtendedView?.(item)}
+              onClick={() => state.openExtendedView(item)}
             >
               <OpenExpandedViewIcon /> View
             </div>
