@@ -147,7 +147,7 @@ export const dashboardTabSpec: DatabaseTabSpec = {
 };
 
 export function fetchExampleSchema(): Promise<string> {
-  return import("./exampleSchema").then(({schemaScript}) => schemaScript);
+  return import("./exampleSchema.mjs").then(({schemaScript}) => schemaScript);
 }
 
 const FirstRunDashboard = observer(function FirstRunDashboard() {

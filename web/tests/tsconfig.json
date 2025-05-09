@@ -1,6 +1,0 @@
-{
-  "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "types": ["./global.d.ts", "@types/jest"]
-  }
-}
