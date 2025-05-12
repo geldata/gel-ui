@@ -75,6 +75,11 @@ const errorLineHighlight = Decoration.line({
   class: styles.errorLineHighlight,
 });
 
+const warningsUnderlineComp = new Compartment();
+const warningUnderlineMark = Decoration.mark({
+  class: styles.warningUnderline,
+});
+
 function getErrorExtension(range: [number, number], doc: Text) {
   if (range[1] > doc.length) {
     return [];
@@ -88,6 +93,16 @@ function getErrorExtension(range: [number, number], doc: Text) {
   for (let i = startLine; i <= endLine; i++) {
     decos.push(errorLineHighlight.range(doc.line(i).from));
   }
+
+  return EditorView.decorations.of(RangeSet.of(decos, true));
+}
+
+function getWarningsExtension(ranges: [number, number][], doc: Text) {
+  const decos: Range<Decoration>[] = ranges.flatMap((range) =>
+    range[1] <= doc.length && range[0] !== range[1]
+      ? [warningUnderlineMark.range(...range)]
+      : []
+  );
 
   return EditorView.decorations.of(RangeSet.of(decos, true));
 }
@@ -207,6 +222,7 @@ export interface CodeEditorProps {
   noPadding?: boolean;
   renderWhitespace?: boolean;
   errorUnderline?: [number, number];
+  warningUnderlines?: [number, number][];
   explainContexts?: ExplainContextsData;
 }
 
@@ -243,6 +259,7 @@ export function createCodeEditor({
     schemaObjects,
     renderWhitespace,
     errorUnderline,
+    warningUnderlines,
     explainContexts,
   }: {
     doc: Text;
@@ -253,6 +270,7 @@ export function createCodeEditor({
     schemaObjects?: Map<string, SchemaObjectType>;
     renderWhitespace?: boolean;
     errorUnderline?: [number, number];
+    warningUnderlines?: [number, number][];
     explainContexts?: ExplainContextsData;
   }) {
     return EditorState.create({
@@ -322,6 +340,9 @@ export function createCodeEditor({
         errorUnderlineComp.of(
           errorUnderline ? getErrorExtension(errorUnderline, doc) : []
         ),
+        warningsUnderlineComp.of(
+          warningUnderlines ? getWarningsExtension(warningUnderlines, doc) : []
+        ),
         explainContextsComp.of(
           explainContexts ? getExplainContextsExtension(explainContexts) : []
         ),
@@ -342,6 +363,7 @@ export function createCodeEditor({
       useDarkTheme = false,
       renderWhitespace,
       errorUnderline,
+      warningUnderlines,
       explainContexts,
     }: CodeEditorProps,
     componentRef
@@ -373,6 +395,7 @@ export function createCodeEditor({
             schemaObjects,
             renderWhitespace,
             errorUnderline,
+            warningUnderlines,
             explainContexts,
           }),
           parent: ref.current,
@@ -396,6 +419,7 @@ export function createCodeEditor({
             schemaObjects,
             renderWhitespace,
             errorUnderline,
+            warningUnderlines,
             explainContexts,
           })
         );
@@ -483,6 +507,16 @@ export function createCodeEditor({
         ),
       });
     }, [errorUnderline]);
+
+    useLayoutEffect(() => {
+      view.current?.dispatch({
+        effects: warningsUnderlineComp.reconfigure(
+          warningUnderlines
+            ? getWarningsExtension(warningUnderlines, view.current.state.doc)
+            : []
+        ),
+      });
+    }, [warningUnderlines]);
 
     useLayoutEffect(() => {
       view.current?.dispatch({

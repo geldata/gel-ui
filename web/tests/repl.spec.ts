@@ -40,4 +40,20 @@ test.describe("repl", () => {
       "\\l"
     );
   });
+
+  test("check query warnings are rendered", async ({uiClass}) => {
+    const replInput = uiClass("repl_replInput").locator(".cm-content");
+
+    await replInput.fill(`select Movie {title}\nfilter {true, false};`);
+    await replInput.press("Enter");
+
+    const response = uiClass("repl_replHistoryItem");
+
+    const warnings = response.locator(uiClass("repl_queryWarnings"));
+    await expect(warnings).toHaveCount(1);
+
+    await expect(warnings).toContainText(
+      "Warning: possibly more than one element returned by an expression in a FILTER clause"
+    );
+  });
 });

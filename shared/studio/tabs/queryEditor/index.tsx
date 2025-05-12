@@ -70,6 +70,7 @@ import {SplitViewDirection} from "@edgedb/common/ui/splitView/model";
 import {createPortal} from "react-dom";
 import {RelativeTime} from "@edgedb/common/utils/relativeTime";
 import {RecordCodec} from "gel/dist/codecs/record";
+import {ErrorDetails} from "../../utils/extractErrorDetails";
 
 export const QueryEditorView = observer(function QueryEditorView() {
   const editorState = useTabState(QueryEditor);
@@ -392,6 +393,14 @@ const QueryCodeEditor = observer(function QueryCodeEditor() {
               ? editorState.currentResult.error.data.range
               : undefined
           }
+          warningUnderlines={
+            editorState.showEditorResultDecorations &&
+            editorState.currentResult instanceof QueryHistoryResultItem
+              ? editorState.currentResult.warnings?.data
+                  .map((w) => w.range)
+                  .filter((r) => r != null)
+              : undefined
+          }
           explainContexts={
             editorState.showEditorResultDecorations && explainState
               ? {
@@ -429,7 +438,10 @@ const ResultInspector = observer(function ResultInspector({
   }, [height]);
 
   return (
-    <div ref={ref} style={{height: "100%", minWidth: 0, width: "100%"}}>
+    <div
+      ref={ref}
+      style={{minHeight: 0, height: "100%", minWidth: 0, width: "100%"}}
+    >
       <CustomScrollbars innerClass={innerClass}>
         <Inspector
           className={styles.inspector}
@@ -495,6 +507,13 @@ const QueryResult = observer(function QueryResult({
 
         content = (
           <>
+            {result.warnings?.data.length ? (
+              <div className={styles.queryWarnings}>
+                {result.warnings.data.map((warning, i) => (
+                  <QueryError key={i} error={warning} errorName="Warning" />
+                ))}
+              </div>
+            ) : null}
             {mode === OutputMode.Grid ? (
               <ResultGrid
                 state={result.getResultGridState(data)}
@@ -518,22 +537,7 @@ const QueryResult = observer(function QueryResult({
       );
     }
   } else if (result instanceof QueryHistoryErrorItem) {
-    content = (
-      <div className={styles.queryError}>
-        <span className={styles.errorName}>{result.error.data.name}</span>:{" "}
-        {result.error.data.msg}
-        {result.error.data.details ? (
-          <div className={styles.errorHint}>
-            Details: {result.error.data.details}
-          </div>
-        ) : null}
-        {result.error.data.hint ? (
-          <div className={styles.errorHint}>
-            Hint: {result.error.data.hint}
-          </div>
-        ) : null}
-      </div>
-    );
+    content = <QueryError error={result.error.data} />;
   }
 
   return (
@@ -545,6 +549,29 @@ const QueryResult = observer(function QueryResult({
     </div>
   );
 });
+
+export function QueryError({
+  className,
+  error,
+  errorName,
+}: {
+  className?: string;
+  error: ErrorDetails;
+  errorName?: string;
+}) {
+  return (
+    <div className={cn(styles.queryError, className)}>
+      <span className={styles.errorName}>{errorName ?? error.name}</span>:{" "}
+      {error.msg}
+      {error.details ? (
+        <div className={styles.errorHint}>Details: {error.details}</div>
+      ) : null}
+      {error.hint ? (
+        <div className={styles.errorHint}>Hint: {error.hint}</div>
+      ) : null}
+    </div>
+  );
+}
 
 export function outputModeToggle(
   codec: ICodec,
