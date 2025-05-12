@@ -147,6 +147,34 @@ test.describe("queryEditor", () => {
       // history sidebar is closed
       await expect(uiClass("queryeditor_history")).toBeHidden();
     });
+
+    test("check query warnings are rendered", async ({page, uiClass}) => {
+      const editor = page.locator(".cm-content");
+
+      await editor.fill("select Movie { title } filter {true, false}");
+
+      // run the query
+      await page.getByRole("button", {name: "Run"}).click();
+
+      const result = uiClass("queryeditor_queryResult");
+
+      const warnings = result.locator(uiClass("queryeditor_queryWarnings"));
+      await expect(warnings).toHaveCount(1);
+
+      await expect(
+        warnings.locator(uiClass("queryeditor_errorName"))
+      ).toHaveText("Warning");
+
+      await expect(
+        warnings.locator(uiClass("queryeditor_queryError"))
+      ).toContainText(
+        "possibly more than one element returned by an expression in a FILTER clause"
+      );
+
+      await expect(
+        warnings.locator(uiClass("queryeditor_errorHint"))
+      ).toHaveText("Hint: If this is intended, try using any()");
+    });
   });
 
   test.describe("builder", () => {
