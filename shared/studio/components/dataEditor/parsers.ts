@@ -11,7 +11,7 @@ import {
   parseWKT,
   RelativeDuration,
   SparseVector,
-} from "edgedb";
+} from "gel";
 
 const parsers: {
   [typename: string]: (val: string, typeArgs: string[] | null) => any;

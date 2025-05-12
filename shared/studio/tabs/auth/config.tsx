@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import {observer} from "mobx-react-lite";
 import {HexColorPicker} from "react-colorful";
-import {encodeB64} from "edgedb/dist/primitives/buffer";
+import {encodeB64} from "gel/dist/primitives/buffer";
 
 import cn from "@edgedb/common/utils/classNames";
 

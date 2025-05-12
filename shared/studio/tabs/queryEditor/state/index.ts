@@ -58,12 +58,12 @@ import {
   createExplainState,
   ExplainState,
 } from "../../../components/explainVis/state";
-import {Language, ProtocolVersion} from "edgedb/dist/ifaces";
+import {Language, ProtocolVersion} from "gel/dist/ifaces";
 import {
   createResultGridState,
   ResultGridState,
 } from "@edgedb/common/components/resultGrid";
-import LRU from "edgedb/dist/primitives/lru";
+import LRU from "gel/dist/primitives/lru";
 
 export enum EditorKind {
   EdgeQL,

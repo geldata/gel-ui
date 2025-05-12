@@ -7,7 +7,7 @@ import {
 } from "react";
 import {observer} from "mobx-react-lite";
 
-import * as PostGIS from "edgedb/dist/datatypes/postgis";
+import * as PostGIS from "gel/dist/datatypes/postgis";
 import {
   Geometry,
   LineString,

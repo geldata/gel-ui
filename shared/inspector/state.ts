@@ -12,7 +12,7 @@ import {
   idProp,
 } from "mobx-keystone";
 import {action, computed, observable} from "mobx";
-import {_ICodec} from "edgedb";
+import {_ICodec} from "gel";
 import {Item, buildItem, expandItem, ItemType} from "./buildItem";
 import {prettyPrintJSON} from "./buildScalar";
 

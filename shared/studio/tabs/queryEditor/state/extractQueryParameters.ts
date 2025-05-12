@@ -13,9 +13,9 @@ import {
   serializePrimitiveType,
 } from "../../../components/dataEditor/utils";
 import {Connection} from "../../../state/connection";
-import {Cardinality, Language} from "edgedb/dist/ifaces";
-import {ObjectCodec} from "edgedb/dist/codecs/object";
-import {ICodec} from "edgedb/dist/codecs/ifaces";
+import {Cardinality, Language} from "gel/dist/ifaces";
+import {ObjectCodec} from "gel/dist/codecs/object";
+import {ICodec} from "gel/dist/codecs/ifaces";
 
 export type ResolvedParameter =
   | {

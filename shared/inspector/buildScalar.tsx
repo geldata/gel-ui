@@ -7,12 +7,12 @@ import {
   SparseVector,
   Geometry,
   type AnyGeometry,
-} from "edgedb";
+} from "gel";
 
 import cn from "@edgedb/common/utils/classNames";
 
-import {EnumCodec} from "edgedb/dist/codecs/enum";
-import {RangeCodec, MultiRangeCodec} from "edgedb/dist/codecs/range";
+import {EnumCodec} from "gel/dist/codecs/enum";
+import {RangeCodec, MultiRangeCodec} from "gel/dist/codecs/range";
 
 import {Item, ItemType} from "./buildItem";
 
