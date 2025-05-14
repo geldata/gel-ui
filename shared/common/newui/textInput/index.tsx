@@ -1,4 +1,9 @@
-import {ForwardedRef, InputHTMLAttributes, forwardRef} from "react";
+import {
+  ForwardedRef,
+  InputHTMLAttributes,
+  TextareaHTMLAttributes,
+  forwardRef,
+} from "react";
 
 import cn from "@edgedb/common/utils/classNames";
 
@@ -7,15 +12,25 @@ import {FieldHeader, FieldHeaderProps} from "../fieldHeader";
 
 import styles from "./textInput.module.scss";
 
-export interface TextInputProps extends FieldHeaderProps {
+interface TextInputProps extends FieldHeaderProps {
   className?: string;
-  type?: "text" | "password" | "textarea";
   error?: string | null;
   prefix?: string;
   suffixEl?: JSX.Element;
 }
 
-export const TextInput = forwardRef(function TextInput(
+type ITextProps = {
+  (
+    props: {type: "textarea"} & TextInputProps &
+      TextareaHTMLAttributes<HTMLTextAreaElement>
+  ): React.ReactNode;
+  (
+    props: {type?: "text" | "password"} & TextInputProps &
+      Omit<InputHTMLAttributes<HTMLInputElement>, "type">
+  ): React.ReactNode;
+};
+
+export const TextInput: ITextProps = forwardRef(function TextInput(
   {
     className,
     type,
@@ -26,8 +41,7 @@ export const TextInput = forwardRef(function TextInput(
     prefix,
     suffixEl,
     ...props
-  }: TextInputProps &
-    Omit<InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement>, "type">,
+  }: {type?: "text" | "password" | "textarea"} & TextInputProps,
   ref: ForwardedRef<HTMLInputElement & HTMLTextAreaElement>
 ) {
   const Input = type === "textarea" ? "textarea" : "input";

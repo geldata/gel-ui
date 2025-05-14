@@ -1,4 +1,4 @@
-import {HTMLAttributes, PropsWithChildren} from "react";
+import {forwardRef, HTMLAttributes, PropsWithChildren} from "react";
 
 import cn from "@edgedb/common/utils/classNames";
 
@@ -18,34 +18,41 @@ export interface ModalProps {
   footerExtra?: JSX.Element;
 }
 
-export function ModalPanel({
-  className,
-  noHeader,
-  title,
-  subheading,
-  onClose,
-  onSubmit,
-  formError,
-  children,
-  footerDetails,
-  footerButtons,
-  footerExtra,
-}: PropsWithChildren<
-  | ({noHeader?: false} & Omit<ModalProps, "noCloseOnOverlayClick">)
-  | ({
-      noHeader: true;
-      title?: undefined;
-      subheading?: undefined;
-      onClose?: undefined;
-    } & Omit<
-      ModalProps,
-      "noCloseOnOverlayClick" | "title" | "subheading" | "onClose"
-    >)
->) {
+export const ModalPanel = forwardRef<
+  HTMLDivElement | HTMLFormElement,
+  PropsWithChildren<
+    | ({noHeader?: false} & Omit<ModalProps, "noCloseOnOverlayClick">)
+    | ({
+        noHeader: true;
+        title?: undefined;
+        subheading?: undefined;
+        onClose?: undefined;
+      } & Omit<
+        ModalProps,
+        "noCloseOnOverlayClick" | "title" | "subheading" | "onClose"
+      >)
+  >
+>(function _ModalPanel(
+  {
+    className,
+    noHeader,
+    title,
+    subheading,
+    onClose,
+    onSubmit,
+    formError,
+    children,
+    footerDetails,
+    footerButtons,
+    footerExtra,
+  },
+  ref
+) {
   const El = onSubmit ? "form" : "div";
 
   return (
     <El
+      ref={ref as any}
       className={cn(styles.modal, className)}
       onSubmit={
         onSubmit
@@ -90,7 +97,7 @@ export function ModalPanel({
       ) : null}
     </El>
   );
-}
+});
 
 export function ModalOverlay({
   noCloseOnOverlayClick,
@@ -115,19 +122,19 @@ export function ModalOverlay({
   );
 }
 
-export function Modal({
-  noCloseOnOverlayClick,
-  ...props
-}: PropsWithChildren<ModalProps>) {
+export const Modal = forwardRef<
+  HTMLDivElement | HTMLFormElement,
+  PropsWithChildren<ModalProps>
+>(function _Modal({noCloseOnOverlayClick, ...props}, ref) {
   return (
     <ModalOverlay
       noCloseOnOverlayClick={noCloseOnOverlayClick}
       onClose={props.onClose}
     >
-      <ModalPanel {...props} />
+      <ModalPanel ref={ref} {...props} />
     </ModalOverlay>
   );
-}
+});
 
 export function ModalContent({
   className,

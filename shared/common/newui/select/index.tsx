@@ -7,14 +7,22 @@ export type {SelectItem, SelectItems} from "@edgedb/common/ui/select";
 
 import styles from "./select.module.scss";
 
-export type SelectProps<T = any> = _SelectProps<T> & {label?: string};
+export type SelectProps<T = any> = _SelectProps<T> & {
+  label?: string | JSX.Element;
+  inputClassName?: string;
+};
 
-export function Select<T>({className, label, ...props}: SelectProps<T>) {
+export function Select<T>({
+  className,
+  label,
+  inputClassName,
+  ...props
+}: SelectProps<T>) {
   if (label != null) {
     return (
       <label className={cn(styles.selectField, className)}>
         <div className={styles.fieldHeader}>{label}</div>
-        <_Select className={styles.select} {...props} />
+        <_Select className={cn(styles.select, inputClassName)} {...props} />
       </label>
     );
   }
