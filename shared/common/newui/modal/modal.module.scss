@@ -34,10 +34,13 @@
   }
 
   .modal {
-    box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.16),
+    box-shadow:
+      0px 4px 16px 0px rgba(0, 0, 0, 0.16),
       0px 2px 4px 0px rgba(0, 0, 0, 0.08);
 
-    transition: transform 0.3s, opacity 0.3s;
+    transition:
+      transform 0.3s,
+      opacity 0.3s;
 
     :global(.MODAL_TRANSITION) & {
       transform: translateY(100px);
@@ -51,7 +54,8 @@
     }
 
     .modal {
-      box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.4),
+      box-shadow:
+        0px 4px 16px 0px rgba(0, 0, 0, 0.4),
         0px 2px 4px 0px rgba(0, 0, 0, 0.2);
     }
   }
@@ -169,6 +173,9 @@
     display: flex;
     align-items: flex-end;
     gap: 6px;
+    width: var(--footerContentWidth, 100%);
+    max-width: 100%;
+    margin: 0 auto;
   }
 
   .footerDetails {
@@ -184,8 +191,6 @@
 .formError {
   display: flex;
   padding: 12px 16px;
-  align-items: center;
-  gap: 8px;
   border-top: 1px solid #e55e5e;
   border-bottom: 1px solid #e55e5e;
   background: #fce3e3;
@@ -197,15 +202,23 @@
   font-weight: 450;
   line-height: 16px;
 
-  > div {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 5;
-    -webkit-box-orient: vertical;
-  }
+  .formErrorContent {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: var(--footerContentWidth, 100%);
+    margin: 0 auto;
 
-  svg {
-    flex-shrink: 0;
+    > div {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
   }
 
   @include darkTheme {

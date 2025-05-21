@@ -5,13 +5,17 @@ import cn from "@edgedb/common/utils/classNames";
 import styles from "./modal.module.scss";
 import {CrossIcon, WarningIcon} from "../icons";
 
-export interface ModalProps {
+export interface ModalProps extends ModalFooterProps {
   className?: string;
   title: string;
   subheading?: string | JSX.Element;
+  headerButtons?: JSX.Element;
   onClose?: () => void;
   noCloseOnOverlayClick?: boolean;
   onSubmit?: () => void;
+}
+
+export interface ModalFooterProps {
   formError?: string | JSX.Element | null;
   footerButtons?: JSX.Element;
   footerDetails?: JSX.Element;
@@ -26,6 +30,7 @@ export const ModalPanel = forwardRef<
         noHeader: true;
         title?: undefined;
         subheading?: undefined;
+        headerButtons?: undefined;
         onClose?: undefined;
       } & Omit<
         ModalProps,
@@ -38,13 +43,11 @@ export const ModalPanel = forwardRef<
     noHeader,
     title,
     subheading,
+    headerButtons,
     onClose,
     onSubmit,
-    formError,
     children,
-    footerDetails,
-    footerButtons,
-    footerExtra,
+    ...footerProps
   },
   ref
 ) {
@@ -72,6 +75,7 @@ export const ModalPanel = forwardRef<
               <div className={styles.subheading}>{subheading}</div>
             ) : null}
           </div>
+          {headerButtons}
           {onClose ? (
             <div className={styles.closeButton} onClick={onClose}>
               <CrossIcon />
@@ -80,10 +84,25 @@ export const ModalPanel = forwardRef<
         </div>
       ) : null}
       {children}
+      <ModalFooter {...footerProps} />
+    </El>
+  );
+});
+
+export function ModalFooter({
+  formError,
+  footerDetails,
+  footerButtons,
+  footerExtra,
+}: ModalFooterProps) {
+  return (
+    <>
       {formError ? (
         <div className={styles.formError}>
-          <WarningIcon />
-          <div>{formError}</div>
+          <div className={styles.formErrorContent}>
+            <WarningIcon />
+            <div>{formError}</div>
+          </div>
         </div>
       ) : null}
       {footerButtons || footerDetails ? (
@@ -95,9 +114,9 @@ export const ModalPanel = forwardRef<
           </div>
         </div>
       ) : null}
-    </El>
+    </>
   );
-});
+}
 
 export function ModalOverlay({
   noCloseOnOverlayClick,

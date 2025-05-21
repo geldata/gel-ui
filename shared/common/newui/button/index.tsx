@@ -56,8 +56,8 @@ function _Button({
             {typeof shortcut === "string"
               ? shortcut
               : isMac && shortcut.macos
-              ? shortcut.macos
-              : shortcut.default}
+                ? shortcut.macos
+                : shortcut.default}
           </span>
         ) : null}
       </span>

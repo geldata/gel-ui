@@ -39,7 +39,7 @@
     border-radius: 6px;
     border: 1px solid var(--Grey90, #e6e6e6);
     background: #fff;
-    padding: 9px 12px;
+    padding: var(--textInputVPadding, 9px) 12px;
     font-family: "Roboto Mono Variable", monospace;
     font-size: 14px;
     font-weight: 400;
@@ -65,7 +65,7 @@
     width: 38px;
     display: flex;
     justify-content: center;
-    padding: 10px 0;
+    padding: calc(var(--textInputVPadding, 9px) + 1px) 0;
     box-sizing: border-box;
     right: 0;
     top: 0;
