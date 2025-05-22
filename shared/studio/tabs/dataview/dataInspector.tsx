@@ -707,7 +707,12 @@ const DataRowIndex = observer(function DataRowIndex({
 
   // const isMobile = useIsMobile();
 
-  if (dataIndex !== null && dataIndex >= (state.rowCount ?? 0)) return null;
+  if (
+    dataIndex !== null &&
+    dataIndex >= (state.rowCount ?? state.loadedRowCount)
+  ) {
+    return null;
+  }
 
   const rowDataIndex = rowIndex - state.insertedRows.length;
 

@@ -400,7 +400,10 @@ export class DataInspector extends Model({
 
   @computed
   get indexColWidth() {
-    return 62 + Math.ceil((this.rowCount ?? 0).toString().length * 7.8);
+    return (
+      62 +
+      Math.ceil((this.rowCount ?? this.loadedRowCount).toString().length * 7.8)
+    );
   }
 
   @action
@@ -687,6 +690,8 @@ export class DataInspector extends Model({
 
   @observable
   rowCount: number | null = null;
+  @observable
+  loadedRowCount: number = 0;
 
   _pendingOffsets: number[] = [];
 
@@ -704,7 +709,8 @@ export class DataInspector extends Model({
   @computed
   get gridRowCount() {
     return (
-      (this.rowCount ?? 0) +
+      (this.rowCount ??
+        (this.loadedRowCount > 0 ? this.loadedRowCount + 1 : fetchBlockSize)) +
       this.expandedRows.reduce(
         (sum, row) => sum + row.inspector.rowsCount,
         0
@@ -1032,6 +1038,15 @@ export class DataInspector extends Model({
   _setData(offset: number, data: EdgeDBSet) {
     this.data.set(offset, data);
 
+    const endCount = offset * fetchBlockSize + data.length;
+    this.loadedRowCount = Math.max(this.loadedRowCount, endCount);
+    if (data.length !== fetchBlockSize && endCount !== this.rowCount) {
+      // not a full block of rows, so we're at the end
+      // and known row count doesn't match, so update the count
+      this.rowCount = endCount;
+      this.loadedRowCount = endCount;
+    }
+
     if (!this.dataCodecs) {
       const codec = data._codec as ObjectCodec;
       const codecs = codec.getSubcodecs();
@@ -1063,6 +1078,7 @@ export class DataInspector extends Model({
   @modelAction
   _refreshData(updateCount: boolean = false, fieldsChanged: boolean = false) {
     this.data.clear();
+    this.loadedRowCount = 0;
     if (fieldsChanged) {
       this.dataCodecs = null;
     }
