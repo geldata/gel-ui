@@ -303,15 +303,12 @@ function serialiseColWidths(
   fields?: Map<string, ObjectField>
 ): string {
   return JSON.stringify(
-    [...colWidths.entries()].reduce(
-      (widths, [id, width]) => {
-        if (id !== "_indexCol" && (!fields || fields.has(id))) {
-          widths[id] = width;
-        }
-        return widths;
-      },
-      {} as {[id: string]: number}
-    )
+    [...colWidths.entries()].reduce((widths, [id, width]) => {
+      if (id !== "_indexCol" && (!fields || fields.has(id))) {
+        widths[id] = width;
+      }
+      return widths;
+    }, {} as {[id: string]: number})
   );
 }
 function deserialiseColWidths(rawWidths: string): {[id: string]: number} {
@@ -1111,8 +1108,8 @@ export class DataInspector extends Model({
     return this.parentObject
       ? `<${typeUnionNames.join(" | ")}>{}`
       : typeUnionNames.length > 1
-        ? `{${typeUnionNames.join(", ")}}`
-        : typeUnionNames[0];
+      ? `{${typeUnionNames.join(", ")}}`
+      : typeUnionNames[0];
   }
 
   getBaseObjectsQuery() {
@@ -1190,14 +1187,14 @@ export class DataInspector extends Model({
     rows := (SELECT baseObjects ${
       this.filter[0] ? `FILTER ${this.filter[0]}` : ""
     } ORDER BY ${inEditMode ? `.__isLinked DESC THEN` : ""}${
-      sortField
-        ? `${
-            sortField.escapedSubtypeName
-              ? `[IS ${sortField.escapedSubtypeName}]`
-              : ""
-          }.${sortField.escapedName} ${this.sortBy!.direction} THEN`
-        : ""
-    } .id OFFSET <int32>$offset LIMIT ${fetchBlockSize})
+        sortField
+          ? `${
+              sortField.escapedSubtypeName
+                ? `[IS ${sortField.escapedSubtypeName}]`
+                : ""
+            }.${sortField.escapedName} ${this.sortBy!.direction} THEN`
+          : ""
+      } .id OFFSET <int32>$offset LIMIT ${fetchBlockSize})
     SELECT rows {
       id,
       ${inEditMode ? "__isLinked," : ""}
@@ -1216,13 +1213,13 @@ export class DataInspector extends Model({
             }`;
           } else {
             if (this.omittedLinks.has(field.name)) {
-              return `__count_${field.queryName} := <int64>{}`;
+              return `__count_${field.queryName} := <int32>{}`;
             }
             const typeUnionNames = resolveObjectTypeUnion(
               this.objectType!
             ).map((t) => t.escapedName);
-            return `__count_${field.queryName} := (for g in (
-              group ${
+            return `__count_${field.queryName} := <int32>count((
+              select ${
                 this.fieldNeedsAccessPolicyWorkaround(field)
                   ? `(
                 with sourceId := .id
@@ -1236,12 +1233,8 @@ export class DataInspector extends Model({
               )`
                   : selectName
               }
-              using typename := .__type__.name
-              by typename
-            ) union {
-              typename := g.key.typename,
-              count := <std::float64>count(g.elements)
-            })`;
+              limit 120
+            ))`;
           }
         })
         .filter((line) => !!line)
@@ -1566,14 +1559,14 @@ class ExpandedInspector extends Model({
         }${accessPolicyWorkaround ? "" : " limit 10"}`;
           return `${linkSelect},
         \`__count_${linkName}\` := count(${
-          accessPolicyWorkaround
-            ? `(
+            accessPolicyWorkaround
+              ? `(
           with sourceId := .id
           select ${link.target!.escapedName}
           filter .<${link.escapedName}.id = sourceId
         )`
-            : `.\`${linkName}\``
-        })`;
+              : `.\`${linkName}\``
+          })`;
         }),
       ].join(",\n")}
     } filter .id = <uuid><str>$objectId`;

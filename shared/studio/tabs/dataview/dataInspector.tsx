@@ -35,7 +35,7 @@ import {PrimitiveType} from "../../components/dataEditor";
 import {DataEditor} from "../../components/dataEditor/editor";
 import {renderInvalidEditorValue} from "../../components/dataEditor/utils";
 
-import {ChevronDownIcon} from "@edgedb/common/newui";
+import {ArrowRightIcon, ChevronDownIcon} from "@edgedb/common/newui";
 
 import {
   DataGrid,
@@ -542,46 +542,46 @@ const GridCell = observer(function GridCell({
     } else {
       const countData = data?.[`__count_${field.queryName}`];
       if (countData !== null || insertedRow) {
-        const counts: {[typename: string]: number} =
-          field.multi || !linkEditState
-            ? countData?.reduce((counts: any, {typename, count}: any) => {
-                counts[typename] = count;
-                return counts;
-              }, {}) ?? {}
-            : {};
+        let totalCount = field.multi || !linkEditState ? countData ?? 0 : 0;
 
         if (linkEditState) {
+          let editCount = 0;
           for (const change of linkEditState.changes.values()) {
-            counts[change.typename] =
-              change.kind === UpdateLinkChangeKind.Set
-                ? 1
-                : (counts[change.typename] ?? 0) +
-                  (change.kind === UpdateLinkChangeKind.Add ? 1 : -1);
+            if (change.kind === UpdateLinkChangeKind.Set) {
+              totalCount = 1;
+            } else {
+              editCount += change.kind === UpdateLinkChangeKind.Add ? 1 : -1;
+            }
           }
-          for (const insert of linkEditState.inserts.values()) {
-            counts[insert.objectTypeName] =
-              (counts[insert.objectTypeName] ?? 0) + 1;
+          editCount += linkEditState.inserts.size;
+
+          // we limit totalCount to 120 so if it equals that we don't know the
+          // true count, so don't apply editCount corrections
+          if (totalCount !== 120) {
+            totalCount = Math.max(0, totalCount + editCount);
           }
         }
 
-        if (Object.keys(counts).length === 0) {
+        if (totalCount === 0) {
           content = (
-            <span className={styles.emptySet}>
-              {field.required && !insertedRow && !linkEditState
-                ? "hidden by access policy"
-                : "{}"}
-            </span>
+            <>
+              <span className={styles.emptySet}>
+                {field.required && !insertedRow && !linkEditState
+                  ? "hidden by access policy"
+                  : "{}"}
+              </span>
+              <ArrowRightIcon />
+            </>
           );
         } else {
           content = (
-            <div className={styles.linksCell}>
-              {Object.entries(counts).map(([typename, count], i) => (
-                <div className={styles.linkObjName} key={i}>
-                  {typename}
-                  <span>{count}</span>
-                </div>
-              ))}
-            </div>
+            <>
+              <div className={styles.linksCell}>
+                {totalCount > 100 ? "100+" : totalCount}{" "}
+                <span>object{totalCount != 1 ? "s" : ""}</span>
+              </div>
+              <ArrowRightIcon />
+            </>
           );
         }
       }
