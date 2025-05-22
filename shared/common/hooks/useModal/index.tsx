@@ -8,7 +8,7 @@ import {
 } from "react";
 import {createPortal} from "react-dom";
 
-const modalContext = createContext<{
+export const _modalContext = createContext<{
   modal: JSX.Element | null;
   openModal: (modal: JSX.Element | null, transition?: boolean) => () => void;
   _modalOpen: boolean;
@@ -66,7 +66,7 @@ export function ModalProvider({children}: PropsWithChildren<{}>) {
   }, [transitionState]);
 
   return (
-    <modalContext.Provider
+    <_modalContext.Provider
       value={{
         modal: modal,
         openModal,
@@ -88,7 +88,7 @@ export function ModalProvider({children}: PropsWithChildren<{}>) {
         {modal}
         <div id="modal_target" style={{display: "contents"}} />
       </div>
-    </modalContext.Provider>
+    </_modalContext.Provider>
   );
 }
 
@@ -108,7 +108,7 @@ export function useModal(modal?: (ctx: any) => JSX.Element): {
     | ((modal: JSX.Element | null, transition?: boolean) => () => void)
     | ((ctx: any, transition?: boolean) => () => void);
 } {
-  const ctx = useContext(modalContext);
+  const ctx = useContext(_modalContext);
   const placeholder = useRef(<></>);
   const modalCtx = useRef<any>();
 
@@ -135,6 +135,6 @@ export function useModal(modal?: (ctx: any) => JSX.Element): {
 }
 
 export function useCloseModal() {
-  const {openModal} = useContext(modalContext);
+  const {openModal} = useContext(_modalContext);
   return (transition?: boolean) => openModal(null, transition);
 }
