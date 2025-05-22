@@ -7,7 +7,7 @@ export function calculateInitialColWidths(
   let totalWidth = 0;
   for (const col of cols) {
     if (col.isLink) {
-      colWidths[col.id] = 280;
+      colWidths[col.id] = 180;
       continue;
     }
     const width = sizedColTypes[col.typename];
