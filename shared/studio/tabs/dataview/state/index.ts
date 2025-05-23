@@ -303,15 +303,12 @@ function serialiseColWidths(
   fields?: Map<string, ObjectField>
 ): string {
   return JSON.stringify(
-    [...colWidths.entries()].reduce(
-      (widths, [id, width]) => {
-        if (id !== "_indexCol" && (!fields || fields.has(id))) {
-          widths[id] = width;
-        }
-        return widths;
-      },
-      {} as {[id: string]: number}
-    )
+    [...colWidths.entries()].reduce((widths, [id, width]) => {
+      if (id !== "_indexCol" && (!fields || fields.has(id))) {
+        widths[id] = width;
+      }
+      return widths;
+    }, {} as {[id: string]: number})
   );
 }
 function deserialiseColWidths(rawWidths: string): {[id: string]: number} {
@@ -400,7 +397,10 @@ export class DataInspector extends Model({
 
   @computed
   get indexColWidth() {
-    return 62 + Math.ceil((this.rowCount ?? 0).toString().length * 7.8);
+    return (
+      62 +
+      Math.ceil((this.rowCount ?? this.loadedRowCount).toString().length * 7.8)
+    );
   }
 
   @action
@@ -454,6 +454,8 @@ export class DataInspector extends Model({
     );
 
     return () => {
+      this.abortFetching();
+
       updateFieldDisposer();
       refreshDataDisposer();
       refreshFieldsDataDisposer();
@@ -687,6 +689,8 @@ export class DataInspector extends Model({
 
   @observable
   rowCount: number | null = null;
+  @observable
+  loadedRowCount: number = 0;
 
   _pendingOffsets: number[] = [];
 
@@ -704,7 +708,8 @@ export class DataInspector extends Model({
   @computed
   get gridRowCount() {
     return (
-      (this.rowCount ?? 0) +
+      (this.rowCount ??
+        (this.loadedRowCount > 0 ? this.loadedRowCount + 1 : fetchBlockSize)) +
       this.expandedRows.reduce(
         (sum, row) => sum + row.inspector.rowsCount,
         0
@@ -744,8 +749,6 @@ export class DataInspector extends Model({
       !this.runningDataFetch ||
       !this._pendingOffsets.includes(this.runningDataFetch.offset)
     ) {
-      this.runningDataFetch?.abortController.abort();
-      this.runningDataFetch = null;
       this._fetchData();
     }
   }
@@ -797,6 +800,8 @@ export class DataInspector extends Model({
     ];
   }
 
+  _runningRowCount: AbortController | null = null;
+
   @modelFlow
   _updateRowCount = _async(function* (this: DataInspector) {
     const conn = connCtx.get(this)!;
@@ -804,7 +809,11 @@ export class DataInspector extends Model({
 
     const {query, params} = this.getBaseObjectsQuery();
     dbState.setLoadingTab(DataView, true);
+
+    this._runningRowCount?.abort();
+    this._runningRowCount = new AbortController();
     this.rowCount = null;
+
     try {
       const data = yield* _await(
         conn.query(
@@ -812,16 +821,23 @@ export class DataInspector extends Model({
           select count((select baseQuery ${
             this.filter[0] ? ` FILTER ${this.filter[0]}` : ""
           }))`,
-          params
+          params,
+          undefined,
+          this._runningRowCount.signal
         )
       );
+      this._runningRowCount = null;
 
       if (data.result) {
         this.rowCount = parseInt(data.result[0], 10);
       }
     } catch (err) {
-      this.dataFetchingError = err as Error;
-      console.error(err);
+      if (err instanceof DOMException && err.name === "AbortError") {
+        // ignore aborted query error
+      } else {
+        this.dataFetchingError = err as Error;
+        console.error(err);
+      }
     } finally {
       dbState.setLoadingTab(DataView, false);
     }
@@ -894,6 +910,15 @@ export class DataInspector extends Model({
   @computed
   get fetchingData() {
     return this.runningDataFetch != null;
+  }
+
+  @action
+  abortFetching() {
+    this.runningDataFetch?.abortController.abort();
+    this.runningDataFetch = null;
+
+    this._runningRowCount?.abort();
+    this._runningRowCount = null;
   }
 
   @observable.ref
@@ -983,13 +1008,13 @@ export class DataInspector extends Model({
           )
         );
 
+        this.runningDataFetch = null;
         this.dataFetchingError = null;
 
         // console.log(offset, data.duration);
 
         if (data.result) {
           // console.log(`data ${offset}, length ${data.result.length}`);
-
           this._setData(offset, data.result);
         }
 
@@ -1002,7 +1027,6 @@ export class DataInspector extends Model({
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
         // ignore aborted fetches
-        console.log("data fetch aborted");
       } else if (err instanceof CardinalityViolationError) {
         const match = err.message.match(
           /^required link '.+' of object type '.+' is hidden by access policy \(while evaluating computed link '(.+)' of object type '.+'\)$/
@@ -1019,7 +1043,6 @@ export class DataInspector extends Model({
         console.error(err);
       }
     } finally {
-      this.runningDataFetch = null;
       dbState.setLoadingTab(DataView, false);
     }
 
@@ -1031,6 +1054,15 @@ export class DataInspector extends Model({
   @modelAction
   _setData(offset: number, data: EdgeDBSet) {
     this.data.set(offset, data);
+
+    const endCount = offset * fetchBlockSize + data.length;
+    this.loadedRowCount = Math.max(this.loadedRowCount, endCount);
+    if (data.length !== fetchBlockSize && endCount !== this.rowCount) {
+      // not a full block of rows, so we're at the end
+      // and known row count doesn't match, so update the count
+      this.rowCount = endCount;
+      this.loadedRowCount = endCount;
+    }
 
     if (!this.dataCodecs) {
       const codec = data._codec as ObjectCodec;
@@ -1063,15 +1095,13 @@ export class DataInspector extends Model({
   @modelAction
   _refreshData(updateCount: boolean = false, fieldsChanged: boolean = false) {
     this.data.clear();
+    this.loadedRowCount = 0;
     if (fieldsChanged) {
       this.dataCodecs = null;
     }
     this.expandedRows = [];
     this._pendingOffsets = [...this.visibleOffsets];
     this.fullyFetchedData.clear();
-
-    this.runningDataFetch?.abortController.abort();
-    this.runningDataFetch = null;
 
     if (updateCount) {
       this._updateRowCount();
@@ -1111,8 +1141,8 @@ export class DataInspector extends Model({
     return this.parentObject
       ? `<${typeUnionNames.join(" | ")}>{}`
       : typeUnionNames.length > 1
-        ? `{${typeUnionNames.join(", ")}}`
-        : typeUnionNames[0];
+      ? `{${typeUnionNames.join(", ")}}`
+      : typeUnionNames[0];
   }
 
   getBaseObjectsQuery() {
@@ -1190,14 +1220,14 @@ export class DataInspector extends Model({
     rows := (SELECT baseObjects ${
       this.filter[0] ? `FILTER ${this.filter[0]}` : ""
     } ORDER BY ${inEditMode ? `.__isLinked DESC THEN` : ""}${
-      sortField
-        ? `${
-            sortField.escapedSubtypeName
-              ? `[IS ${sortField.escapedSubtypeName}]`
-              : ""
-          }.${sortField.escapedName} ${this.sortBy!.direction} THEN`
-        : ""
-    } .id OFFSET <int32>$offset LIMIT ${fetchBlockSize})
+        sortField
+          ? `${
+              sortField.escapedSubtypeName
+                ? `[IS ${sortField.escapedSubtypeName}]`
+                : ""
+            }.${sortField.escapedName} ${this.sortBy!.direction} THEN`
+          : ""
+      } .id OFFSET <int32>$offset LIMIT ${fetchBlockSize})
     SELECT rows {
       id,
       ${inEditMode ? "__isLinked," : ""}
@@ -1323,8 +1353,7 @@ export class DataInspector extends Model({
 
     const conn = connCtx.get(this)!;
 
-    this.runningDataFetch?.abortController.abort();
-    this.runningDataFetch = null;
+    this.abortFetching();
 
     try {
       yield* _await(conn.parse(filterCheckQuery));
@@ -1566,14 +1595,14 @@ class ExpandedInspector extends Model({
         }${accessPolicyWorkaround ? "" : " limit 10"}`;
           return `${linkSelect},
         \`__count_${linkName}\` := count(${
-          accessPolicyWorkaround
-            ? `(
+            accessPolicyWorkaround
+              ? `(
           with sourceId := .id
           select ${link.target!.escapedName}
           filter .<${link.escapedName}.id = sourceId
         )`
-            : `.\`${linkName}\``
-        })`;
+              : `.\`${linkName}\``
+          })`;
         }),
       ].join(",\n")}
     } filter .id = <uuid><str>$objectId`;
