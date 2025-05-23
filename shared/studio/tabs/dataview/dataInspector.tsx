@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect} from "react";
+import {createContext, useContext, useEffect, useLayoutEffect} from "react";
 import {observer} from "mobx-react-lite";
 
 import cn from "@edgedb/common/utils/classNames";
@@ -304,7 +304,9 @@ const DataViewContent = observer(function DataViewContent({
 }) {
   const ranges = state.grid.visibleRanges;
 
-  state.updateVisibleOffsets(...ranges.rows);
+  useLayoutEffect(() => {
+    state.updateVisibleOffsets(...ranges.rows);
+  });
 
   const cells: JSX.Element[] = [];
   const pinnedCells: JSX.Element[] = [];
