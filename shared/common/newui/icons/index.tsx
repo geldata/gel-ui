@@ -1025,3 +1025,24 @@ export function FileIcon({className}: {className?: string}) {
     </svg>
   );
 }
+
+export function DeleteIcon({className}: {className?: string}) {
+  return (
+    <svg
+      className={className}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5 7.2H6.55556M6.55556 7.2H19M6.55556 7.2V18.4C6.55556 18.8243 6.71944 19.2313 7.01117 19.5314C7.30289 19.8314 7.69855 20 8.11111 20H15.8889C16.3014 20 16.6971 19.8314 16.9888 19.5314C17.2806 19.2313 17.4444 18.8243 17.4444 18.4V7.2M8.88889 7.2V5.6C8.88889 5.17565 9.05278 4.76869 9.3445 4.46863C9.63622 4.16857 10.0319 4 10.4444 4H13.5556C13.9681 4 14.3638 4.16857 14.6555 4.46863C14.9472 4.76869 15.1111 5.17565 15.1111 5.6V7.2M10.4444 11.2V16M13.5556 11.2V16"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
