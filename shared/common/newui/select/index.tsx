@@ -26,5 +26,10 @@ export function Select<T>({
       </label>
     );
   }
-  return <_Select className={cn(styles.select, className)} {...props} />;
+  return (
+    <_Select
+      className={cn(styles.select, className, inputClassName)}
+      {...props}
+    />
+  );
 }
