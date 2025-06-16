@@ -512,6 +512,8 @@ export class Connection {
         ]);
       }
 
+      this.checkAborted(abortSignal);
+
       const executeEndTime = performance.now();
 
       const duration = {
