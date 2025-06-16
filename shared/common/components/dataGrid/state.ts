@@ -1,6 +1,7 @@
 import {makeObservable, observable, computed, action} from "mobx";
 
 export const DefaultColumnWidth = 200;
+const minColWidth = 70;
 
 export interface GridColumn {
   id: string;
@@ -33,13 +34,13 @@ export class DataGridState {
 
   @action
   setColWidth(columnId: string, width: number) {
-    this._colWidths.set(columnId, Math.max(width, 60));
+    this._colWidths.set(columnId, Math.max(width, minColWidth));
   }
 
   @action
   setColWidths(widths: {[columnId: string]: number}) {
     for (const [id, width] of Object.entries(widths)) {
-      this._colWidths.set(id, Math.max(width, 60));
+      this._colWidths.set(id, Math.max(width, minColWidth));
     }
     this.onColumnResizeComplete?.(this._colWidths);
   }
