@@ -1,5 +1,9 @@
 @import "@edgedb/common/mixins.scss";
 
+.resultGrid {
+  position: relative;
+}
+
 .header {
   position: relative;
   padding: 8px 12px;
@@ -37,5 +41,32 @@
   &.stickyCell {
     position: sticky;
     top: var(--gridHeaderHeight);
+  }
+}
+
+.copyButton {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  z-index: 10;
+  font-family: "Roboto Flex Variable", sans-serif;
+  font-size: 13px;
+  height: 32px;
+  padding: 0 6px 0 8px;
+  gap: 0px;
+  color: var(--secondary_text_color);
+  opacity: 0;
+  transition: opacity 0.2s;
+
+  .resultGrid:hover & {
+    opacity: 1;
+  }
+
+  svg {
+    width: 20px;
+  }
+
+  @include darkTheme {
+    background-color: var(--Grey25);
   }
 }

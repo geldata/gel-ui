@@ -3,13 +3,16 @@ import {VariableSizeList as List, ListChildComponentProps} from "react-window";
 import {_ICodec} from "gel";
 
 import cn from "@edgedb/common/utils/classNames";
+import {
+  renderResultAsJson,
+  _renderToJson,
+} from "@edgedb/common/utils/renderJsonResult";
 
 import {InspectorState, Item} from "./state";
 import {InspectorContext, useInspectorState} from "./context";
 
 import styles from "./inspector.module.scss";
 import {ItemType} from "./buildItem";
-import {renderResultAsJson, _renderToJson} from "./renderJsonResult";
 import {
   forwardRef,
   HTMLAttributes,

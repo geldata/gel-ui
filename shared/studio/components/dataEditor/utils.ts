@@ -4,7 +4,7 @@ import {SchemaScalarType} from "@edgedb/common/schemaData";
 import {assertNever} from "@edgedb/common/utils/assertNever";
 
 import {parsers} from "./parsers";
-import {scalarItemToString} from "@edgedb/inspector/buildScalar";
+import {scalarItemToString} from "@edgedb/common/utils/renderJsonResult";
 
 export interface EditorArrayType {
   schemaType: "Array";

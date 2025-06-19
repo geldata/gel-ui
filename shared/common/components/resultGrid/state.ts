@@ -37,7 +37,7 @@ export class ResultGridState {
   rowTops = new Map<any[], number[]>();
   rowCount: number;
 
-  constructor(codec: ICodec, public data: any[]) {
+  constructor(public codec: ICodec, public data: any[]) {
     // makeObservable(this);
 
     const {headers} = _getHeaders(codec, null);
