@@ -6,8 +6,12 @@ import {assertNever} from "../../utils/assertNever";
 import {NamedTupleCodec} from "gel/dist/codecs/namedtuple";
 import {RecordCodec} from "gel/dist/codecs/record";
 
-export function createResultGridState(codec: ICodec, data: any[]) {
-  return new ResultGridState(codec, data);
+export function createResultGridState(
+  codec: ICodec,
+  data: any[],
+  implicitLimit: number | null
+) {
+  return new ResultGridState(codec, data, implicitLimit);
 }
 
 export const RowHeight = 40;
@@ -36,8 +40,13 @@ export class ResultGridState {
 
   rowTops = new Map<any[], number[]>();
   rowCount: number;
+  implicitLimit: number;
 
-  constructor(public codec: ICodec, public data: any[]) {
+  constructor(
+    public codec: ICodec,
+    public data: any[],
+    implicitLimit: number | null
+  ) {
     // makeObservable(this);
 
     const {headers} = _getHeaders(codec, null);
@@ -47,7 +56,14 @@ export class ResultGridState {
 
     this.maxDepth = Math.max(...this.flatHeaders.map((h) => h.depth));
 
-    this.rowCount = _getRowTops(this.rowTops, data, this._headers);
+    this.implicitLimit = implicitLimit ?? Infinity;
+
+    this.rowCount = _getRowTops(
+      this.rowTops,
+      data,
+      this._headers,
+      this.implicitLimit
+    );
 
     this.grid = new DataGridState(
       RowHeight,
@@ -60,28 +76,33 @@ export class ResultGridState {
   getData(
     header: GridHeader,
     rowIndex: number
-  ): {data: any[]; indexOffset: number; endIndex: number} {
+  ): {data: any[]; indexOffset: number; endIndex: number; dataRef: any[]} {
     if (!header.parent) {
       return {
-        data: this.data,
+        data: this.data.slice(0, this.implicitLimit),
         indexOffset: 0,
         endIndex: this.rowCount,
+        dataRef: this.data,
       };
     }
-    const {data: parentData, indexOffset} = this.getData(
-      header.parent,
-      rowIndex
-    );
+    const {
+      data: parentData,
+      indexOffset,
+      dataRef: parentDataRef,
+    } = this.getData(header.parent, rowIndex);
     const offsetRowIndex = rowIndex - indexOffset;
-    const tops = this.rowTops.get(parentData);
+    const tops = this.rowTops.get(parentDataRef);
     const dataIndex = tops
       ? tops.findIndex((top) => top > offsetRowIndex) - 1
       : offsetRowIndex;
     const data = parentData[dataIndex]?.[header.parent.key!];
     return {
-      data: data ? (header.parent.multi ? data : [data]) : [],
+      data: data
+        ? (header.parent.multi ? data : [data]).slice(0, this.implicitLimit)
+        : [],
       indexOffset: indexOffset + (tops ? tops[dataIndex] : dataIndex),
       endIndex: indexOffset + (tops ? tops[dataIndex + 1] : dataIndex + 1),
+      dataRef: data,
     };
   }
 }
@@ -89,19 +110,25 @@ export class ResultGridState {
 function _getRowTops(
   topsMap: Map<any[], number[]>,
   items: any[],
-  headers: GridHeader[]
+  headers: GridHeader[],
+  implicitLimit: number
 ): number {
   let top = 0;
   let dense = true;
   const tops: number[] = [0];
-  for (const item of items) {
+  for (const item of items.slice(0, implicitLimit)) {
     let height = 1;
     for (const header of headers) {
       if (!header.multi) continue;
       const colHeight =
         header.subHeaders && header.subHeaders[0].name !== null
-          ? _getRowTops(topsMap, item[header.key!], header.subHeaders)
-          : item[header.key!].length;
+          ? _getRowTops(
+              topsMap,
+              item[header.key!],
+              header.subHeaders,
+              implicitLimit
+            )
+          : Math.min(item[header.key!].length, implicitLimit);
       if (colHeight > height) {
         height = colHeight;
       }

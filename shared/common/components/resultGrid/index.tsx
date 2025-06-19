@@ -64,7 +64,9 @@ export const ResultGrid = observer(function ResultGrid({
 
       <CopyButton
         className={styles.copyButton}
-        content={() => renderResultAsJson(state.data, state.codec, null)}
+        content={() =>
+          renderResultAsJson(state.data, state.codec, state.implicitLimit)
+        }
       />
     </DataGrid>
   );
@@ -157,8 +159,11 @@ export const ResultGridContent = observer(function ResultGridContent({
   )) {
     let rowIndex = ranges.rows[0];
     while (rowIndex < ranges.rows[1]) {
-      const {data, indexOffset, endIndex} = state.getData(header, rowIndex);
-      const tops = rowTops.get(data);
+      const {data, indexOffset, endIndex, dataRef} = state.getData(
+        header,
+        rowIndex
+      );
+      const tops = rowTops.get(dataRef);
       const offsetRowIndex = rowIndex - indexOffset;
       let dataIndex = tops
         ? tops.findIndex((top) => top > offsetRowIndex) - 1
