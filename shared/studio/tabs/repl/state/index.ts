@@ -166,7 +166,7 @@ export class ReplHistoryItem extends Model({
     const cache = cachesCtx.get(this)!.grid;
     let state = cache.get(this.$modelId);
     if (!state) {
-      state = createResultGridState(data._codec, data);
+      state = createResultGridState(data._codec, data, this.implicitLimit);
       cache.set(this.$modelId, state);
     }
     return state;
