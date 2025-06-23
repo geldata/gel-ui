@@ -9,10 +9,16 @@ import {Button} from "../button";
 export interface CopyButtonProps {
   className?: string;
   content: string | (() => string);
+  label?: string;
   mini?: boolean;
 }
 
-export function CopyButton({className, content, mini}: CopyButtonProps) {
+export function CopyButton({
+  className,
+  content,
+  label,
+  mini,
+}: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -25,7 +31,9 @@ export function CopyButton({className, content, mini}: CopyButtonProps) {
   }, [copied]);
 
   const onCopy = () => {
-    navigator.clipboard?.writeText(typeof content === 'string' ? content : content());
+    navigator.clipboard?.writeText(
+      typeof content === "string" ? content : content()
+    );
     setCopied(true);
   };
 
@@ -44,7 +52,7 @@ export function CopyButton({className, content, mini}: CopyButtonProps) {
       onClick={onCopy}
       leftIcon={copied ? <CheckIcon /> : <CopyIcon />}
     >
-      {copied ? "Copied!" : "Copy"}
+      {copied ? "Copied!" : label ?? "Copy"}
     </Button>
   );
 }

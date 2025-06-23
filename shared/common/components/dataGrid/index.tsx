@@ -99,7 +99,9 @@ export const GridHeaders = observer(function GridHeaders({
         ...style,
         gridTemplateColumns: `${
           state.pinnedColsWidth ? `${state.pinnedColsWidth}px ` : ""
-        }${state.colWidths.join("px ")}px minmax(100px, 1fr)`,
+        }${state.colWidths.join(
+          "px "
+        )}px minmax(var(--dataGridHeaderEndWidth, 100px), 1fr)`,
       }}
     >
       {state.pinnedColWidths.length ? (
