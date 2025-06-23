@@ -64,6 +64,7 @@ export const ResultGrid = observer(function ResultGrid({
 
       <CopyButton
         className={styles.copyButton}
+        label="Copy JSON"
         content={() =>
           renderResultAsJson(state.data, state.codec, state.implicitLimit)
         }
