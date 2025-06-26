@@ -1,8 +1,13 @@
 import {useEffect, useRef, useState} from "react";
 import {action, computed, makeObservable, observable} from "mobx";
 import {observer} from "mobx-react-lite";
+import * as z from "zod";
 
 import cn from "@edgedb/common/utils/classNames";
+import {
+  getLocalStorageCacheItem,
+  storeLocalStorageCacheItem,
+} from "@edgedb/common/utils/localStorageCache";
 
 import {
   Checkbox,
@@ -58,7 +63,10 @@ class DraftFieldConfig {
   @observable
   pinned: Set<string>;
 
-  constructor(config: FieldConfig, public fields: Map<string, ObjectField>) {
+  constructor(
+    config: FieldConfig,
+    public fields: Map<string, ObjectField>
+  ) {
     makeObservable(this);
 
     this.order = [...config.order];
@@ -187,33 +195,59 @@ class DraftFieldConfig {
   }
 }
 
-export function serialiseFieldConfig(config: FieldConfig) {
-  return JSON.stringify({
-    order: config.order,
-    selected: [...config.selected].map((id) => config.order.indexOf(id)),
-    pinned: [...config.pinned].map((id) => config.order.indexOf(id)),
-  });
+// convert + clean up old cached field configs
+(function () {
+  const data = Object.entries(localStorage)
+    .map(([rawKey, val]) => {
+      if (rawKey.startsWith("DataTableFieldConfig-")) {
+        const key = rawKey.slice(21);
+        try {
+          localStorage.removeItem(rawKey);
+          return [key, JSON.parse(val)];
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    })
+    .filter((entry) => entry != null);
+  if (data.length) {
+    localStorage.setItem("Cache-datatable-field-config", JSON.stringify(data));
+  }
+})();
+
+const FieldConfigCacheName = "datatable-field-config";
+const CachedFieldConfigType = z.object({
+  order: z.array(z.string()),
+  selected: z.array(z.number()),
+  pinned: z.array(z.number()),
+});
+
+export function serialiseFieldConfig(key: string, config: FieldConfig) {
+  storeLocalStorageCacheItem(
+    FieldConfigCacheName,
+    key,
+    {
+      order: config.order,
+      selected: [...config.selected].map((id) => config.order.indexOf(id)),
+      pinned: [...config.pinned].map((id) => config.order.indexOf(id)),
+    },
+    500_000
+  );
 }
 
-export function deserialiseFieldConfig(rawConfig: string): FieldConfig | null {
-  let configJSON: any;
-  try {
-    configJSON = JSON.parse(rawConfig);
-    if (
-      typeof configJSON !== "object" ||
-      !Array.isArray(configJSON.order) ||
-      !Array.isArray(configJSON.selected) ||
-      !Array.isArray(configJSON.pinned) ||
-      !configJSON.order.every((id: any) => typeof id === "string") ||
-      !configJSON.selected.every(
-        (i: any) => typeof i === "number" && configJSON.order[i] != null
-      ) ||
-      !configJSON.pinned.every(
-        (i: any) => typeof i === "number" && configJSON.order[i] != null
-      )
-    )
-      return null;
-  } catch {
+export function deserialiseFieldConfig(key: string): FieldConfig | null {
+  const configJSON = getLocalStorageCacheItem(
+    FieldConfigCacheName,
+    key,
+    CachedFieldConfigType
+  );
+
+  if (
+    !configJSON ||
+    !configJSON.selected.every((i) => configJSON.order[i] != null) ||
+    !configJSON.pinned.every((i) => configJSON.order[i] != null)
+  ) {
     return null;
   }
 
