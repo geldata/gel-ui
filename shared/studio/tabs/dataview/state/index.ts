@@ -12,6 +12,7 @@ import {
   idProp,
   ModelCreationData,
 } from "mobx-keystone";
+import * as z from "zod";
 
 import {NavigateFunction} from "../../../hooks/dbRoute";
 
@@ -40,6 +41,10 @@ import {sortObjectTypes} from "../../../components/objectTypeSelect";
 
 import {DataGridState} from "@edgedb/common/components/dataGrid/state";
 import {deserialiseFieldConfig, serialiseFieldConfig} from "../fieldConfig";
+import {
+  storeLocalStorageCacheItem,
+  getLocalStorageCacheItem,
+} from "@edgedb/common/utils/localStorageCache";
 
 const fetchBlockSize = 100;
 
@@ -267,6 +272,27 @@ function pointerTargetHasSelectAccessPolicy(pointer: SchemaLink) {
   );
 }
 
+// convert + clean up old cached col widths
+(function () {
+  const data = Object.entries(localStorage)
+    .map(([rawKey, val]) => {
+      if (rawKey.startsWith("DataTableColWidths-")) {
+        const key = rawKey.slice(19);
+        try {
+          localStorage.removeItem(rawKey);
+          return [key, JSON.parse(val)];
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    })
+    .filter((entry) => entry != null);
+  if (data.length) {
+    localStorage.setItem("Cache-datatable-col-widths", JSON.stringify(data));
+  }
+})();
+
 function createDataInspectorState(props: ModelCreationData<DataInspector>) {
   const state = new DataInspector(props);
   state.grid = new DataGridState(
@@ -275,34 +301,31 @@ function createDataInspectorState(props: ModelCreationData<DataInspector>) {
     () => [{id: "_indexCol"}, ...state.pinnedFields],
     () => state.gridRowCount,
     {
-      ...deserialiseColWidths(
-        localStorage.getItem(`DataTableColWidths-${props.objectTypeId}`) ?? ""
-      ),
+      ...deserialiseColWidths(props.objectTypeId),
       _indexCol: state.indexColWidth,
     },
     (colWidths) => {
-      localStorage.setItem(
-        `DataTableColWidths-${props.objectTypeId}`,
-        serialiseColWidths(colWidths, state.allFields!)
-      );
+      serialiseColWidths(props.objectTypeId, colWidths, state.allFields!);
     }
   );
-  const rawFieldConfig = localStorage.getItem(
-    `DataTableFieldConfig-${props.objectTypeId}`
+  runInAction(
+    () => (state.fieldConfig = deserialiseFieldConfig(props.objectTypeId))
   );
-  if (rawFieldConfig) {
-    runInAction(
-      () => (state.fieldConfig = deserialiseFieldConfig(rawFieldConfig))
-    );
-  }
+
   return state;
 }
 
+const ColWidthsCacheName = "datatable-col-widths";
+const CachedColWidthsType = z.record(z.number());
+
 function serialiseColWidths(
+  key: string,
   colWidths: Map<string, number>,
   fields?: Map<string, ObjectField>
-): string {
-  return JSON.stringify(
+) {
+  storeLocalStorageCacheItem(
+    ColWidthsCacheName,
+    key,
     [...colWidths.entries()].reduce(
       (widths, [id, width]) => {
         if (id !== "_indexCol" && (!fields || fields.has(id))) {
@@ -311,23 +334,15 @@ function serialiseColWidths(
         return widths;
       },
       {} as {[id: string]: number}
-    )
+    ),
+    200_000
   );
 }
-function deserialiseColWidths(rawWidths: string): {[id: string]: number} {
-  try {
-    const widthsJSON = JSON.parse(rawWidths);
-    const widths: {[id: string]: number} = {};
-    if (typeof widthsJSON !== "object") return widths;
-    for (const [id, width] of Object.entries(widthsJSON)) {
-      if (typeof width !== "number") continue;
-      widths[id] = width;
-    }
-    return widths;
-  } catch {
-    // ignore
-  }
-  return {};
+function deserialiseColWidths(key: string): {[id: string]: number} {
+  return (
+    getLocalStorageCacheItem(ColWidthsCacheName, key, CachedColWidthsType) ??
+    {}
+  );
 }
 
 type ErrorFilter = {filter: string; error: string};
@@ -366,10 +381,7 @@ export class DataInspector extends Model({
   @action
   setFieldConfig(config: FieldConfig) {
     this.fieldConfig = config;
-    localStorage.setItem(
-      `DataTableFieldConfig-${this.objectTypeId}`,
-      serialiseFieldConfig(config)
-    );
+    serialiseFieldConfig(this.objectTypeId, config);
   }
 
   @computed

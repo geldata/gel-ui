@@ -1,4 +1,17 @@
+import * as z from "zod";
+
 import {InstanceState} from "@edgedb/studio/state/instance";
+import {
+  getLocalStorageCacheItem,
+  storeLocalStorageCacheItem,
+} from "../utils/localStorageCache";
+
+// clean up old cached branch graph data
+Object.keys(localStorage)
+  .filter((key) => key.startsWith("edgedb-branch-graph-"))
+  .forEach((key) => {
+    localStorage.removeItem(key);
+  });
 
 interface Migration {
   id: string;
@@ -11,27 +24,47 @@ interface MigrationsData {
   migrations: Migration[];
 }
 
+const branchGraphCacheName = "branches-graph";
+
+const CachedBranchGraphDataType = z.array(
+  z.tuple([
+    z.string(),
+    z.array(z.tuple([z.string(), z.string(), z.string().nullable()])),
+  ])
+);
+
 function _getBranchGraphDataFromCache(
   instanceId: string
 ): MigrationsData[] | null {
-  const data = localStorage.getItem(`edgedb-branch-graph-${instanceId}`);
-  if (data) {
-    try {
-      return JSON.parse(data);
-    } catch {
-      // ignore
-    }
-  }
-  return null;
+  const data = getLocalStorageCacheItem(
+    branchGraphCacheName,
+    instanceId,
+    CachedBranchGraphDataType
+  );
+
+  return data
+    ? data.map(([branch, migrations]) => ({
+        branch,
+        migrations: migrations.map(([id, name, parentId]) => ({
+          id,
+          name,
+          parentId,
+        })),
+      }))
+    : null;
 }
 
 function _storeBranchGraphDataInCache(
   instanceId: string,
   data: MigrationsData[]
 ) {
-  localStorage.setItem(
-    `edgedb-branch-graph-${instanceId}`,
-    JSON.stringify(data)
+  storeLocalStorageCacheItem(
+    branchGraphCacheName,
+    instanceId,
+    data.map(({branch, migrations}) => [
+      branch,
+      migrations.map(({id, name, parentId}) => [id, name, parentId]),
+    ]) satisfies z.infer<typeof CachedBranchGraphDataType>
   );
 }
 
