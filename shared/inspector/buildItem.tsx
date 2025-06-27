@@ -94,8 +94,8 @@ export function expandItem(
               item.level === 0
                 ? item.codec
                 : item.codec.getKind() === "tuple"
-                ? item.codec.getSubcodecs()[i]
-                : item.codec.getSubcodecs()[0];
+                  ? item.codec.getSubcodecs()[i]
+                  : item.codec.getSubcodecs()[0];
 
             const id = `${item.id}.${i}`;
 
@@ -310,7 +310,7 @@ export function expandItem(
         const subCodecs = item.codec.getSubcodecs();
 
         childItems = fieldNames.flatMap((fieldName, i) => {
-          const data = item.data[isRecord ? i : fieldName];
+          const data = item.data[fieldName];
 
           const id = `${item.id}.${i}`;
 
@@ -329,7 +329,7 @@ export function expandItem(
               fieldName: fieldName,
             },
             data,
-            isRecord ? i : fieldName,
+            fieldName,
             state.noMultiline,
             i < item.data.length - 1
           );

@@ -115,7 +115,7 @@ export function _renderToJson(
                 depth +
                   `  "${fieldName}": ` +
                   _renderToJson(
-                    codecKind === "record" ? val[i] : val[fieldName],
+                    val[fieldName],
                     subcodecs[i],
                     depth + "  ",
                     implicitLimit
