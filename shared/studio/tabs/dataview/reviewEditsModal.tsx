@@ -1,6 +1,7 @@
 import {Fragment, useState} from "react";
 import {observer} from "mobx-react-lite";
 
+import {containsUserDataClass} from "@edgedb/common";
 import cn from "@edgedb/common/utils/classNames";
 
 import {DataView} from "./state";
@@ -131,7 +132,12 @@ export const ReviewEditsModal = observer(function ReviewEditsModal({
 
                         content.props.children.pop();
                         return (
-                          <span className={styles.codeBlockParam}>
+                          <span
+                            className={cn(
+                              styles.codeBlockParam,
+                              containsUserDataClass
+                            )}
+                          >
                             {content}
                             <span className={styles.codeBlockParamValue}>
                               {renderParam(param)}

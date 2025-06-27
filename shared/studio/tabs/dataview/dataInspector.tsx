@@ -1,6 +1,7 @@
 import {createContext, useContext, useEffect} from "react";
 import {observer} from "mobx-react-lite";
 
+import {containsUserDataClass} from "@edgedb/common";
 import cn from "@edgedb/common/utils/classNames";
 
 import {InspectorRow} from "@edgedb/inspector";
@@ -373,7 +374,7 @@ const DataViewContent = observer(function DataViewContent({
 
   return (
     <GridContent
-      className={cn(inspectorStyles.inspectorTheme)}
+      className={cn(inspectorStyles.inspectorTheme, containsUserDataClass)}
       style={{
         paddingBottom:
           state.grid.gridContainerSize.height - state.grid.headerHeight - 40,
@@ -474,7 +475,7 @@ const GridCell = observer(function GridCell({
   const _value =
     cellEditState?.value !== undefined
       ? cellEditState.value.value
-      : data?.[insertedRow ? field.name : field.queryName] ?? null;
+      : (data?.[insertedRow ? field.name : field.queryName] ?? null);
 
   const value = insertedRow && _value ? _value.value : _value;
 
@@ -510,7 +511,7 @@ const GridCell = observer(function GridCell({
         content = (
           <>
             <span className={styles.emptySet}>
-              {(insertedRow ? field.default ?? field.computedExpr : null) ??
+              {(insertedRow ? (field.default ?? field.computedExpr) : null) ??
                 "{}"}
             </span>
             {undoEdit}
@@ -544,10 +545,10 @@ const GridCell = observer(function GridCell({
       if (countData !== null || insertedRow) {
         const counts: {[typename: string]: number} =
           field.multi || !linkEditState
-            ? countData?.reduce((counts: any, {typename, count}: any) => {
+            ? (countData?.reduce((counts: any, {typename, count}: any) => {
                 counts[typename] = count;
                 return counts;
-              }, {}) ?? {}
+              }, {}) ?? {})
             : {};
 
         if (linkEditState) {
@@ -726,8 +727,8 @@ const DataRowIndex = observer(function DataRowIndex({
         editedLink != null &&
         !!data?.__isLinked)
     : state.parentObject?.isMultiLink
-    ? !!editedLinkChange
-    : !!editedLink;
+      ? !!editedLinkChange
+      : !!editedLink;
 
   let rowAction: JSX.Element | null = null;
   if ((dataIndex === null || data) && !state.objectType?.readonly) {
@@ -742,8 +743,8 @@ const DataRowIndex = observer(function DataRowIndex({
                 ? editedLinkChange
                   ? editedLinkChange.kind === UpdateLinkChangeKind.Add
                   : data.__isLinked
-                : editedLink?.inserts.has(state.insertedRows[rowIndex]) ??
-                  false
+                : (editedLink?.inserts.has(state.insertedRows[rowIndex]) ??
+                  false)
             }
             onChange={() => {
               if (dataIndex !== null) {
@@ -784,10 +785,10 @@ const DataRowIndex = observer(function DataRowIndex({
         const checked = editedLink?.setNull
           ? false
           : dataIndex !== null
-          ? editedLink
-            ? editedLink.changes.has(data.id)
-            : data.__isLinked
-          : editedLink?.inserts.has(state.insertedRows[rowIndex]) ?? false;
+            ? editedLink
+              ? editedLink.changes.has(data.id)
+              : data.__isLinked
+            : (editedLink?.inserts.has(state.insertedRows[rowIndex]) ?? false);
         const sharedArgs = [
           state.parentObject!.id!,
           state.parentObject!.subtypeName ??

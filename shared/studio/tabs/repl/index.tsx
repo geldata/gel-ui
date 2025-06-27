@@ -13,6 +13,7 @@ import {observer} from "mobx-react-lite";
 
 import {PostgreSQL, sql} from "@codemirror/lang-sql";
 
+import {containsUserDataClass} from "@edgedb/common";
 import {useInitialValue} from "@edgedb/common/hooks/useInitialValue";
 import {useResize} from "@edgedb/common/hooks/useResize";
 import {Theme, useTheme} from "@edgedb/common/hooks/useTheme";
@@ -491,7 +492,11 @@ const InspectorRenderer = observer(function InspectorRenderer({
   return (
     <InspectorContext.Provider value={inspectorState}>
       <div
-        className={cn(inspectorStyles.inspector, styles.inspector)}
+        className={cn(
+          inspectorStyles.inspector,
+          styles.inspector,
+          containsUserDataClass
+        )}
         style={inspectorStyle}
         tabIndex={0}
         onKeyDown={onKeyDown}
@@ -582,7 +587,7 @@ const ResultGridWrapper = observer(function ResultGridWrapper({
 
   return (
     <div
-      className={styles.replResultGridWrapper}
+      className={cn(styles.replResultGridWrapper, containsUserDataClass)}
       style={{
         height: contentHeight,
       }}
@@ -793,8 +798,8 @@ const ReplHistoryItem = observer(function ReplHistoryItem({
   const marginLeftRepl = isMobile
     ? "0px"
     : item.isExplain
-    ? "16px"
-    : `${promptLength + 1}ch`;
+      ? "16px"
+      : `${promptLength + 1}ch`;
 
   const expandButton = showExpandBtn ? (
     <div className={styles.showMore}>
@@ -847,9 +852,13 @@ const ReplHistoryItem = observer(function ReplHistoryItem({
             <div className={styles.scrollWrapper}>
               <div
                 ref={containerRef}
-                className={cn(styles.codeBlockContainer, {
-                  [styles.truncateQuery]: truncateQuery,
-                })}
+                className={cn(
+                  styles.codeBlockContainer,
+                  containsUserDataClass,
+                  {
+                    [styles.truncateQuery]: truncateQuery,
+                  }
+                )}
               >
                 <QueryCodeBlock item={item} containerRef={containerRef} />
                 {item.error?.data.range ? (

@@ -10,6 +10,7 @@ import {observer} from "mobx-react-lite";
 import {Text} from "@codemirror/state";
 import {sql, PostgreSQL} from "@codemirror/lang-sql";
 
+import {containsUserDataClass} from "@edgedb/common";
 import cn from "@edgedb/common/utils/classNames";
 
 import {CodeEditorRef, createCodeEditor} from "@edgedb/code-editor";
@@ -541,7 +542,7 @@ const QueryResult = observer(function QueryResult({
   }
 
   return (
-    <div className={styles.queryResult}>
+    <div className={cn(styles.queryResult, containsUserDataClass)}>
       {outputModeTargetRef.current
         ? createPortal(headerContent, outputModeTargetRef.current)
         : null}

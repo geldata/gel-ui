@@ -3,6 +3,7 @@ import {observer} from "mobx-react-lite";
 
 import {sql, PostgreSQL} from "@codemirror/lang-sql";
 
+import {containsUserDataClass} from "@edgedb/common";
 import cn from "@edgedb/common/utils/classNames";
 
 import {
@@ -109,7 +110,9 @@ export const QueryStatsRow = observer(function QueryStatsRow({
 
   return (
     <div className={cn(styles.queryStatsRow, {[styles.expanded]: expanded})}>
-      <div className={styles.query}>{queryStats.query.slice(0, 150)}</div>
+      <div className={cn(styles.query, containsUserDataClass)}>
+        {queryStats.query.slice(0, 150)}
+      </div>
       <div className={styles.totalExec}>
         {formatDuration(queryStats.totalExecTime)}
       </div>
@@ -257,6 +260,7 @@ export const QueryStatsRow = observer(function QueryStatsRow({
                 mini
               />
               <CodeBlock
+                className={containsUserDataClass}
                 code={queryStats.query}
                 language={
                   queryStats.query_type === "SQL" ? sqlLang : undefined

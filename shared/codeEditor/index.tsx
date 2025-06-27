@@ -53,6 +53,7 @@ import {edgeql, edgeqlLanguage} from "@edgedb/lang-edgeql";
 import {highlightStyle, darkTheme, lightTheme} from "./theme";
 import {getCompletions} from "./completions";
 
+import {containsUserDataClass} from "@edgedb/common";
 import cn from "@edgedb/common/utils/classNames";
 
 import {SchemaObjectType} from "@edgedb/common/schemaData";
@@ -319,7 +320,7 @@ export function createCodeEditor({
           },
         ]),
         darkThemeComp.of(useDarkTheme ? darkTheme : lightTheme),
-        language === undefined ? edgeql() : language ?? [],
+        language === undefined ? edgeql() : (language ?? []),
         onChangeComp.of(
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
@@ -548,7 +549,7 @@ export function createCodeEditor({
 
     return (
       <div
-        className={cn(styles.codeEditor, className, {
+        className={cn(styles.codeEditor, className, containsUserDataClass, {
           [styles.terminalCursor]: !!terminalCursor,
         })}
         ref={ref}

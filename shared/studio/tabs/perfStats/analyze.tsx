@@ -1,5 +1,8 @@
 import {observer} from "mobx-react-lite";
 
+import {containsUserDataClass} from "@edgedb/common";
+import cn from "@edgedb/common/utils/classNames";
+
 import {Button, CrossIcon} from "@edgedb/common/newui";
 import {ExplainCodeBlock} from "../../components/explainVis/codeblock";
 
@@ -33,7 +36,7 @@ export const AnalyzeQueryPanel = observer(function AnalyzeQueryPanel({
         <div className={styles.queryWrapper}>
           <div className={styles.query}>
             <ExplainCodeBlock
-              className={styles.code}
+              className={cn(styles.code, containsUserDataClass)}
               code={state.query}
               explainContexts={state.explainState?.contextsByBufIdx[0] ?? []}
             />
