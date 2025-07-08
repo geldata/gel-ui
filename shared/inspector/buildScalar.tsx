@@ -10,6 +10,14 @@ import {
 } from "gel";
 
 import cn from "@edgedb/common/utils/classNames";
+import {
+  bufferToString,
+  float16ArrayToString,
+  float32ArrayToString,
+  formatDatetime,
+  prettyPrintJSON,
+  sparseVectorToString,
+} from "@edgedb/common/utils/renderJsonResult";
 
 import {EnumCodec} from "gel/dist/codecs/enum";
 import {RangeCodec, MultiRangeCodec} from "gel/dist/codecs/range";
@@ -316,52 +324,6 @@ export function renderValue(
   };
 }
 
-export function scalarItemToString(item: any, typename: string): string {
-  if (item instanceof Float32Array) {
-    return float32ArrayToString(item);
-  }
-  if (item instanceof Float16Array) {
-    return float16ArrayToString(item);
-  }
-  switch (typename) {
-    case "std::bytes":
-      return bufferToString(item);
-    case "std::json":
-      return prettyPrintJSON(item);
-    case "std::datetime":
-      return formatDatetime(item);
-    case "ext::postgis::geometry":
-    case "ext::postgis::geography":
-      return (item as Geometry).toWKT(2);
-    default:
-      return item.toString();
-  }
-}
-
-export function float32ArrayToString(vec: Float32Array | number[]): string {
-  return `[${[...vec]
-    .map((float) =>
-      float
-        .toPrecision(7)
-        .replace(/(\.\d*?)0+$/, (_, $1) => ($1 === "." ? "" : $1))
-    )
-    .join(", ")}]`;
-}
-
-export function float16ArrayToString(vec: Float16Array | number[]): string {
-  return `[${[...vec]
-    .map((float) =>
-      float
-        .toPrecision(4)
-        .replace(/(\.\d*?)0+$/, (_, $1) => ($1 === "." ? "" : $1))
-    )
-    .join(", ")}]`;
-}
-
-export function sparseVectorToString(vec: SparseVector | number[]): string {
-  return float32ArrayToString([...vec]);
-}
-
 function VectorRenderer<
   VecType extends Float32Array | Float16Array | SparseVector
 >({vec, format}: {vec: VecType; format: (vec: VecType | number[]) => string}) {
@@ -392,37 +354,6 @@ function sliceVec(vec: Iterable<number>, length: number): number[] {
     arr.push(val);
   }
   return arr;
-}
-
-function formatDatetime(date: Date): string {
-  return date.toString() + "+00:00";
-}
-
-function bufferToString(buf: Uint8Array): string {
-  const res: string[] = [];
-  for (let i = 0; i < buf.length; i++) {
-    const char = buf[i];
-    if (char < 32 || char > 126) {
-      switch (char) {
-        case 9:
-          res.push("\\t");
-          break;
-        case 10:
-          res.push("\\n");
-          break;
-        case 13:
-          res.push("\\r");
-          break;
-        default:
-          res.push(`\\x${char.toString(16).padStart(2, "0").toLowerCase()}`);
-      }
-    } else if (char === 34) {
-      res.push('\\"');
-    } else {
-      res.push(String.fromCharCode(char));
-    }
-  }
-  return `"${res.join("")}"`;
 }
 
 function strToString(value: string): string {
@@ -460,74 +391,4 @@ function toSingleLineStr(value: string, limit = 200): JSX.Element {
       {value.length > limit ? <span>…</span> : null}
     </>
   );
-}
-
-export function prettyPrintJSON(
-  json: string,
-  indentSpaces: number = 2
-): string {
-  const switchRegex = /["{}[\],]/g;
-  let pretty = "";
-  let i = 0;
-  let lasti = 0;
-  let indent = 0;
-  while (i < json.length) {
-    switchRegex.lastIndex = i;
-    if (!switchRegex.exec(json)) {
-      break;
-    }
-    i = switchRegex.lastIndex - 1;
-    switch (json[i]) {
-      case "{":
-      case "[":
-        pretty +=
-          "".padStart(indent * indentSpaces, " ") +
-          json.slice(lasti, i + 1).trim();
-        lasti = i + 1;
-
-        if (json[i + 1] === (json[i] === "{" ? "}" : "]")) {
-          pretty += json[i + 1];
-          lasti++;
-          i++;
-        } else {
-          pretty += "\n";
-          indent++;
-        }
-        break;
-      case "}":
-      case "]":
-        pretty +=
-          "".padStart(indent * indentSpaces, " ") +
-          json.slice(lasti, i).trim() +
-          "\n";
-        indent--;
-        pretty += json[i].padStart(indent * indentSpaces + 1, " ");
-        lasti = i + 1;
-        break;
-      case ",":
-        const line = json.slice(lasti, i).trim();
-        if (line) {
-          pretty += "".padStart(indent * indentSpaces, " ") + line;
-        }
-        pretty += ",\n";
-        lasti = i + 1;
-        break;
-      case '"':
-        const strRegex = /\\*"/g;
-        strRegex.lastIndex = i + 1;
-        while (true) {
-          const match = strRegex.exec(json);
-          if (!match) {
-            throw new Error("Cannot pretty print json");
-          }
-          if (match[0].length % 2 === 1) {
-            i = strRegex.lastIndex - 1;
-            break;
-          }
-        }
-    }
-    i++;
-  }
-  pretty += json.slice(lasti);
-  return pretty;
 }

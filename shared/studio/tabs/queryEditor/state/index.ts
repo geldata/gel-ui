@@ -137,7 +137,7 @@ export class QueryHistoryResultItem extends ExtendedModel(QueryHistoryItem, {
   getResultGridState(data: EdgeDBSet) {
     let state = resultGridStateCache.get(this.$modelId);
     if (!state) {
-      state = createResultGridState(data._codec, data);
+      state = createResultGridState(data._codec, data, this.implicitLimit);
       resultGridStateCache.set(this.$modelId, state);
     }
 

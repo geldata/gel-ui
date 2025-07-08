@@ -13,8 +13,10 @@ import {
 } from "mobx-keystone";
 import {action, computed, observable} from "mobx";
 import {_ICodec} from "gel";
+
+import {prettyPrintJSON} from "@edgedb/common/utils/renderJsonResult";
+
 import {Item, buildItem, expandItem, ItemType} from "./buildItem";
-import {prettyPrintJSON} from "./buildScalar";
 
 export type {Item};
 

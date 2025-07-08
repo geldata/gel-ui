@@ -1,6 +1,9 @@
+import {useEffect} from "react";
 import {observer} from "mobx-react-lite";
 
 import cn from "@edgedb/common/utils/classNames";
+import {renderResultAsJson} from "@edgedb/common/utils/renderJsonResult";
+import {CopyButton} from "../../newui/copyButton";
 
 import {GridHeader, ResultGridState, RowHeight} from "./state";
 
@@ -11,14 +14,13 @@ import {
   GridHeaders,
   HeaderResizeHandle,
 } from "../dataGrid";
+import {calculateInitialColWidths} from "../dataGrid/utils";
 import {renderCellValue} from "../dataGrid/renderUtils";
 
 import gridStyles from "../dataGrid/dataGrid.module.scss";
 import inspectorStyles from "@edgedb/inspector/inspector.module.scss";
 
 import styles from "./resultGrid.module.scss";
-import {useEffect} from "react";
-import {calculateInitialColWidths} from "../dataGrid/utils";
 
 export {createResultGridState, ResultGridState} from "./state";
 
@@ -28,6 +30,7 @@ export interface ResultGridProps extends Omit<DataGridProps, "state"> {
 }
 
 export const ResultGrid = observer(function ResultGrid({
+  className,
   state,
   bottomPadding,
   ...props
@@ -51,9 +54,21 @@ export const ResultGrid = observer(function ResultGrid({
   }, [state.grid.gridContainerSize.width]);
 
   return (
-    <DataGrid state={state.grid} {...props}>
+    <DataGrid
+      className={cn(styles.resultGrid, className)}
+      state={state.grid}
+      {...props}
+    >
       <ResultGridHeaders state={state} />
       <ResultGridContent state={state} bottomPadding={bottomPadding} />
+
+      <CopyButton
+        className={styles.copyButton}
+        label="Copy JSON"
+        content={() =>
+          renderResultAsJson(state.data, state.codec, state.implicitLimit)
+        }
+      />
     </DataGrid>
   );
 });
@@ -145,8 +160,11 @@ export const ResultGridContent = observer(function ResultGridContent({
   )) {
     let rowIndex = ranges.rows[0];
     while (rowIndex < ranges.rows[1]) {
-      const {data, indexOffset, endIndex} = state.getData(header, rowIndex);
-      const tops = rowTops.get(data);
+      const {data, indexOffset, endIndex, dataRef} = state.getData(
+        header,
+        rowIndex
+      );
+      const tops = rowTops.get(dataRef);
       const offsetRowIndex = rowIndex - indexOffset;
       let dataIndex = tops
         ? tops.findIndex((top) => top > offsetRowIndex) - 1

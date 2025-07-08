@@ -4,7 +4,7 @@ import {codeFolding, foldGutter} from "@codemirror/language";
 import {json} from "@codemirror/lang-json";
 import {CodeEditorRef, createCodeEditor} from "@edgedb/code-editor";
 import {Theme, useTheme} from "@edgedb/common/hooks/useTheme";
-import {prettyPrintJSON} from "@edgedb/inspector/buildScalar";
+import {prettyPrintJSON} from "@edgedb/common/utils/renderJsonResult";
 
 import styles from "./jsonViewer.module.scss";
 import {HeaderBar} from "../shared";
