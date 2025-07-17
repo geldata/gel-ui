@@ -42,6 +42,7 @@ export interface SchemaScalarType {
   default: string | null;
   enum_values: string[] | null;
   arg_values: string[] | null;
+  isSequence: boolean;
   knownBaseType: SchemaScalarType | null;
   bases: SchemaScalarType[];
   constraints: SchemaConstraint[];
@@ -380,6 +381,7 @@ export function buildTypesGraph(
           default: type.default,
           enum_values: type.enum_values,
           arg_values: type.arg_values ?? null,
+          isSequence: false,
           annotations: type.annotations,
           isDeprecated: isDeprecated(type.annotations),
         } as any);
@@ -862,6 +864,9 @@ export function buildTypesGraph(
         const bases = [...type.bases];
         while (bases.length) {
           const base = bases.pop()!;
+          if (base.name === "std::sequence") {
+            type.isSequence = true;
+          }
           if (knownTypes.has(base.name)) {
             type.knownBaseType = base;
             break;
