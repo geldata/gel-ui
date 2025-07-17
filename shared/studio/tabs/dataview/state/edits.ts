@@ -115,7 +115,7 @@ export class DataEditingManager extends Model({}) {
     const state = new DataEditorState(
       cellId,
       field.schemaType as PrimitiveType,
-      field.required,
+      field.required && (typeof objectId === "string" || !field.default),
       field.multi,
       editValue ? editValue.value : valueGetter(),
       editValue != null && !editValue.valid,
@@ -507,6 +507,9 @@ export class DataEditingManager extends Model({}) {
           (prop) =>
             prop.required &&
             !prop.default &&
+            !(
+              prop.target?.schemaType === "Scalar" && prop.target.isSequence
+            ) &&
             !prop.expr &&
             insertEdit.data[prop.name] == null
         ),

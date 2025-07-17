@@ -556,6 +556,11 @@ export class DataInspector extends Model({
       escapedSubtypeName?: string,
       queryNamePrefix: string = ""
     ): ObjectField {
+      const defaultVal =
+        pointer.default ??
+        (pointer.target?.schemaType === "Scalar" && pointer.target.isSequence
+          ? "sequence_next()"
+          : null);
       const baseField = {
         id: pointer.id,
         subtypeName,
@@ -575,7 +580,7 @@ export class DataInspector extends Model({
             ? pointer.target!.escapedName
             : pointer.target!.name,
         required: pointer.required,
-        hasDefault: !!pointer.default,
+        hasDefault: defaultVal != null,
         multi: pointer.cardinality === "Many",
         computedExpr: pointer.expr,
         readonly: pointer.readonly,
@@ -587,7 +592,7 @@ export class DataInspector extends Model({
           type: ObjectFieldType.property,
           ...baseField,
           schemaType: pointer.target!,
-          default: pointer.default?.replace(/^select/i, "").trim() ?? null,
+          default: defaultVal?.replace(/^select/i, "").trim() ?? null,
         };
       } else {
         return {
