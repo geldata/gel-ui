@@ -1,0 +1,57 @@
+@import "@edgedb/common/mixins.scss";
+
+.tabs {
+  grid-column: 2;
+  display: flex;
+  background: var(--Grey97);
+  border: 1px solid var(--Grey93);
+  border-radius: 8px;
+  font-family: "Roboto Flex Variable", sans-serif;
+  line-height: 16px;
+  align-self: flex-start;
+  margin: 0 auto;
+
+  @include darkTheme {
+    background: var(--Grey18);
+    border-color: var(--Grey22);
+  }
+
+  .tab {
+    position: relative;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 450;
+    padding: 0 10px;
+    color: var(--secondary_text_color);
+    z-index: 0;
+
+    &.selected {
+      color: var(--main_text_color);
+
+      &:before {
+        content: "";
+        position: absolute;
+        inset: 2px;
+        border-radius: 6px;
+        background: #fff;
+
+        box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.16);
+        z-index: -1;
+
+        @include darkTheme {
+          background: var(--Grey30);
+          box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.4);
+        }
+      }
+    }
+
+    &.disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+  }
+}
