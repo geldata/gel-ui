@@ -406,6 +406,37 @@ const DraftProviderConfigForm = observer(function DraftProviderConfigForm({
               />
             </div>
           ) : null}
+          {state.hasVerificationMethod &&
+          (draftState.selectedProviderType ===
+            "ext::auth::EmailPasswordProviderConfig" ||
+            draftState.selectedProviderType ===
+              "ext::auth::WebAuthnProviderConfig" ||
+            draftState.selectedProviderType ===
+              "ext::auth::MagicLinkProviderConfig") ? (
+            <div className={styles.formRow}>
+              <Checkbox
+                label={
+                  <>
+                    Use one-time code verification
+                    <InfoTooltip
+                      message={
+                        <>
+                          {draftState.selectedProviderType ===
+                          "ext::auth::MagicLinkProviderConfig"
+                            ? "Send a short one-time code instead of a link in the magic link email. This allows the user to sign in on a different device to the one on which they receive the email."
+                            : "During email verification, send a short one-time code instead of a link. This allows the user to verify their email on a different device to the one on which they signed up."}
+                        </>
+                      }
+                    />
+                  </>
+                }
+                checked={draftState.useCodeVerificationMethod}
+                onChange={(checked) =>
+                  draftState.setUseCodeVerificationMethod(checked)
+                }
+              />
+            </div>
+          ) : null}
         </>
       ) : null}
 
@@ -556,6 +587,21 @@ function ProviderCard({provider}: {provider: AuthProviderData}) {
                     value={
                       (provider as LocalMagicLinkProviderData)
                         .token_time_to_live
+                    }
+                  />
+                </div>
+              ) : null}
+              {state.hasVerificationMethod &&
+              (provider.name === "builtin::local_emailpassword" ||
+                provider.name === "builtin::local_webauthn" ||
+                provider.name === "builtin::local_magic_link") ? (
+                <div className={styles.formRow}>
+                  <Checkbox
+                    readOnly
+                    label="Use one-time code verification"
+                    checked={
+                      (provider as LocalEmailPasswordProviderData)
+                        .verification_method === "Code"
                     }
                   />
                 </div>

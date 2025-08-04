@@ -12,12 +12,7 @@ import {
 } from "@edgedb/common/newui";
 
 import {useTabState} from "../../state";
-import {
-  AuthAdminState,
-  DraftWebhookConfig,
-  WebhookConfigData,
-  webhookEvents,
-} from "./state";
+import {AuthAdminState, DraftWebhookConfig, WebhookConfigData} from "./state";
 
 import styles from "./authAdmin.module.scss";
 import {useState} from "react";
@@ -140,7 +135,7 @@ function WebhookConfigCard({config}: {config: WebhookConfigData}) {
           <div className={styles.webhookEvents}>
             <FieldHeader label="Events" />
             <div className={styles.grid}>
-              {webhookEvents.map((col, i) => (
+              {state.webhookEventsList.map((col, i) => (
                 <div key={i}>
                   {col.map(({name, label}) => (
                     <Checkbox
@@ -201,7 +196,7 @@ const WebhookDraftForm = observer(function WebhookDraftForm({
           headerNote="At least one event must be selected"
         />
         <div className={styles.grid}>
-          {webhookEvents.map((col, i) => (
+          {state.webhookEventsList.map((col, i) => (
             <div key={i}>
               {col.map(({name, label}) => (
                 <Checkbox

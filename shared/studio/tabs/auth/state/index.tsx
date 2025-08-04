@@ -54,21 +54,25 @@ export type OpenIDProviderData = Omit<OAuthProviderData, "_typename"> & {
   issuer_url: string;
   logo_url: string | null;
 };
+export type VerificationMethod = "Link" | "Code";
 export type LocalEmailPasswordProviderData = {
   name: string;
   _typename: "ext::auth::EmailPasswordProviderConfig";
   require_verification: boolean;
+  verification_method?: VerificationMethod;
 };
 export type LocalWebAuthnProviderData = {
   name: string;
   _typename: "ext::auth::WebAuthnProviderConfig";
   relying_party_origin: string;
   require_verification: boolean;
+  verification_method?: VerificationMethod;
 };
 export type LocalMagicLinkProviderData = {
   name: string;
   _typename: "ext::auth::MagicLinkProviderConfig";
   token_time_to_live: string;
+  verification_method?: VerificationMethod;
 };
 export type AuthProviderData =
   | OAuthProviderData
@@ -107,20 +111,16 @@ export interface SMTPConfigData {
 
 export type EmailProviderConfig = SMTPConfigData;
 
-export const webhookEvents = (
-  [
-    ["IdentityCreated", "IdentityAuthenticated"],
-    ["EmailFactorCreated", "EmailVerified", "EmailVerificationRequested"],
-    ["PasswordResetRequested", "MagicLinkRequested"],
-  ] as const
-).map((col) =>
-  col.map((name) => ({
-    name: name,
-    label: name.replace(/[A-Z]/g, "\u200b$&"), // insert zero width space between words
-  }))
-);
-
-export type WebhookEvent = (typeof webhookEvents)[number][number]["name"];
+export type WebhookEvent =
+  | "IdentityCreated"
+  | "IdentityAuthenticated"
+  | "EmailFactorCreated"
+  | "EmailVerified"
+  | "EmailVerificationRequested"
+  | "PasswordResetRequested"
+  | "MagicLinkRequested"
+  | "OneTimeCodeRequested"
+  | "OneTimeCodeVerified";
 
 export interface WebhookConfigData {
   url: string;
@@ -227,6 +227,39 @@ export class AuthAdminState extends Model({
       dbCtx
         .get(this)!
         .schemaData?.objectsByName.has("ext::auth::WebhookConfig") === true
+    );
+  }
+
+  @computed
+  get hasVerificationMethod() {
+    return (
+      dbCtx
+        .get(this)!
+        .schemaData?.objectsByName.get(
+          "ext::auth::EmailPasswordProviderConfig"
+        )?.properties["verification_method"] != null
+    );
+  }
+
+  @computed
+  get webhookEventsList() {
+    return (
+      [
+        [
+          "IdentityCreated",
+          "IdentityAuthenticated",
+          ...(this.hasVerificationMethod
+            ? (["OneTimeCodeRequested", "OneTimeCodeVerified"] as const)
+            : []),
+        ],
+        ["EmailFactorCreated", "EmailVerified", "EmailVerificationRequested"],
+        ["PasswordResetRequested", "MagicLinkRequested"],
+      ] satisfies WebhookEvent[][]
+    ).map((col) =>
+      col.map((name) => ({
+        name: name,
+        label: name.replace(/[A-Z]/g, "\u200b$&"), // insert zero width space between words
+      }))
     );
   }
 
@@ -482,7 +515,7 @@ export class AuthAdminState extends Model({
 
   async refreshConfig() {
     const conn = connCtx.get(this)!;
-    const {newAppAuthSchema, newSMTPSchema} = this;
+    const {newAppAuthSchema, newSMTPSchema, hasVerificationMethod} = this;
 
     if (!newSMTPSchema && !this.draftSMTPConfigs.has("")) {
       this.draftSMTPConfigs.set(
@@ -532,6 +565,15 @@ export class AuthAdminState extends Model({
                   : ""
               }
             ),
+            ${
+              hasVerificationMethod
+                ? `verification_method := (
+              [is EmailPasswordProviderConfig].verification_method ??
+              [is WebAuthnProviderConfig].verification_method ??
+              [is MagicLinkProviderConfig].verification_method
+            ),`
+                : ""
+            }
             ${
               hasWebAuthn
                 ? `[is WebAuthnProviderConfig].relying_party_origin,`
@@ -1286,6 +1328,7 @@ export class DraftProviderConfig extends Model({
   webauthnRelyingOrigin: prop<string | null>(null).withSetter(),
 
   requireEmailVerification: prop(true).withSetter(),
+  useCodeVerificationMethod: prop(false).withSetter(),
 
   tokenTimeToLive: prop("").withSetter(),
 }) {
@@ -1508,6 +1551,19 @@ export class DraftProviderConfig extends Model({
             `token_time_to_live := <std::duration>${JSON.stringify(
               this.tokenTimeToLive
             )}`
+          );
+        }
+        if (
+          state.hasVerificationMethod &&
+          (this.selectedProviderType === "ext::auth::WebAuthnProviderConfig" ||
+            this.selectedProviderType ===
+              "ext::auth::EmailPasswordProviderConfig" ||
+            this.selectedProviderType ===
+              "ext::auth::MagicLinkProviderConfig") &&
+          this.useCodeVerificationMethod
+        ) {
+          queryFields.push(
+            `verification_method := ext::auth::VerificationMethod.Code`
           );
         }
       }
