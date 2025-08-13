@@ -570,9 +570,10 @@ export function MigrationsListIcon() {
   );
 }
 
-export function CircledCrossIcon() {
+export function CircledCrossIcon({className}: {className?: string}) {
   return (
     <svg
+      className={className}
       width="24"
       height="24"
       viewBox="0 0 24 24"
@@ -590,9 +591,10 @@ export function CircledCrossIcon() {
   );
 }
 
-export function CircledCheckIcon() {
+export function CircledCheckIcon({className}: {className?: string}) {
   return (
     <svg
+      className={className}
       width="24"
       height="24"
       viewBox="0 0 24 24"
