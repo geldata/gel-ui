@@ -53,9 +53,9 @@
 
   &.outline {
     background: none;
-    border: 1px solid var(--Grey85, #d9d9d9);
+    border: 1px solid var(--Grey90, #d9d9d9);
     box-shadow: none;
-    color: var(--secondary_text_color, #666);
+    color: var(--tertiary_text_color, #666);
   }
 
   &:disabled,
