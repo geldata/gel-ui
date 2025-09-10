@@ -14,7 +14,7 @@ export enum Theme {
   system = "system",
 }
 
-const themeContext = createContext<
+export const themeContext = createContext<
   [Theme, Theme.light | Theme.dark, (val: Theme) => void]
 >(null!);
 
