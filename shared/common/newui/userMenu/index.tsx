@@ -1,8 +1,7 @@
-import {JSX, useEffect, useRef, useState} from "react";
+import {JSX, PropsWithChildren, useEffect, useRef, useState} from "react";
 
 import cn from "@edgedb/common/utils/classNames";
 
-import {Button, LinkButton} from "../button";
 import {SignOutIcon} from "../icons";
 import {LoadingSkeleton} from "../loadingSkeleton";
 
@@ -12,12 +11,20 @@ export function UserMenuSkeleton() {
   return <LoadingSkeleton className={styles.userMenuSkeleton} />;
 }
 
+export type ActionOrLink =
+  | {
+      action: () => void;
+    }
+  | {
+      link: (props: PropsWithChildren<{className?: string}>) => JSX.Element;
+    };
+
 export interface UserMenuProps {
   avatarUrl: string;
   name?: string | null;
   email?: string | null;
-  signout: string | (() => void);
-  menuItems?: MenuItemProps[];
+  signout: ActionOrLink;
+  menuItems?: MenuItemProps[][];
 }
 
 export function UserMenu(props: UserMenuProps) {
@@ -73,53 +80,48 @@ export function UserMenuContent({
   return (
     <div className={cn(styles.menuContent, className)}>
       <div className={styles.userCard}>
-        <>
-          <div className={styles.info}>
-            <div className={styles.name}>{user.name ?? user.email}</div>
-            {user.name && user.email ? (
-              <div className={styles.subtitle}>{user.email}</div>
-            ) : null}
-          </div>
-          <SignoutButton signout={signout} />
-        </>
+        <UserAvatar avatarUrl={user.avatarUrl} />
+        <div className={styles.info}>
+          <div className={styles.name}>{user.name ?? user.email}</div>
+          {user.name && user.email ? (
+            <div className={styles.subtitle}>{user.email}</div>
+          ) : null}
+        </div>
       </div>
 
-      {menuItems ? (
-        <div className={styles.menuItemsList}>
-          {menuItems.map((item, i) => (
-            <MenuItem key={i} {...item} />
-          ))}
-        </div>
-      ) : null}
+      {menuItems
+        ? menuItems.map((g, i) => (
+            <div key={`menuGroup-${i}`} className={styles.menuItemsList}>
+              {g.map((item, i) => (
+                <MenuItem key={`menuItem-${i}`} {...item} />
+              ))}
+            </div>
+          ))
+        : null}
+      <div className={styles.menuItemsList}>
+        <MenuItem label="Sign out" icon={<SignOutIcon />} {...signout} />
+      </div>
     </div>
   );
 }
 
-export interface MenuItemProps {
-  action: () => void;
+export type MenuItemProps = {
   icon: JSX.Element;
   label: string;
-}
+} & (ActionOrLink | {});
 
-function MenuItem({action, icon, label}: MenuItemProps) {
+function MenuItem({icon, label, ...rest}: MenuItemProps) {
+  const El = "link" in rest ? rest.link : "div";
   return (
-    <div className={styles.menuItem} onClick={action}>
-      {icon}
+    <El
+      className={cn(styles.menuItem, {
+        [styles.hasAction]: "action" in rest || "link" in rest,
+      })}
+      onClick={"action" in rest ? rest.action : undefined}
+    >
       <span>{label}</span>
-    </div>
-  );
-}
-
-function SignoutButton({signout}: Pick<UserMenuProps, "signout">) {
-  const props = {
-    className: styles.signout,
-    rightIcon: <SignOutIcon />,
-    children: "Sign out",
-  };
-  return typeof signout === "string" ? (
-    <LinkButton {...props} href={signout} />
-  ) : (
-    <Button {...props} onClick={signout} />
+      {icon}
+    </El>
   );
 }
 
