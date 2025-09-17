@@ -1,0 +1,39 @@
+.themeSwitcher {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 30px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) inset;
+  overflow: clip;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: var(--tertiary_text_color);
+  cursor: pointer;
+  z-index: 1;
+
+  &.selected {
+    color: var(--secondary_text_color);
+  }
+}
+
+.selectedMarker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 16px;
+  border: 1px solid #eaeaea;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  transition: transform 0.1s;
+}
