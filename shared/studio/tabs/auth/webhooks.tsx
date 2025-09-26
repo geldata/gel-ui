@@ -53,7 +53,11 @@ export const WebhooksTab = observer(function WebhooksTab() {
       ) : state.emailProviderWarnings.magicLinkNoMethods ? (
         <EmailProviderWarning>
           You have the 'Magic Link' auth provider enabled. Create a webhook
-          below to handle the 'MagicLinkRequested' event, or{" "}
+          below to handle the '
+          {state.emailProviderWarnings.magicLinkNoMethods === "Code"
+            ? "OneTimeCodeRequested"
+            : "MagicLinkRequested"}
+          ' event, or{" "}
           <span
             className={styles.link}
             onClick={() => state.setSelectedTab("smtp")}
