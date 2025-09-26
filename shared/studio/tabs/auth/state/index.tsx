@@ -73,6 +73,7 @@ export type LocalMagicLinkProviderData = {
   _typename: "ext::auth::MagicLinkProviderConfig";
   token_time_to_live: string;
   verification_method?: VerificationMethod;
+  auto_signup?: boolean;
 };
 export type AuthProviderData =
   | OAuthProviderData
@@ -238,6 +239,16 @@ export class AuthAdminState extends Model({
         .schemaData?.objectsByName.get(
           "ext::auth::EmailPasswordProviderConfig"
         )?.properties["verification_method"] != null
+    );
+  }
+
+  @computed
+  get hasMagicLinkAutoSignup() {
+    return (
+      dbCtx
+        .get(this)!
+        .schemaData?.objectsByName.get("ext::auth::MagicLinkProviderConfig")
+        ?.properties["auto_signup"] != null
     );
   }
 
@@ -515,7 +526,12 @@ export class AuthAdminState extends Model({
 
   async refreshConfig() {
     const conn = connCtx.get(this)!;
-    const {newAppAuthSchema, newSMTPSchema, hasVerificationMethod} = this;
+    const {
+      newAppAuthSchema,
+      newSMTPSchema,
+      hasVerificationMethod,
+      hasMagicLinkAutoSignup,
+    } = this;
 
     if (!newSMTPSchema && !this.draftSMTPConfigs.has("")) {
       this.draftSMTPConfigs.set(
@@ -582,6 +598,11 @@ export class AuthAdminState extends Model({
             ${
               hasMagicLink
                 ? `token_time_to_live_seconds := <str>duration_get([is MagicLinkProviderConfig].token_time_to_live, 'totalseconds'),`
+                : ""
+            }
+            ${
+              hasMagicLinkAutoSignup
+                ? `[is MagicLinkProviderConfig].auto_signup`
                 : ""
             }
           },
@@ -1329,6 +1350,7 @@ export class DraftProviderConfig extends Model({
 
   requireEmailVerification: prop(true).withSetter(),
   useCodeVerificationMethod: prop(false).withSetter(),
+  enableAutoSignup: prop(false).withSetter(),
 
   tokenTimeToLive: prop("").withSetter(),
 }) {
@@ -1564,6 +1586,14 @@ export class DraftProviderConfig extends Model({
         ) {
           queryFields.push(
             `verification_method := ext::auth::VerificationMethod.Code`
+          );
+        }
+        if (
+          state.hasMagicLinkAutoSignup &&
+          this.selectedProviderType === "ext::auth::MagicLinkProviderConfig"
+        ) {
+          queryFields.push(
+            `auto_signup := ${this.enableAutoSignup ? "true" : "false"}`
           );
         }
       }
