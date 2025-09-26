@@ -1,5 +1,5 @@
-import {test as base, Locator} from "@playwright/test";
-import {Client, createClient} from "gel";
+import {test as base, type Locator} from "@playwright/test";
+import {type Client, createClient} from "gel";
 
 type Fixtures = {
   gelClient: Client;
