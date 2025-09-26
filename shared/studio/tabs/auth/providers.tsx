@@ -437,6 +437,30 @@ const DraftProviderConfigForm = observer(function DraftProviderConfigForm({
               />
             </div>
           ) : null}
+          {state.hasMagicLinkAutoSignup &&
+          draftState.selectedProviderType ===
+            "ext::auth::MagicLinkProviderConfig" ? (
+            <div className={styles.formRow}>
+              <Checkbox
+                label={
+                  <>
+                    Enable auto signup
+                    <InfoTooltip
+                      message={
+                        <>
+                          Automatically register a new identity when a user
+                          attempts to sign in using an email that hasn't yet
+                          been explicitly registered using the sign up API.
+                        </>
+                      }
+                    />
+                  </>
+                }
+                checked={draftState.enableAutoSignup}
+                onChange={(checked) => draftState.setEnableAutoSignup(checked)}
+              />
+            </div>
+          ) : null}
         </>
       ) : null}
 
@@ -602,6 +626,19 @@ function ProviderCard({provider}: {provider: AuthProviderData}) {
                     checked={
                       (provider as LocalEmailPasswordProviderData)
                         .verification_method === "Code"
+                    }
+                  />
+                </div>
+              ) : null}
+              {state.hasMagicLinkAutoSignup &&
+              provider.name === "builtin::local_magic_link" ? (
+                <div className={styles.formRow}>
+                  <Checkbox
+                    readOnly
+                    label="Enable auto signup"
+                    checked={
+                      (provider as LocalMagicLinkProviderData).auto_signup ===
+                      true
                     }
                   />
                 </div>
