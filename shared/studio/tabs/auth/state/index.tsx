@@ -479,6 +479,9 @@ export class AuthAdminState extends Model({
     const magicLinkWebhook = this.webhooks?.some((wh) =>
       wh.events.includes("MagicLinkRequested")
     );
+    const oneTimeCodeWebhook = this.webhooks?.some((wh) =>
+      wh.events.includes("OneTimeCodeRequested")
+    );
     const emailVerificationWebhook = this.webhooks?.some((wh) =>
       wh.events.includes("EmailVerificationRequested")
     );
@@ -495,7 +498,13 @@ export class AuthAdminState extends Model({
       passwordNoReset:
         !!passwordProvider && !passwordResetWebhook && !smtpConfigured,
       magicLinkNoMethods:
-        !!magicLinkProvider && !magicLinkWebhook && !smtpConfigured,
+        !!magicLinkProvider &&
+        !(magicLinkProvider.verification_method === "Code"
+          ? oneTimeCodeWebhook
+          : magicLinkWebhook) &&
+        !smtpConfigured
+          ? magicLinkProvider.verification_method ?? "Link"
+          : false,
     };
   }
 
