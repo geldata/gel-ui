@@ -19,7 +19,7 @@ import {DuplicateDatabaseDefinitionError} from "gel";
 import {cleanupOldSchemaDataForInstance} from "../idbStore";
 
 import {DatabaseState} from "./database";
-import {AuthProvider, Connection} from "./connection";
+import {AuthProvider, Connection, Role} from "./connection";
 import {SessionState} from "./sessionState";
 
 export const instanceCtx = createMobxContext<InstanceState>();
@@ -62,7 +62,16 @@ export class InstanceState extends Model({
   @observable instanceName: string | null = null;
   @observable.ref serverVersion: ServerVersion | null = null;
   @observable.ref databases: DatabaseInfo[] | null = null;
-  @observable roles: string[] | null = null;
+  @observable roles: Role[] | null = null;
+
+  @computed
+  get userRole() {
+    const user = this._authProvider.getAuthUser?.();
+    return (
+      (user ? this.roles?.find((r) => r.name === user) : this.roles?.[0]) ??
+      null
+    );
+  }
 
   @computed
   get instanceId() {
@@ -72,6 +81,17 @@ export class InstanceState extends Model({
   @computed
   get databaseNames() {
     return this.databases?.map((d) => d.name) ?? null;
+  }
+
+  @computed
+  get allowedDatabases() {
+    const role = this.userRole;
+    if (!role || role.branches.includes("*")) {
+      return this.databases;
+    }
+    return (
+      this.databases?.filter((d) => role.branches.includes(d.name)) ?? null
+    );
   }
 
   defaultConnection: Connection | null = null;
@@ -106,14 +126,19 @@ export class InstanceState extends Model({
       instanceName: string;
       version: ServerVersion;
       databases: DatabaseInfo[];
-      roles: string[];
+      roles: Role[];
     }>(
       `
       select {
         instanceName := sys::get_instance_name(),
         version := sys::get_version(),
         databases := ${this.databasesQuery},
-        roles := sys::Role.name,
+        roles := sys::Role {
+          name,
+          is_superuser,
+          permissions,
+          branches
+        },
       }`,
       true
     ))!;
@@ -169,8 +194,9 @@ export class InstanceState extends Model({
             ...this._authProvider,
             getAuthUser: () =>
               this._authProvider.getAuthUser?.() ??
-              this.roles?.[0] ??
+              this.roles?.[0]?.name ??
               "edgedb",
+            getUserRole: () => this.userRole,
           },
         },
         this.serverVersion,

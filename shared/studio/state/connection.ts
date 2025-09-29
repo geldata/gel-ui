@@ -104,9 +104,17 @@ const queryOptions: QueryOptions = {
   injectObjectids: true,
 };
 
+export interface Role {
+  name: string;
+  is_superuser: boolean;
+  permissions: string[];
+  branches: string[];
+}
+
 export interface AuthProvider {
   getAuthToken(): string;
   getAuthUser?(): string;
+  getUserRole?(): Role | null;
   invalidateToken(): void;
 }
 
@@ -206,6 +214,15 @@ export class Connection {
       );
     }
     return setQueryTag(state, "gel/ui");
+  }
+
+  hasRolePermissions(...perms: string[]): boolean {
+    const role = this.config.authProvider.getUserRole?.();
+    return (
+      !role ||
+      role.is_superuser ||
+      perms.every((perm) => role.permissions.includes(perm))
+    );
   }
 
   @computed
@@ -369,12 +386,13 @@ export class Connection {
       let state = this._state;
 
       if (opts.ignoreSessionConfig) {
-        state = setQueryTag(
-          baseOptions
-            .withConfig({apply_access_policies: false})
-            .withGlobals(state.globals),
-          "gel/ui"
-        );
+        state = baseOptions.withGlobals(state.globals);
+        if (
+          this.hasRolePermissions("cfg::perm::configure_apply_access_policies")
+        ) {
+          state = state.withConfig({apply_access_policies: false});
+        }
+        state = setQueryTag(state, "gel/ui");
       }
       if (opts.userQuery) {
         state = setQueryTag(state, "gel/webrepl");

@@ -259,6 +259,13 @@ export class PerfStatsState extends Model({
     );
   }
 
+  @computed
+  get hasAnalyzePermissions() {
+    return (
+      connCtx.get(this)?.hasRolePermissions("sys::perm::analyze") ?? false
+    );
+  }
+
   @observable
   analyzeQuery: AnalyseQueryState | null = null;
 

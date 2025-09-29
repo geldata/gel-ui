@@ -54,18 +54,42 @@ export default observer(function DatabasePageLoadingWrapper(
   if (!instanceState.databaseNames.includes(props.databaseName)) {
     return (
       <ErrorPage
-        title="Database doesn't exist"
+        title="Branch doesn't exist"
         actions={
           <Button
             className={styles.greenButton}
-            label="Go back to database list"
+            label="Go back to branch list"
             onClick={() => gotoInstancePage()}
             style="square"
             size="large"
           />
         }
       >
-        The database '{props.databaseName}' does not exist.
+        The branch '{props.databaseName}' does not exist.
+      </ErrorPage>
+    );
+  }
+
+  if (
+    !instanceState.allowedDatabases?.some(
+      (db) => db.name === props.databaseName
+    )
+  ) {
+    return (
+      <ErrorPage
+        title="Insufficient permissions"
+        actions={
+          <Button
+            className={styles.greenButton}
+            label="Go back to branch list"
+            onClick={() => gotoInstancePage()}
+            style="square"
+            size="large"
+          />
+        }
+      >
+        The current role has insufficient permissions to access the branch '
+        {props.databaseName}'.
       </ErrorPage>
     );
   }

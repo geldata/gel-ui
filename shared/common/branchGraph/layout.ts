@@ -112,7 +112,7 @@ export async function fetchMigrationsData(
   }
 
   const databases = new Map(
-    instanceState.databases!.map((db) => [db.name, db.last_migration])
+    instanceState.allowedDatabases!.map((db) => [db.name, db.last_migration])
   );
 
   if (
@@ -129,7 +129,7 @@ export async function fetchMigrationsData(
   }
 
   migrationsData = await Promise.all(
-    instanceState.databases!.map(async ({name, last_migration}) => {
+    instanceState.allowedDatabases!.map(async ({name, last_migration}) => {
       if (last_migration !== undefined) {
         const cachedMigration = migrationsData?.find((d) => d.branch === name);
         if (

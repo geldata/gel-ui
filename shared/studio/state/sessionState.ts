@@ -171,6 +171,43 @@ export class SessionState extends Model({
     this.loadStoredSessionState();
   }
 
+  get allowedConfigNames(): (name: string) => boolean {
+    // https://github.com/geldata/rfcs/blob/master/text/1029-rbac.rst#session-configuration-permissions
+    const dbState = dbCtx.get(this)!;
+    const role = dbState.connection?.config.authProvider.getUserRole?.();
+    if (!role || role.is_superuser) {
+      return () => true;
+    }
+    const names = new Set<string>([
+      "default_transaction_isolation",
+      "default_transaction_access_mode",
+      "default_transaction_deferrable",
+      "force_database_error",
+      "simple_scoping",
+      "warn_old_scoping",
+    ]);
+    const regexes = [`^pg_trgm::.*$`, `^pg_vector::.*$`];
+
+    if (role.permissions.includes("cfg::perm::configure_timeouts")) {
+      names.add("session_idle_transaction_timeout");
+      names.add("query_execution_timeout");
+    }
+    if (
+      role.permissions.includes("cfg::perm::configure_apply_access_policies")
+    ) {
+      names.add("apply_access_policies");
+      names.add("apply_access_policies_pg");
+    }
+    if (
+      role.permissions.includes("cfg::perm::configure_allow_user_specified_id")
+    ) {
+      names.add("allow_user_specified_id");
+    }
+    const regex = new RegExp(regexes.join("|"));
+
+    return (name: string) => names.has(name) || regex.test(name);
+  }
+
   async loadStoredSessionState() {
     const instanceState = instanceCtx.get(this)!;
     const dbState = dbCtx.get(this)!;
@@ -187,6 +224,7 @@ export class SessionState extends Model({
     );
 
     const configType = schemaData.objectsByName.get("cfg::AbstractConfig")!;
+    const allowedConfigNames = this.allowedConfigNames;
     this.configNames = Object.values(configType.properties)
       .filter(
         (prop) =>
@@ -199,6 +237,7 @@ export class SessionState extends Model({
           )
       )
       .map((prop) => prop.name)
+      .filter(allowedConfigNames)
       .sort((a, b) => a.localeCompare(b));
     this.configNamesIndex = this.configNames.map((name) =>
       fuzzysort.prepare(name)
