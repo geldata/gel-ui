@@ -39,7 +39,7 @@ export function setAuthToken(username: string, token: string) {
   window.location.replace("/ui");
 }
 
-function clearAuthToken() {
+export function clearAuthToken() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USERNAME_KEY);
   if (window.location.pathname !== "/ui/_login") {

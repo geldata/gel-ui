@@ -10,6 +10,10 @@
   .themeSwitcher {
     margin-left: auto;
     z-index: 110;
+
+    @include breakpoint(mobile) {
+      display: none;
+    }
   }
 }
 
@@ -43,10 +47,26 @@
   }
 }
 
-.themeSwitcher {
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-left: auto;
+}
 
-  @include breakpoint(mobile) {
-    display: none;
+.userMenu {
+  z-index: 120;
+
+  .userIcon {
+    width: 20px;
+    height: 20px;
+    color: var(--Grey50);
+  }
+
+  .userInitial {
+    font-family: "Roboto Flex Variable", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--Grey50);
   }
 }
