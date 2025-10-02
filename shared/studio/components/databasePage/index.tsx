@@ -54,18 +54,18 @@ export default observer(function DatabasePageLoadingWrapper(
   if (!instanceState.databaseNames.includes(props.databaseName)) {
     return (
       <ErrorPage
-        title="Database doesn't exist"
+        title="Branch doesn't exist"
         actions={
           <Button
             className={styles.greenButton}
-            label="Go back to database list"
+            label="Go back to branch list"
             onClick={() => gotoInstancePage()}
             style="square"
             size="large"
           />
         }
       >
-        The database '{props.databaseName}' does not exist.
+        The branch '{props.databaseName}' does not exist.
       </ErrorPage>
     );
   }
@@ -106,6 +106,7 @@ const DatabasePageContent = observer(function DatabasePageContent({
   tabsLoading,
   mobileMenu,
 }: DatabasePageProps) {
+  const {gotoInstancePage} = useDBRouter();
   const instanceState = useInstanceState();
 
   const dbState = instanceState.getDatabasePageState(databaseName, tabs);
@@ -114,6 +115,26 @@ const DatabasePageContent = observer(function DatabasePageContent({
 
   const {currentPath, navigate} = useDBRouter();
   const isMobile = useIsMobile();
+
+  if (dbState.branchAccessDisallowed) {
+    return (
+      <ErrorPage
+        title="Insufficient permissions"
+        actions={
+          <Button
+            className={styles.greenButton}
+            label="Go back to branch list"
+            onClick={() => gotoInstancePage()}
+            style="square"
+            size="large"
+          />
+        }
+      >
+        The current role has insufficient permissions to access the branch '
+        {databaseName}'.
+      </ErrorPage>
+    );
+  }
 
   const currentTabId = currentPath[1] ?? "";
   const activeTab = tabs.find((tab) => tab.path === currentTabId);

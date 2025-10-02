@@ -43,6 +43,7 @@ import {fetchSchemaData, storeSchemaData} from "../idbStore";
 import {instanceCtx} from "./instance";
 import {Capabilities, connCtx, Connection} from "./connection";
 import {SessionState, sessionStateCtx} from "./sessionState";
+import {AuthenticationError} from "gel";
 
 export const dbCtx = createMobxContext<DatabaseState>();
 
@@ -81,6 +82,9 @@ export class DatabaseState extends Model({
 }) {
   @observable.ref
   connection: Connection | null = null;
+
+  @observable
+  branchAccessDisallowed = false;
 
   @action
   _setConnection(conn: Connection) {
@@ -155,7 +159,7 @@ export class DatabaseState extends Model({
     );
 
     const connectionDisposer = reaction(
-      () => instanceState.roles?.[0],
+      () => instanceState.currentRole,
       (currentRole) => {
         if (currentRole) {
           this._setConnection(
@@ -271,10 +275,21 @@ export class DatabaseState extends Model({
                 stage_no: number;
                 local: string[];
               },
-            })),
+            }))
+            .catch((err) => {
+              if (err instanceof AuthenticationError) {
+                return null;
+              }
+              throw err;
+            }),
           fetchSchemaData(this.name, instanceState.instanceId!),
         ])
       );
+
+      if (schemaInfo === null) {
+        this.branchAccessDisallowed = true;
+        return;
+      }
 
       if (this.schemaId === schemaInfo.schemaId) {
         return;

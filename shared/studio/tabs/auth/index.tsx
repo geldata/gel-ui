@@ -19,16 +19,31 @@ const AuthAdminLoader = observer(function AuthAdminLoader() {
   const extEnabled =
     db.schemaData?.extensions.some((ext) => ext.name === "auth") ?? null;
 
+  const hasPermission = db.connection?.hasRolePermissions(
+    "sys::perm::branch_config",
+    "ext::auth::perm::auth_read"
+  );
+
   return (
     <div className={styles.tabWrapper}>
       {extEnabled === null ? (
         <div className={styles.loadingSchema}>Loading schema...</div>
       ) : extEnabled ? (
-        <Suspense
-          fallback={<Spinner className={styles.fallbackSpinner} size={20} />}
-        >
-          <AuthAdmin />
-        </Suspense>
+        hasPermission ? (
+          <Suspense
+            fallback={<Spinner className={styles.fallbackSpinner} size={20} />}
+          >
+            <AuthAdmin />
+          </Suspense>
+        ) : (
+          <div className={styles.extDisabled}>
+            <h2>Insufficient permissions</h2>
+            <p>
+              The current role does not have permissions to modify the auth
+              extension configuration.
+            </p>
+          </div>
+        )
       ) : (
         <div className={styles.extDisabled}>
           <h2>The auth extension is not enabled</h2>

@@ -104,9 +104,16 @@ const queryOptions: QueryOptions = {
   injectObjectids: true,
 };
 
+export interface Role {
+  name: string;
+  is_superuser: boolean;
+  permissions: string[];
+}
+
 export interface AuthProvider {
   getAuthToken(): string;
   getAuthUser?(): string;
+  getUserRole?(): Role | null;
   invalidateToken(): void;
 }
 
@@ -206,6 +213,15 @@ export class Connection {
       );
     }
     return setQueryTag(state, "gel/ui");
+  }
+
+  hasRolePermissions(...perms: string[]): boolean {
+    const role = this.config.authProvider.getUserRole?.();
+    return (
+      !role ||
+      role.is_superuser ||
+      perms.every((perm) => role.permissions.includes(perm))
+    );
   }
 
   @computed
@@ -330,7 +346,13 @@ export class Connection {
       if (result && "error" in result) {
         const {error, capabilities} = result;
         if (error instanceof AuthenticationError) {
-          this.config.authProvider.invalidateToken();
+          if (
+            !error.message.includes(
+              "user does not have permission for database branch"
+            )
+          ) {
+            this.config.authProvider.invalidateToken();
+          }
           throw error;
         }
         if (
@@ -369,12 +391,13 @@ export class Connection {
       let state = this._state;
 
       if (opts.ignoreSessionConfig) {
-        state = setQueryTag(
-          baseOptions
-            .withConfig({apply_access_policies: false})
-            .withGlobals(state.globals),
-          "gel/ui"
-        );
+        state = baseOptions.withGlobals(state.globals);
+        if (
+          this.hasRolePermissions("cfg::perm::configure_apply_access_policies")
+        ) {
+          state = state.withConfig({apply_access_policies: false});
+        }
+        state = setQueryTag(state, "gel/ui");
       }
       if (opts.userQuery) {
         state = setQueryTag(state, "gel/webrepl");

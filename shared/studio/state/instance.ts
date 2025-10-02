@@ -62,7 +62,21 @@ export class InstanceState extends Model({
   @observable instanceName: string | null = null;
   @observable.ref serverVersion: ServerVersion | null = null;
   @observable.ref databases: DatabaseInfo[] | null = null;
-  @observable roles: string[] | null = null;
+  @observable currentRole: string | null = null;
+  isSuperuser: boolean = true;
+  permissions: string[] = [];
+
+  @computed
+  get userRole() {
+    const user = this._authProvider.getAuthUser?.();
+    return user
+      ? {
+          name: user,
+          is_superuser: this.isSuperuser,
+          permissions: this.permissions,
+        }
+      : null;
+  }
 
   @computed
   get instanceId() {
@@ -106,14 +120,18 @@ export class InstanceState extends Model({
       instanceName: string;
       version: ServerVersion;
       databases: DatabaseInfo[];
-      roles: string[];
+      currentRole: string;
+      isSuperuser: boolean;
+      permissions: string[];
     }>(
       `
       select {
         instanceName := sys::get_instance_name(),
         version := sys::get_version(),
         databases := ${this.databasesQuery},
-        roles := sys::Role.name,
+        currentRole := global sys::current_role,
+        isSuperuser := global sys::perm::superuser,
+        permissions := global sys::current_permissions,
       }`,
       true
     ))!;
@@ -122,7 +140,9 @@ export class InstanceState extends Model({
       this.instanceName = data.instanceName ?? "_localdev";
       this.serverVersion = data.version;
       this.databases = data.databases;
-      this.roles = data.roles;
+      this.currentRole = data.currentRole;
+      this.isSuperuser = data.isSuperuser;
+      this.permissions = data.permissions;
     });
 
     cleanupOldSchemaDataForInstance(this.instanceId!, this.databaseNames!);
@@ -152,7 +172,7 @@ export class InstanceState extends Model({
     );
 
     return reaction(
-      () => [this.serverUrl, this.roles, this.serverVersion],
+      () => [this.serverUrl, this.currentRole, this.serverVersion],
       () => (this._connections = new Map())
     );
   }
@@ -169,8 +189,9 @@ export class InstanceState extends Model({
             ...this._authProvider,
             getAuthUser: () =>
               this._authProvider.getAuthUser?.() ??
-              this.roles?.[0] ??
+              this.currentRole ??
               "edgedb",
+            getUserRole: () => this.userRole,
           },
         },
         this.serverVersion,
