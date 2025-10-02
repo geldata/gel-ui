@@ -97,7 +97,7 @@ export class SessionState extends Model({
   @computed
   get indexedSchemaGlobals() {
     return [...(dbCtx.get(this)!.schemaData?.globals.values() ?? [])]
-      .filter((global) => !global.expr)
+      .filter((global) => !global.expr && !global.name.startsWith("sys::"))
       .map((global) => ({global, indexed: fuzzysort.prepare(global.name)}));
   }
 
@@ -251,6 +251,7 @@ export class SessionState extends Model({
       if (
         schemaGlobal &&
         !schemaGlobal.expr &&
+        !schemaGlobal.name.startsWith("sys::") &&
         schemaGlobal.target.id === global.typeId
       ) {
         draftState.globals[key] = {

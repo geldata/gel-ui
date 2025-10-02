@@ -19,7 +19,7 @@ import {DuplicateDatabaseDefinitionError} from "gel";
 import {cleanupOldSchemaDataForInstance} from "../idbStore";
 
 import {DatabaseState} from "./database";
-import {AuthProvider, Connection, Role} from "./connection";
+import {AuthProvider, Connection} from "./connection";
 import {SessionState} from "./sessionState";
 
 export const instanceCtx = createMobxContext<InstanceState>();
@@ -62,15 +62,20 @@ export class InstanceState extends Model({
   @observable instanceName: string | null = null;
   @observable.ref serverVersion: ServerVersion | null = null;
   @observable.ref databases: DatabaseInfo[] | null = null;
-  @observable roles: Role[] | null = null;
+  @observable currentRole: string | null = null;
+  isSuperuser: boolean = true;
+  permissions: string[] = [];
 
   @computed
   get userRole() {
     const user = this._authProvider.getAuthUser?.();
-    return (
-      (user ? this.roles?.find((r) => r.name === user) : this.roles?.[0]) ??
-      null
-    );
+    return user
+      ? {
+          name: user,
+          is_superuser: this.isSuperuser,
+          permissions: this.permissions,
+        }
+      : null;
   }
 
   @computed
@@ -81,17 +86,6 @@ export class InstanceState extends Model({
   @computed
   get databaseNames() {
     return this.databases?.map((d) => d.name) ?? null;
-  }
-
-  @computed
-  get allowedDatabases() {
-    const role = this.userRole;
-    if (!role || role.branches.includes("*")) {
-      return this.databases;
-    }
-    return (
-      this.databases?.filter((d) => role.branches.includes(d.name)) ?? null
-    );
   }
 
   defaultConnection: Connection | null = null;
@@ -126,19 +120,18 @@ export class InstanceState extends Model({
       instanceName: string;
       version: ServerVersion;
       databases: DatabaseInfo[];
-      roles: Role[];
+      currentRole: string;
+      isSuperuser: boolean;
+      permissions: string[];
     }>(
       `
       select {
         instanceName := sys::get_instance_name(),
         version := sys::get_version(),
         databases := ${this.databasesQuery},
-        roles := sys::Role {
-          name,
-          is_superuser,
-          permissions,
-          branches
-        },
+        currentRole := global sys::current_role,
+        isSuperuser := global sys::perm::superuser,
+        permissions := global sys::current_permissions,
       }`,
       true
     ))!;
@@ -147,7 +140,9 @@ export class InstanceState extends Model({
       this.instanceName = data.instanceName ?? "_localdev";
       this.serverVersion = data.version;
       this.databases = data.databases;
-      this.roles = data.roles;
+      this.currentRole = data.currentRole;
+      this.isSuperuser = data.isSuperuser;
+      this.permissions = data.permissions;
     });
 
     cleanupOldSchemaDataForInstance(this.instanceId!, this.databaseNames!);
@@ -177,7 +172,7 @@ export class InstanceState extends Model({
     );
 
     return reaction(
-      () => [this.serverUrl, this.roles, this.serverVersion],
+      () => [this.serverUrl, this.currentRole, this.serverVersion],
       () => (this._connections = new Map())
     );
   }
@@ -194,7 +189,7 @@ export class InstanceState extends Model({
             ...this._authProvider,
             getAuthUser: () =>
               this._authProvider.getAuthUser?.() ??
-              this.roles?.[0]?.name ??
+              this.currentRole ??
               "edgedb",
             getUserRole: () => this.userRole,
           },

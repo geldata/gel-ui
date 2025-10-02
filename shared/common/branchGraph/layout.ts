@@ -1,4 +1,5 @@
 import * as z from "zod";
+import {AuthenticationError} from "gel";
 
 import {InstanceState} from "@edgedb/studio/state/instance";
 import {
@@ -21,7 +22,7 @@ interface Migration {
 
 interface MigrationsData {
   branch: string;
-  migrations: Migration[];
+  migrations: Migration[] | null;
 }
 
 const branchGraphCacheName = "branches-graph";
@@ -29,7 +30,9 @@ const branchGraphCacheName = "branches-graph";
 const CachedBranchGraphDataType = z.array(
   z.tuple([
     z.string(),
-    z.array(z.tuple([z.string(), z.string(), z.string().nullable()])),
+    z
+      .array(z.tuple([z.string(), z.string(), z.string().nullable()]))
+      .nullable(),
   ])
 );
 
@@ -45,11 +48,12 @@ function _getBranchGraphDataFromCache(
   return data
     ? data.map(([branch, migrations]) => ({
         branch,
-        migrations: migrations.map(([id, name, parentId]) => ({
-          id,
-          name,
-          parentId,
-        })),
+        migrations:
+          migrations?.map(([id, name, parentId]) => ({
+            id,
+            name,
+            parentId,
+          })) ?? null,
       }))
     : null;
 }
@@ -63,7 +67,7 @@ function _storeBranchGraphDataInCache(
     instanceId,
     data.map(({branch, migrations}) => [
       branch,
-      migrations.map(({id, name, parentId}) => [id, name, parentId]),
+      migrations?.map(({id, name, parentId}) => [id, name, parentId]) ?? null,
     ]) satisfies z.infer<typeof CachedBranchGraphDataType>
   );
 }
@@ -112,7 +116,7 @@ export async function fetchMigrationsData(
   }
 
   const databases = new Map(
-    instanceState.allowedDatabases!.map((db) => [db.name, db.last_migration])
+    instanceState.databases!.map((db) => [db.name, db.last_migration])
   );
 
   if (
@@ -120,8 +124,9 @@ export async function fetchMigrationsData(
     migrationsData.length == databases.size &&
     migrationsData.every(
       ({branch, migrations}) =>
+        migrations === null ||
         databases.get(branch) ===
-        (migrations[migrations.length - 1]?.name ?? null)
+          (migrations[migrations.length - 1]?.name ?? null)
     )
   ) {
     // all cached data is still valid
@@ -129,13 +134,14 @@ export async function fetchMigrationsData(
   }
 
   migrationsData = await Promise.all(
-    instanceState.allowedDatabases!.map(async ({name, last_migration}) => {
+    instanceState.databases!.map(async ({name, last_migration}) => {
       if (last_migration !== undefined) {
         const cachedMigration = migrationsData?.find((d) => d.branch === name);
         if (
           cachedMigration &&
-          (cachedMigration.migrations[cachedMigration.migrations.length - 1]
-            ?.name ?? null) === last_migration
+          (cachedMigration.migrations === null ||
+            (cachedMigration.migrations[cachedMigration.migrations.length - 1]
+              ?.name ?? null) === last_migration)
         ) {
           // return cached data for branch if still valid
           return cachedMigration;
@@ -143,18 +149,26 @@ export async function fetchMigrationsData(
       }
 
       const conn = instanceState.getConnection(name);
-      return {
-        branch: name,
-        migrations: sortMigrations(
-          ((
-            await conn.query(`
+      const migrations = await conn
+        .query(
+          `
               select schema::Migration {
                 id,
                 name,
                 parentId := assert_single(.parents.id)
-              }`)
-          ).result as Migration[]) ?? []
-        ),
+              }`
+        )
+        .catch((err) => {
+          if (err instanceof AuthenticationError) {
+            return null;
+          }
+          throw err;
+        });
+      return {
+        branch: name,
+        migrations: migrations
+          ? sortMigrations(migrations.result ?? [])
+          : null,
       };
     })
   );
@@ -176,6 +190,9 @@ export function buildBranchGraph(migrationsData: MigrationsData[]): GraphData {
   const graphItems = new Map<string, GraphItem>();
 
   for (const {branch, migrations} of migrationsData) {
+    if (!migrations) {
+      continue;
+    }
     if (migrations.length === 0) {
       emptyBranches.push(branch);
       continue;

@@ -108,7 +108,6 @@ export interface Role {
   name: string;
   is_superuser: boolean;
   permissions: string[];
-  branches: string[];
 }
 
 export interface AuthProvider {
@@ -347,7 +346,13 @@ export class Connection {
       if (result && "error" in result) {
         const {error, capabilities} = result;
         if (error instanceof AuthenticationError) {
-          this.config.authProvider.invalidateToken();
+          if (
+            !error.message.includes(
+              "user does not have permission for database branch"
+            )
+          ) {
+            this.config.authProvider.invalidateToken();
+          }
           throw error;
         }
         if (

@@ -70,30 +70,6 @@ export default observer(function DatabasePageLoadingWrapper(
     );
   }
 
-  if (
-    !instanceState.allowedDatabases?.some(
-      (db) => db.name === props.databaseName
-    )
-  ) {
-    return (
-      <ErrorPage
-        title="Insufficient permissions"
-        actions={
-          <Button
-            className={styles.greenButton}
-            label="Go back to branch list"
-            onClick={() => gotoInstancePage()}
-            style="square"
-            size="large"
-          />
-        }
-      >
-        The current role has insufficient permissions to access the branch '
-        {props.databaseName}'.
-      </ErrorPage>
-    );
-  }
-
   return <DatabasePageContent key={props.databaseName} {...props} />;
 });
 
@@ -130,6 +106,7 @@ const DatabasePageContent = observer(function DatabasePageContent({
   tabsLoading,
   mobileMenu,
 }: DatabasePageProps) {
+  const {gotoInstancePage} = useDBRouter();
   const instanceState = useInstanceState();
 
   const dbState = instanceState.getDatabasePageState(databaseName, tabs);
@@ -138,6 +115,26 @@ const DatabasePageContent = observer(function DatabasePageContent({
 
   const {currentPath, navigate} = useDBRouter();
   const isMobile = useIsMobile();
+
+  if (dbState.branchAccessDisallowed) {
+    return (
+      <ErrorPage
+        title="Insufficient permissions"
+        actions={
+          <Button
+            className={styles.greenButton}
+            label="Go back to branch list"
+            onClick={() => gotoInstancePage()}
+            style="square"
+            size="large"
+          />
+        }
+      >
+        The current role has insufficient permissions to access the branch '
+        {databaseName}'.
+      </ErrorPage>
+    );
+  }
 
   const currentTabId = currentPath[1] ?? "";
   const activeTab = tabs.find((tab) => tab.path === currentTabId);
