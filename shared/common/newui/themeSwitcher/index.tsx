@@ -13,11 +13,11 @@ const themeIcons = {
   [Theme.dark]: <DarkThemeIcon />,
 };
 
-export function ThemeSwitcher() {
+export function ThemeSwitcher({className}: {className?: string}) {
   const [theme, _, setTheme] = useTheme();
 
   return (
-    <div className={styles.themeSwitcher}>
+    <div className={cn(styles.themeSwitcher, className)}>
       <div
         className={styles.selectedMarker}
         style={{transform: `translateX(${themes.indexOf(theme) * 30}px)`}}

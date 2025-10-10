@@ -29,7 +29,7 @@
 
     &:checked + .check {
       border: 0;
-      background-color: #a15ec0;
+      background-color: var(--checkboxSelectedColor, #a15ec0);
       background-image: url.svg(
         '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">'
           '<path d="M5 10.5L8 13.5L14.5 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'

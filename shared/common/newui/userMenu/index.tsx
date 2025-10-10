@@ -93,7 +93,11 @@ export function UserMenuContent({
         ? menuItems.map((g, i) => (
             <div key={`menuGroup-${i}`} className={styles.menuItemsList}>
               {g.map((item, i) => (
-                <MenuItem key={`menuItem-${i}`} {...item} />
+                <MenuItem
+                  key={`menuItem-${i}`}
+                  {...item}
+                  onClick={closeMenu}
+                />
               ))}
             </div>
           ))
@@ -105,22 +109,41 @@ export function UserMenuContent({
   );
 }
 
-export type MenuItemProps = {
-  icon: JSX.Element;
-  label: string;
-} & (ActionOrLink | {});
+export type MenuItemProps = (
+  | {
+      icon: JSX.Element;
+      label: string;
+    }
+  | {component: JSX.Element}
+) &
+  (ActionOrLink | {});
 
-function MenuItem({icon, label, ...rest}: MenuItemProps) {
-  const El = "link" in rest ? rest.link : "div";
+function MenuItem(props: MenuItemProps & {onClick?: () => void}) {
+  const El = "link" in props ? props.link : "div";
   return (
     <El
       className={cn(styles.menuItem, {
-        [styles.hasAction]: "action" in rest || "link" in rest,
+        [styles.hasAction]: "action" in props || "link" in props,
       })}
-      onClick={"action" in rest ? rest.action : undefined}
+      onClick={
+        "action" in props
+          ? () => {
+              props.onClick?.();
+              props.action();
+            }
+          : "link" in props
+            ? props.onClick
+            : undefined
+      }
     >
-      <span>{label}</span>
-      {icon}
+      {"component" in props ? (
+        props.component
+      ) : (
+        <>
+          <span>{props.label}</span>
+          {props.icon}
+        </>
+      )}
     </El>
   );
 }
