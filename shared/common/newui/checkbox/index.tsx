@@ -1,3 +1,4 @@
+import type {JSX} from "react";
 import cn from "@edgedb/common/utils/classNames";
 
 import styles from "./checkbox.module.scss";

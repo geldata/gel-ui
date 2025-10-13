@@ -1,14 +1,15 @@
 import {
-  ForwardedRef,
-  InputHTMLAttributes,
-  TextareaHTMLAttributes,
+  type JSX,
+  type ForwardedRef,
+  type InputHTMLAttributes,
+  type TextareaHTMLAttributes,
   forwardRef,
 } from "react";
 
 import cn from "@edgedb/common/utils/classNames";
 
 import {InfoIcon} from "../icons";
-import {FieldHeader, FieldHeaderProps} from "../fieldHeader";
+import {FieldHeader, type FieldHeaderProps} from "../fieldHeader";
 
 import styles from "./textInput.module.scss";
 

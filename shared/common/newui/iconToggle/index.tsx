@@ -1,3 +1,4 @@
+import type {JSX} from "react";
 import cn from "@edgedb/common/utils/classNames";
 
 import styles from "./iconToggle.module.scss";
@@ -23,7 +24,11 @@ export function IconToggle<OptionKey extends string | number = any>({
   disabled,
 }: IconToggleProps<OptionKey>) {
   return (
-    <div className={cn(styles.iconToggle, className, {[styles.disabled]: !!disabled})}>
+    <div
+      className={cn(styles.iconToggle, className, {
+        [styles.disabled]: !!disabled,
+      })}
+    >
       {options.map((option) => (
         <div
           key={option.key}

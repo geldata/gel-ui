@@ -1,8 +1,15 @@
+import {
+  type JSX,
+  type CSSProperties,
+  type PropsWithChildren,
+  useEffect,
+  useState,
+} from "react";
+
 import cn from "@edgedb/common/utils/classNames";
 
 import styles from "./button.module.scss";
 import Spinner from "../../ui/spinner";
-import {CSSProperties, PropsWithChildren, useEffect, useState} from "react";
 
 const isMac = navigator.platform.toLowerCase().includes("mac");
 

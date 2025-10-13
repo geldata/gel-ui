@@ -1,6 +1,7 @@
 import {
+  type JSX,
+  type PropsWithChildren,
   createContext,
-  PropsWithChildren,
   useState,
   useContext,
   useRef,
@@ -110,7 +111,7 @@ export function useModal(modal?: (ctx: any) => JSX.Element): {
 } {
   const ctx = useContext(_modalContext);
   const placeholder = useRef(<></>);
-  const modalCtx = useRef<any>();
+  const modalCtx = useRef<any>(undefined);
 
   if (!modal) {
     return {

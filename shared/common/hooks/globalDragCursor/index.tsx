@@ -1,9 +1,9 @@
 import {
+  type PropsWithChildren,
+  type CSSProperties,
   createContext,
-  PropsWithChildren,
   useState,
   useContext,
-  CSSProperties,
 } from "react";
 
 import styles from "./globalDragCursor.module.scss";

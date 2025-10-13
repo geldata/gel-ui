@@ -1,8 +1,8 @@
 "use client";
 
 import {
+  type PropsWithChildren,
   createContext,
-  PropsWithChildren,
   useState,
   useContext,
   useLayoutEffect,

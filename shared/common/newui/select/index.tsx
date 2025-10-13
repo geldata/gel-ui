@@ -1,7 +1,8 @@
+import type {JSX} from "react";
 import cn from "@edgedb/common/utils/classNames";
 import {
   Select as _Select,
-  SelectProps as _SelectProps,
+  type SelectProps as _SelectProps,
 } from "@edgedb/common/ui/select";
 export type {SelectItem, SelectItems} from "@edgedb/common/ui/select";
 

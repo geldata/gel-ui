@@ -1,4 +1,9 @@
-import {forwardRef, HTMLAttributes, PropsWithChildren} from "react";
+import {
+  forwardRef,
+  type HTMLAttributes,
+  type PropsWithChildren,
+  type JSX,
+} from "react";
 
 import cn from "@edgedb/common/utils/classNames";
 
