@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .databasePage {
   position: relative;
@@ -68,7 +68,7 @@
   --buttonBg: #49d8ad;
   --buttonTextColour: #fff;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --buttonBg: #29b189;
     --buttonTextColour: #141414;
   }
@@ -111,7 +111,7 @@
       border-radius: 16px;
       cursor: pointer;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: rgba(255, 255, 255, 0.15);
       }
     }

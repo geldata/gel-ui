@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .copyButton {
   svg {
@@ -9,7 +9,7 @@
     color: #70b53a !important;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     svg {
       color: var(--Grey60, #999999);
     }
@@ -31,7 +31,7 @@
     color: #70b53a !important;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: var(--Grey30, #4d4d4d);
 
     &:hover {

@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .button,
 .linkButton {
@@ -65,7 +65,7 @@
     pointer-events: none;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border: 1px solid #4d4d4d;
     background: #363636;
     color: #ccc;

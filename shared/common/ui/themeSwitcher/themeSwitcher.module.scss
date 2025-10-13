@@ -1,4 +1,4 @@
-@import "../../mixins.scss";
+@use "../../mixins.scss";
 
 .themeSwitcher {
   position: relative;
@@ -9,14 +9,14 @@
 
   $iconSizeMobile: 48px;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     margin: 24px;
     border-radius: 8px;
     padding: 0px 20px;
     background-color: var(--grey90);
     color: var(--baseText);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: var(--grey18);
     }
   }
@@ -39,7 +39,7 @@
     .dropdownIcon {
       display: none;
 
-      @include breakpoint(mobile) {
+      @include mixins.breakpoint(mobile) {
         display: block;
       }
     }
@@ -51,12 +51,12 @@
         opacity: 1;
       }
 
-      @include breakpoint(mobile) {
+      @include mixins.breakpoint(mobile) {
         color: var(--baseText);
       }
     }
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       width: $iconSizeMobile;
       height: $iconSizeMobile;
     }
@@ -64,11 +64,11 @@
     &.active {
       color: var(--accentGreen);
 
-      @include breakpoint(mobile) {
+      @include mixins.breakpoint(mobile) {
         background-color: #fff;
         color: var(--baseText);
 
-        @include darkTheme {
+        @include mixins.darkTheme {
           background-color: var(--grey30);
         }
       }
@@ -78,7 +78,7 @@
       display: none;
     }
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       width: 100%;
 
       .checkIcon {
@@ -102,10 +102,12 @@
     opacity: 0;
     pointer-events: none;
     transform: scale(0);
-    transition: transform 0.1s 0.2s linear,
-      height 0.133s 0.066s cubic-bezier(0.76, 0, 0.78, 0.9), opacity 0s 0.3s;
+    transition:
+      transform 0.1s 0.2s linear,
+      height 0.133s 0.066s cubic-bezier(0.76, 0, 0.78, 0.9),
+      opacity 0s 0.3s;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: #212121;
     }
 
@@ -126,7 +128,7 @@
       }
     }
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       top: 0;
       border-radius: 8px;
       transition: none;
@@ -163,7 +165,7 @@
         }
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background-color: var(--grey18);
       }
     }
@@ -173,7 +175,9 @@
       width: $iconSize * 3 + $iconSpacing * 2;
       opacity: 1;
       pointer-events: all;
-      transition: transform 0.1s linear, height 0.133s 0.1s ease;
+      transition:
+        transform 0.1s linear,
+        height 0.133s 0.1s ease;
       z-index: 1;
 
       .button {
@@ -189,7 +193,7 @@
         }
       }
 
-      @include breakpoint(mobile) {
+      @include mixins.breakpoint(mobile) {
         height: $iconSizeMobile * 3;
         width: 100%;
       }
@@ -234,25 +238,25 @@
       z-index: 200;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #adadad;
       color: #141414;
     }
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       display: none;
     }
   }
 
   .lightIcon {
-    @include darkTheme {
+    @include mixins.darkTheme {
       display: none;
     }
   }
 
   .darkIcon {
     display: none;
-    @include darkTheme {
+    @include mixins.darkTheme {
       display: block;
     }
   }
@@ -260,7 +264,7 @@
   .themeLabel {
     display: none;
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       color: var(--baseText);
       text-transform: capitalize;
       display: block;

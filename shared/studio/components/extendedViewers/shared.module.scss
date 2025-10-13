@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .lazyLoading {
   margin: auto;
@@ -16,7 +16,7 @@
   flex-shrink: 0;
   z-index: 1;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border-bottom: 1px solid var(--Grey22, #363636);
     background: var(--Grey18, #2e2e2e);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.2);
@@ -40,7 +40,7 @@
   &:hover {
     background: var(--Grey93);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: var(--Grey25);
     }
   }

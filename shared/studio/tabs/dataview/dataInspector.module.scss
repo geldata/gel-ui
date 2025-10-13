@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .dataInspector {
   flex-grow: 1;
@@ -9,35 +9,35 @@
   // 10px (chevron width) + 16px (chevron padding)
   --rowIndexWidth: calc(var(--rowIndexCharWidth) * 7.8px + 62px);
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     --rowIndexWidth: calc(var(--rowIndexCharWidth) * 7.8px + 74px);
 
     --inspector-green: #2cb88e;
     --inspector-orange: #e5a507;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       --inspector-green: #00ba83;
       --inspector-orange: #d0a02b;
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #2e2e2e;
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       background: #242424;
     }
   }
 
-  @include breakpoint(mobile) {
-    @include darkTheme {
+  @include mixins.breakpoint(mobile) {
+    @include mixins.darkTheme {
       background: #242424;
     }
   }
 }
 
 .gridScrollContainer {
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 }
 
 .gridInner {
@@ -49,7 +49,7 @@
   margin-left: var(--rowIndexWidth);
   margin-bottom: var(--gridBottomPadding);
 
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 }
 
 .headers {
@@ -90,7 +90,7 @@
       opacity: 0.7;
     }
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       color: var(--grey30);
     }
   }
@@ -153,11 +153,11 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     .fieldName {
       color: #c5c5c5;
 
-      @include breakpoint(mobile) {
+      @include mixins.breakpoint(mobile) {
         color: var(--baseTextDarkTheme);
       }
     }
@@ -202,7 +202,7 @@
     z-index: -1;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     .subtypeLabel,
     &:before {
       background: #4d4d4d;
@@ -216,11 +216,11 @@
   padding: 4px 0;
   box-sizing: border-box;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     border-bottom: 2px solid #e6e6e6;
     align-items: center;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       border-color: #141414;
     }
   }
@@ -251,7 +251,7 @@
 .hoveredCell {
   background: #fff;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey18);
   }
 }
@@ -267,7 +267,7 @@
     width: calc(100% - 4rem);
     background: #e6e6e6;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #2f2f2f;
     }
   }
@@ -321,7 +321,7 @@
     width: 3px;
     background-color: #ffa900;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: #b88523;
     }
   }
@@ -330,7 +330,7 @@
 .hasEdits {
   background: #fff5e3;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #4e422c;
   }
 }
@@ -345,7 +345,7 @@
     background-color: #d17870;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #3a2323;
 
     .invalidValue {
@@ -362,7 +362,7 @@
   background: rgba(0, 0, 0, 0.07);
   pointer-events: none;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: rgba(0, 0, 0, 0.45);
   }
 }
@@ -381,7 +381,7 @@
   svg {
     fill: #ffa900;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       fill: #b88523;
     }
   }
@@ -452,7 +452,7 @@
     cursor: pointer;
     user-select: none;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       border: 1px solid #7c7c7c;
       color: #adadad;
     }
@@ -475,7 +475,7 @@
       width: 3px;
       background-color: #ffa900;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background-color: #b88523;
       }
     }
@@ -483,14 +483,14 @@
   &.isNewRow:before {
     background-color: #58ba2b;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: #55873d;
     }
   }
   &.isDeletedRow:before {
     background-color: #d17870;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: #e26e64;
     }
   }
@@ -499,7 +499,7 @@
   &.isDeletedRow {
     background: var(--Grey95);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: var(--Grey12);
     }
   }
@@ -513,7 +513,7 @@
     align-self: center;
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     height: 58px;
     border-bottom: 2px solid #e6e6e6;
     box-sizing: border-box;
@@ -524,7 +524,7 @@
       color: #7d7d7d;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       border-color: #141414;
 
       .cell {
@@ -567,7 +567,7 @@
     margin: 3px 12px 0 8px;
     color: #b3b3b3;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: #666;
     }
   }
@@ -575,7 +575,7 @@
   .rowActions {
     display: flex;
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       display: none;
     }
   }
@@ -620,7 +620,7 @@
         background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M5 1H1.5C1.22386 1 1 1.22386 1 1.5V4.5C1 4.77614 1.22386 5 1.5 5H5C5.27614 5 5.5 4.77614 5.5 4.5V4H6.5V4.5C6.5 5.32843 5.82843 6 5 6H1.5C0.671573 6 0 5.32843 0 4.5V1.5C0 0.671573 0.671573 0 1.5 0H5C5.82843 0 6.5 0.671573 6.5 1.5H5.5C5.5 1.22386 5.27614 1 5 1ZM8.5 3H5C4.72386 3 4.5 3.22386 4.5 3.5V4H3.5V3.5C3.5 2.67157 4.17157 2 5 2H8.5C9.32843 2 10 2.67157 10 3.5V6.5C10 7.32843 9.32843 8 8.5 8H5C4.17157 8 3.5 7.32843 3.5 6.5H4.5C4.5 6.77614 4.72386 7 5 7H8.5C8.77614 7 9 6.77614 9 6.5V3.5C9 3.22386 8.77614 3 8.5 3Z' fill='white'/%3E%3C/svg%3E%0A");
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         border-color: #7d7d7d;
       }
     }
@@ -637,7 +637,7 @@
       opacity: 1;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: var(--Grey18);
     }
   }
@@ -646,7 +646,7 @@
 .mobileInspectorWindow {
   display: none;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     display: flex;
     position: fixed;
     top: 56px;
@@ -732,7 +732,7 @@
       font-size: 14px;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #242424;
 
       .field {

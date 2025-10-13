@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .mainLayout {
   flex-grow: 1;
@@ -7,7 +7,7 @@
   min-width: 0;
   min-height: 0;
 
-  @include isMobile {
+  @include mixins.isMobile {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
   }
@@ -27,7 +27,7 @@
     margin: 0;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     grid-column: 1;
   }
 }
@@ -38,7 +38,9 @@
   flex-direction: column;
   gap: 8px;
   padding: 48px 24px;
-  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.04), 2px 0 3px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    2px 0 6px rgba(0, 0, 0, 0.04),
+    2px 0 3px rgba(0, 0, 0, 0.03);
 
   .tab {
     position: relative;
@@ -81,8 +83,10 @@
     }
   }
 
-  @include darkTheme {
-    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1), 2px 0 3px rgba(0, 0, 0, 0.25);
+  @include mixins.darkTheme {
+    box-shadow:
+      2px 0 6px rgba(0, 0, 0, 0.1),
+      2px 0 3px rgba(0, 0, 0, 0.25);
 
     .tab {
       color: var(--grey70);
@@ -97,13 +101,15 @@
     }
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     justify-self: stretch;
     flex-direction: row;
     justify-content: center;
     background: var(--header_background);
     padding: 4px 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04), 0 2px 3px rgba(0, 0, 0, 0.03);
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.04),
+      0 2px 3px rgba(0, 0, 0, 0.03);
     z-index: 2;
 
     .tab {
@@ -124,8 +130,10 @@
       }
     }
 
-    @include darkTheme {
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.25);
+    @include mixins.darkTheme {
+      box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.1),
+        0 2px 3px rgba(0, 0, 0, 0.25);
     }
   }
 }
@@ -139,7 +147,7 @@
   grid-template-rows: 1fr auto;
   height: 100%;
 
-  @include isMobile {
+  @include mixins.isMobile {
     grid-template-areas: "chathistory" "chatinput";
     grid-template-columns: 1fr;
   }
@@ -164,7 +172,7 @@
     display: flex;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     &:hover {
       background: rgba(255, 255, 255, 0.05);
     }
@@ -194,7 +202,7 @@
     opacity: 0.7;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     .chatHistoryWrapper {
       padding: 24px 32px;
     }
@@ -246,7 +254,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     > span {
       background: #505050;
     }
@@ -300,7 +308,7 @@
     background: #f6ebfd;
     border-color: #cdb1df;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #43384a;
       border-color: #765d86;
     }
@@ -349,7 +357,7 @@
       border-radius: 4px;
       font-size: 13px;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
       }
@@ -363,7 +371,7 @@
       border-left: 2px solid rgba(0, 0, 0, 0.3);
       padding: 4px 8px;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         border-left-color: rgba(255, 255, 255, 0.3);
       }
     }
@@ -404,7 +412,7 @@
     color: #bb3225;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border: 1px solid #404040;
     background: #2f2f2f;
 
@@ -426,7 +434,7 @@
     margin-right: 16px;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     margin: 0 16px 24px 24px;
   }
 }
@@ -490,7 +498,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border: 1px solid #4d4d4d;
     background: #363636;
 
@@ -534,7 +542,7 @@
     font-weight: 550;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #534a36;
     border: 1px solid #7d6c43;
     color: #f7e4b8;
@@ -543,7 +551,9 @@
 
 .playgroundConfig {
   grid-area: config;
-  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.04), -2px 0 3px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    -2px 0 6px rgba(0, 0, 0, 0.04),
+    -2px 0 3px rgba(0, 0, 0, 0.03);
   display: flex;
 
   .contentWrapper {
@@ -568,8 +578,10 @@
     width: 32ch;
   }
 
-  @include darkTheme {
-    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1), -2px 0 3px rgba(0, 0, 0, 0.25);
+  @include mixins.darkTheme {
+    box-shadow:
+      -2px 0 6px rgba(0, 0, 0, 0.1),
+      -2px 0 3px rgba(0, 0, 0, 0.25);
   }
 
   .contextQuery {
@@ -582,7 +594,7 @@
       padding: 6px 0;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       --code-editor-bg: #363636;
 
       & > * {
@@ -624,7 +636,7 @@
       transform: none;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #2f2f2f;
     }
   }
@@ -695,7 +707,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     > span {
       color: var(--grey60);
     }
@@ -735,7 +747,7 @@
     box-sizing: border-box;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     .contentWrapper {
       margin: 0 auto;
       padding: 48px 24px;
@@ -758,10 +770,10 @@
   justify-content: center;
   align-items: center;
   border-radius: 8px;
-  background-image: dashedBorderBg(#d9d9d9);
+  background-image: mixins.dashedBorderBg(#d9d9d9);
 
-  @include darkTheme {
-    background-image: dashedBorderBg(#666);
+  @include mixins.darkTheme {
+    background-image: mixins.dashedBorderBg(#666);
   }
 }
 
@@ -794,7 +806,7 @@
       grid-auto-columns: 1fr;
     }
 
-    @include isMobile {
+    @include mixins.isMobile {
       flex-direction: column;
       gap: 8px;
 
@@ -824,7 +836,7 @@
       height: 18px;
       color: #000;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         color: #fff;
       }
     }
@@ -858,7 +870,7 @@
       flex-shrink: 0;
       color: #000;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         color: #fff;
       }
     }
@@ -891,7 +903,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border: 1px solid #404040;
     background: #2f2f2f;
 
@@ -929,7 +941,7 @@
     background: #f7f7f7;
     border: 1px solid #d7d7d7;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #3c3c3c;
       border: 1px solid #4d4d4d;
     }
@@ -950,7 +962,7 @@
         flex-grow: 1;
       }
 
-      @include isMobile {
+      @include mixins.isMobile {
         flex-direction: column;
         gap: 8px;
       }
@@ -999,7 +1011,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #534a36;
     border: 1px solid #7d6c43;
     color: #f7e4b8;
@@ -1020,7 +1032,7 @@
     right: -1px;
     height: 24px;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #242424;
     }
   }
@@ -1080,7 +1092,7 @@
     top: -64px;
     stroke-dasharray: 4, 4;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       stroke: #666;
     }
   }
@@ -1097,7 +1109,7 @@
   gap: 8px;
 
   &.newDraft {
-    background: dashedBorderBg(#d9d9d9);
+    background: mixins.dashedBorderBg(#d9d9d9);
     border: 0;
 
     .connectingLine,
@@ -1200,12 +1212,12 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border: 1px solid #404040;
     background: #2f2f2f;
 
     &.newDraft {
-      background: dashedBorderBg(#666);
+      background: mixins.dashedBorderBg(#666);
       border: 0;
     }
 

@@ -1,10 +1,12 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .perfStats {
   flex-grow: 1;
   background-color: var(--app_panel_background);
   border-radius: 12px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 8px rgba(0, 0, 0, 0.04),
+    0 0 4px rgba(0, 0, 0, 0.06);
   display: flex;
   min-width: 0;
   min-height: 0;
@@ -18,12 +20,13 @@
     pointer-events: none;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     border-radius: 0;
   }
 
-  @include darkTheme {
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2),
+  @include mixins.darkTheme {
+    box-shadow:
+      0px 0px 8px 0px rgba(0, 0, 0, 0.2),
       0px 0px 4px 0px rgba(0, 0, 0, 0.3);
   }
 }
@@ -37,7 +40,7 @@
   height: max-content;
   min-width: 0;
 
-  @include isMobile {
+  @include mixins.isMobile {
     padding: 24px;
   }
 }
@@ -46,7 +49,7 @@
   width: 100%;
   max-width: 1200px;
 
-  @include isMobile {
+  @include mixins.isMobile {
     width: calc(100% + 48px);
     margin: 0 -24px;
     overflow: auto;
@@ -79,11 +82,11 @@
     justify-content: center;
     align-items: center;
     border-radius: 8px;
-    background-image: dashedBorderBg(#ccc);
+    background-image: mixins.dashedBorderBg(#ccc);
     color: var(--tertiary_text_color);
 
-    @include darkTheme {
-      background-image: dashedBorderBg(#4d4d4d);
+    @include mixins.darkTheme {
+      background-image: mixins.dashedBorderBg(#4d4d4d);
     }
   }
 
@@ -95,7 +98,7 @@
     padding: 24px;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     grid-template-columns: 1fr repeat(3, auto) 0px auto;
     min-width: 100%;
     width: max-content;
@@ -138,7 +141,9 @@
   border-bottom-width: 0;
   padding: 16px 24px;
   align-items: center;
-  transition: margin 0.25s, border-radius 0.25s;
+  transition:
+    margin 0.25s,
+    border-radius 0.25s;
 
   &:first-child {
     border-top-left-radius: 12px;
@@ -151,7 +156,7 @@
     border-bottom-right-radius: 12px;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     border-radius: 0 !important;
   }
 
@@ -203,7 +208,7 @@
         stroke: var(--Grey85);
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         stroke: var(--Grey70);
 
         .distribution {
@@ -225,7 +230,7 @@
     &:hover {
       background: var(--Grey95);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: var(--Grey25);
       }
     }
@@ -253,7 +258,7 @@
       opacity: 1;
     }
 
-    @include isMobile {
+    @include mixins.isMobile {
       margin-left: 0;
       margin-right: 0;
     }
@@ -278,7 +283,9 @@
     margin-top: -24px;
     height: 0;
     overflow: hidden;
-    transition: height 0.25s, opacity 0.25s;
+    transition:
+      height 0.25s,
+      opacity 0.25s;
     opacity: 0;
   }
 }
@@ -343,7 +350,7 @@
       right: 4px;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: var(--Grey16);
     }
   }
@@ -362,7 +369,9 @@
   top: 12px;
   background-color: var(--app_panel_background);
   border-radius: 12px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 8px rgba(0, 0, 0, 0.04),
+    0 0 4px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -448,7 +457,7 @@
   padding: 8px 32px 8px 18px;
   margin-bottom: 24px;
 
-  @include isMobile {
+  @include mixins.isMobile {
     width: calc(100% + 48px);
     margin-left: -24px;
     margin-right: -24px;
@@ -496,14 +505,14 @@
       stroke-width: 0;
       fill: rgba(0, 0, 0, 0.03);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         fill: rgba(255, 255, 255, 0.05);
       }
     }
     .hoverYLine {
       stroke: var(--Grey85);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         stroke: var(--Grey40);
       }
     }
@@ -527,7 +536,7 @@
     background: #e8f0fa;
     border-radius: 4px;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #323d4b;
     }
   }
@@ -563,7 +572,7 @@
       }
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       .outline {
         border-color: #296bbc;
       }
@@ -686,7 +695,7 @@
     white-space: nowrap;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     flex-direction: column;
     align-items: start;
     row-gap: 4px;
@@ -743,7 +752,7 @@
         font-style: italic;
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: var(--Grey30);
       }
     }
@@ -757,14 +766,18 @@
     display: flex;
     flex-direction: column;
     background: var(--panel_background);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.08),
+      0 2px 8px rgba(0, 0, 0, 0.04);
     border-radius: 8px;
     padding: 8px 10px;
     z-index: 10;
     opacity: 0;
     transform: translateY(16px);
     pointer-events: none;
-    transition: transform 0.2s, opacity 0.2s;
+    transition:
+      transform 0.2s,
+      opacity 0.2s;
 
     &.open {
       opacity: 1;
@@ -826,7 +839,7 @@
     font-style: italic;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     width: 100%;
   }
 }

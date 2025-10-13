@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .resultGrid {
   position: relative;
@@ -67,7 +67,7 @@
     width: 20px;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background-color: var(--Grey25);
   }
 }

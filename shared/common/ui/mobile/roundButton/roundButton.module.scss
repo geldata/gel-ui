@@ -1,9 +1,9 @@
-@import "../../../mixins.scss";
+@use "../../../mixins.scss";
 
 .container {
   display: none;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     border: none;
     border-radius: 50%;
     color: #f9f9f9;
@@ -32,7 +32,7 @@
       background-color: var(--grey40);
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2));
       color: var(--grey8);
 

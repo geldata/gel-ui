@@ -1,4 +1,4 @@
-@import "../mixins.scss";
+@use "../mixins.scss";
 
 .theme {
   // Base colors
@@ -41,7 +41,7 @@
   --secondary_text_color: var(--Grey40);
   --tertiary_text_color: var(--Grey50);
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --page_background: var(--Grey8);
     --app_panel_background: var(--Grey14);
     --panel_background: var(--Grey22);

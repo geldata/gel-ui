@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .hexViewer {
   font-family: "Roboto Mono Variable", monospace;
@@ -20,7 +20,7 @@
   min-height: 0;
 
   & > div > div:first-child {
-    @include hideScrollbar;
+    @include mixins.hideScrollbar;
 
     > div {
       margin: 8px 0;

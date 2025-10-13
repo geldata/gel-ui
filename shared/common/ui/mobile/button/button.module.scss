@@ -1,10 +1,10 @@
-@import "../../../mixins.scss";
+@use "../../../mixins.scss";
 
 .button {
   display: none;
 
   // Should be updated with styles for red buttons.
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     border: none;
     text-decoration: none;
     margin: auto;
@@ -32,7 +32,7 @@
       background-color: var(--grey80);
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       &:disabled {
         color: var(--grey8);
         background-color: var(--grey30);

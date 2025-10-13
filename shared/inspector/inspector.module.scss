@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .inspectorTheme {
   --type-color: #888;
@@ -17,7 +17,7 @@
     --inspector-orange: #fb9256;
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     --inspector-green: #2cb88e;
     --inspector-orange: #e5a507;
 
@@ -45,7 +45,7 @@
 .rowWrapper {
   position: relative;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     &:first-of-type {
       .rowItem {
         .actions {

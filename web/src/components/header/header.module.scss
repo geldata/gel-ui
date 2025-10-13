@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .header {
   flex-shrink: 0;
@@ -22,7 +22,7 @@
   color: #848484;
   margin-left: 8px;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #7d7d7d;
   }
 }
@@ -34,7 +34,7 @@
     fill: var(--Grey65);
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     fill: var(--Grey60);
 
     path:nth-child(2) {
@@ -46,7 +46,7 @@
 .themeSwitcher {
   margin-left: auto;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     display: none;
   }
 }

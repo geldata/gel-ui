@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .splitViewContainer {
   display: flex;
@@ -24,7 +24,7 @@
   flex-grow: 0;
   background: var(--app_panel_background);
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     width: 100% !important;
     z-index: 0;
 
@@ -44,11 +44,11 @@
   justify-content: center;
   background: #e4e4e4;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     display: none;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #0f0f0f;
   }
 
@@ -89,7 +89,7 @@
       }
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #0f0f0f;
     }
   }

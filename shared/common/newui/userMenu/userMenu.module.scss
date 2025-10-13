@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .userMenu {
   position: relative;
@@ -15,7 +15,7 @@
   --skeletonBg: #f5f5f5;
   --skeletonShimmer: #fafafa;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --skeletonBg: #242424;
     --skeletonShimmer: #323232;
   }
@@ -47,7 +47,7 @@
   flex-direction: column;
   position: relative;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --main_text_color: #ccc;
     --tertiary_text_color: #999;
   }
@@ -87,7 +87,7 @@
     &:hover {
       background: rgba(0, 0, 0, 0.05);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: var(--Grey25, #404040);
       }
     }
@@ -160,7 +160,7 @@
     0px 4px 16px 0px rgba(0, 0, 0, 0.16),
     0px 2px 4px 0px rgba(0, 0, 0, 0.08);
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --panel_background: #363636;
     box-shadow:
       0px 4px 16px 0px rgba(0, 0, 0, 0.28),

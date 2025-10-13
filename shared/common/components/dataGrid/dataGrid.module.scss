@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .scrollbarWrapper {
   min-height: 0;
@@ -13,7 +13,7 @@
   overscroll-behavior: contain auto;
   font-family: "Roboto Mono Variable", monospace;
 
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 
   &.noVerticalScroll {
     overflow-y: hidden;
@@ -38,7 +38,7 @@
   font-weight: 450;
   z-index: 2;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
@@ -58,7 +58,7 @@
         border-color: var(--Grey85);
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: var(--Grey25);
 
         &:after {
@@ -103,7 +103,7 @@
     width: 4px;
     background: linear-gradient(90deg, rgba(0, 0, 0, 0.06), transparent);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: linear-gradient(90deg, rgba(0, 0, 0, 0.15), transparent);
     }
   }
@@ -141,7 +141,7 @@
     background: linear-gradient(90deg, rgba(0, 0, 0, 0.06), transparent);
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border-color: var(--Grey25);
 
     &.lastPinned:after {
@@ -153,7 +153,7 @@
 .emptyCell {
   background: var(--Grey95) !important;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey12) !important;
   }
 }

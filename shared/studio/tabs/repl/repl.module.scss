@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .replWrapper {
   position: relative;
@@ -11,7 +11,7 @@
 .repl {
   --outline-color: #468bff;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --outline-color: #74a6fc;
   }
   flex-grow: 1;
@@ -20,7 +20,9 @@
   background-color: var(--app_panel_background);
   --code-editor-bg: var(--app_panel_background);
   border-radius: 12px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 8px rgba(0, 0, 0, 0.04),
+    0 0 4px rgba(0, 0, 0, 0.06);
   font-family: "Roboto Mono Variable", monospace;
 
   :global {
@@ -40,12 +42,13 @@
     pointer-events: none;
   }
 
-  @include darkTheme {
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2),
+  @include mixins.darkTheme {
+    box-shadow:
+      0px 0px 8px 0px rgba(0, 0, 0, 0.2),
       0px 0px 4px 0px rgba(0, 0, 0, 0.3);
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     border-radius: 0;
 
     &.showExtendedResult {
@@ -62,17 +65,20 @@
   right: 0;
   bottom: 0;
   background: var(--app_panel_background);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 8px rgba(0, 0, 0, 0.04),
+    0 0 4px rgba(0, 0, 0, 0.06);
   border-radius: 12px;
   z-index: 1;
   overflow: hidden;
 
-  @include darkTheme {
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2),
+  @include mixins.darkTheme {
+    box-shadow:
+      0px 0px 8px 0px rgba(0, 0, 0, 0.2),
       0px 0px 4px 0px rgba(0, 0, 0, 0.3);
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     border-radius: 0;
   }
 }
@@ -105,7 +111,7 @@
       color: var(--main_text_color);
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: var(--grey40);
 
       span {
@@ -114,7 +120,7 @@
     }
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     padding: 0 16px;
 
     .headerAscii {
@@ -135,12 +141,12 @@
   flex-direction: column-reverse;
   overflow: auto;
 
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 
   .runBtn {
     display: none;
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       display: grid;
       position: absolute;
       bottom: 8px;
@@ -160,7 +166,7 @@
   position: relative;
   margin-bottom: 12px;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     margin-bottom: 0;
   }
 }
@@ -173,7 +179,7 @@
   --cursor-color: #808080;
   --cursor-text-color: #fff;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --cursor-color: #595959;
     --cursor-text-color: #111;
   }
@@ -189,7 +195,7 @@
   }
 
   :global(.cm-scroller) {
-    @include hideScrollbar;
+    @include mixins.hideScrollbar;
   }
 
   &.hidden {
@@ -229,7 +235,7 @@
         background: var(--Grey95);
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: #1c1c1c;
 
         > div {
@@ -238,7 +244,7 @@
       }
     }
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       display: block;
     }
   }
@@ -250,7 +256,7 @@
   .scrollWrapper {
     overflow-x: auto;
     overflow-y: hidden;
-    @include hideScrollbar;
+    @include mixins.hideScrollbar;
 
     &.sticky {
       height: 100%;
@@ -260,7 +266,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey12);
     --inspectorBg: var(--Grey12);
     border-color: var(--Grey20);
@@ -288,7 +294,7 @@
     margin: 0 8px;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #808080;
 
     &:before,
@@ -399,7 +405,7 @@
     margin: 14px 12px 0 16px;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     .historyPrompt,
     .historyQueryCode {
       padding-top: 14px;
@@ -427,7 +433,7 @@
     }
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     width: 100%;
   }
 }
@@ -457,7 +463,7 @@
       font-family: "Roboto Flex Variable", sans-serif;
     }
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       padding-right: 8px;
     }
   }
@@ -467,7 +473,7 @@
   padding: 0 !important;
   color: #6a6a6a;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #bfbfbf;
   }
 }
@@ -483,7 +489,7 @@
     font-size: 13px;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: rgba(255, 180, 0, 0.1);
     border-top-color: #67572d;
   }
@@ -514,7 +520,7 @@
   --inspectorRowHoverBg: var(--Grey90);
   --inspectorRowSelectedBg: #d6e2e9;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --inspectorRowHoverBg: #292929;
     --inspectorRowSelectedBg: #2d383f;
   }
@@ -559,7 +565,7 @@
     height: 16px;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     .command {
       color: #c4c4c4;
 
@@ -588,7 +594,7 @@
   tbody {
     border: 1px solid var(--Grey70);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       border-color: var(--Grey30);
     }
   }

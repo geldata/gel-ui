@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .modal {
   display: flex;
@@ -58,7 +58,7 @@
     .errorDetails {
       color: #8d6363;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         color: #ba6b6b;
       }
     }
@@ -80,7 +80,7 @@
     padding: 0 6px;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #292929;
 
     .codeBlockParamValue {

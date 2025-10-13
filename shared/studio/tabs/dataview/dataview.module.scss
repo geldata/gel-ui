@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .dataview {
   display: flex;
@@ -15,15 +15,18 @@
   min-height: 0;
   background: var(--app_panel_background);
   border-radius: 12px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 8px rgba(0, 0, 0, 0.04),
+    0 0 4px rgba(0, 0, 0, 0.06);
   overflow: hidden;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     border-radius: 0;
   }
 
-  @include darkTheme {
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2),
+  @include mixins.darkTheme {
+    box-shadow:
+      0px 0px 8px 0px rgba(0, 0, 0, 0.2),
       0px 0px 4px 0px rgba(0, 0, 0, 0.3);
   }
 }
@@ -48,12 +51,12 @@
     background: linear-gradient(var(--Grey97) 60%, var(--Grey93));
     border-radius: 12px 12px 0 0;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #242424;
     }
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     display: none;
   }
 }
@@ -85,7 +88,7 @@
       opacity: 0.7;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       --hoverBg: var(--Grey30);
       // color: red;
     }
@@ -104,7 +107,7 @@
     font-weight: 500;
     box-sizing: border-box;
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       display: none;
     }
   }
@@ -140,14 +143,14 @@
       background-color: var(--Grey93);
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       &:hover {
         background-color: var(--Grey30);
       }
     }
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     position: absolute;
     bottom: 0;
     z-index: 11;
@@ -185,7 +188,7 @@
       width: 100%;
       display: flex;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: #999;
 
         .nestedPathStep {
@@ -198,14 +201,14 @@
           height: 40px;
           background-color: #b3b3b3;
 
-          @include darkTheme {
+          @include mixins.darkTheme {
             background-color: #666;
           }
 
           &.filterActive {
             background-color: #b199f2;
 
-            @include darkTheme {
+            @include mixins.darkTheme {
               background-color: #666;
             }
           }
@@ -214,7 +217,7 @@
         .removeFilter {
           color: #b3b3b3;
 
-          @include darkTheme {
+          @include mixins.darkTheme {
             color: var(--accentRed);
           }
         }
@@ -234,7 +237,7 @@
         background: transparent;
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: transparent;
         color: #4d4d4d;
 
@@ -244,7 +247,7 @@
       }
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: linear-gradient(
         180deg,
         rgba(36, 36, 36, 0) 0%,
@@ -264,7 +267,7 @@
     border: none;
     color: #b3b3b3;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: #4d4d4d;
     }
   }
@@ -288,7 +291,7 @@
     background: #57c3a4;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey30);
 
     svg {
@@ -312,7 +315,7 @@
 .nestedPathSteps {
   display: contents;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     display: flex;
     margin-left: 16px;
     flex-grow: 1;
@@ -327,7 +330,7 @@
   color: var(--main_text_color);
   margin-right: 2rem;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     color: #e6e6e6;
     margin-right: 0;
   }
@@ -350,7 +353,7 @@
       white-space: nowrap;
     }
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       display: none;
     }
   }
@@ -358,7 +361,7 @@
   &:first-child {
     margin-left: 16px;
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       margin-left: 0;
       margin-right: 12px;
     }
@@ -380,7 +383,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #adadad;
   }
 }
@@ -395,7 +398,7 @@
   .reviewChanges {
     --buttonPrimaryBackground: #e79e10;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       --buttonPrimaryBackground: #b88523;
     }
   }
@@ -409,7 +412,7 @@
     &:hover {
       background: var(--Grey93);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: var(--Grey30);
       }
     }
@@ -422,7 +425,7 @@
       .filterIcon {
         color: #a15ec0;
 
-        @include darkTheme {
+        @include mixins.darkTheme {
           color: #d48cf5;
         }
       }
@@ -460,7 +463,9 @@
       width: 18px;
       border-radius: 9px;
       background: #c8c8c8;
-      transition: left 0.1s, background 0.1s;
+      transition:
+        left 0.1s,
+        background 0.1s;
     }
 
     &:checked:after {
@@ -468,7 +473,7 @@
       background: #9d9d9d;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #111;
 
       &:after {
@@ -481,7 +486,7 @@
     }
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     display: none;
   }
 }
@@ -513,7 +518,7 @@
     &.open {
       background: #cccccc;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: #4c4c4c;
       }
 
@@ -523,7 +528,7 @@
     }
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     .filterButton {
       border-radius: 20px;
       background-color: #666;
@@ -535,7 +540,7 @@
         fill: #f7f7f7;
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background-color: #999;
 
         .filterIcon {
@@ -559,7 +564,7 @@
     display: none;
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     position: fixed;
     top: 0;
     left: 0;
@@ -605,7 +610,7 @@
           color: var(--grey50);
           background-color: var(--grey80);
 
-          @include darkTheme {
+          @include mixins.darkTheme {
             color: var(--grey8);
             background-color: var(--grey30);
           }
@@ -628,7 +633,7 @@
       width: 100%;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       --code-editor-bg: #242424;
 
       .title {
@@ -659,7 +664,7 @@
     --buttonPrimaryBackground: var(--accentRed);
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     display: none;
   }
 }
@@ -675,7 +680,7 @@
   @extend .filterError;
   display: none;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     position: absolute;
     top: -60px;
     left: 0;
@@ -687,7 +692,7 @@
 .applyFilterMobile {
   display: none;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     display: block;
     width: 100%;
     height: 64px;
@@ -703,7 +708,7 @@
       opacity: 0.4;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: #141414;
       background: #279474;
     }
@@ -723,7 +728,9 @@
   left: 50%;
   transform: translate(-50%, 30px);
   opacity: 0;
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 
   svg {
     fill: currentColor;

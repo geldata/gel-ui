@@ -1,5 +1,5 @@
 @import "@edgedb/common/styles.scss";
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .app {
   position: relative;
@@ -58,7 +58,7 @@
   --btn-green: #0ccb93;
   --btn-text-hover: #fafafa;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --app-bg: #141414;
     --app-panel-bg: #242424;
     --app-card-bg: #2e2e2e;

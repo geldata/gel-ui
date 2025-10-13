@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .fieldConfigWrapper {
   position: relative;
@@ -25,7 +25,7 @@
   &:hover {
     background: var(--Grey93);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: var(--Grey30);
     }
   }
@@ -40,13 +40,15 @@
   background: var(--panel_background);
   border-radius: 12px;
   border: 1px solid var(--panel_border);
-  box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.12),
+  box-shadow:
+    0px 4px 16px 0px rgba(0, 0, 0, 0.12),
     0px 2px 4px 0px rgba(0, 0, 0, 0.06);
   min-width: 280px;
   z-index: 10;
 
-  @include darkTheme {
-    box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.4),
+  @include mixins.darkTheme {
+    box-shadow:
+      0px 4px 16px 0px rgba(0, 0, 0, 0.4),
       0px 2px 4px 0px rgba(0, 0, 0, 0.2);
   }
 }
@@ -71,7 +73,7 @@
     padding-bottom: 4px;
     margin-bottom: 4px;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       border-bottom-color: var(--Grey30);
     }
   }
@@ -139,7 +141,7 @@
       color: #a15ec0;
       opacity: 1;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         color: #c187dc;
       }
     }
@@ -149,7 +151,7 @@
   &.dragging {
     background: var(--Grey95);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: var(--Grey25);
     }
   }
@@ -176,7 +178,7 @@
     opacity: 0.5;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey25);
   }
 }
@@ -191,7 +193,7 @@
   &:hover {
     background: var(--Grey93);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: var(--Grey30);
     }
   }
@@ -213,7 +215,9 @@
     background: var(--panel_background);
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 0 8px rgba(0, 0, 0, 0.04),
+      0 0 4px rgba(0, 0, 0, 0.06);
     padding: 4px;
     border-radius: 8px;
     border: 1px solid var(--panel_border);
@@ -230,7 +234,7 @@
       &:hover {
         background: var(--Grey95);
 
-        @include darkTheme {
+        @include mixins.darkTheme {
           background: var(--Grey30);
         }
       }

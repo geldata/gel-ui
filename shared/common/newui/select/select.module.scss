@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .select {
   font-family: "Roboto Flex Variable", "Roboto", sans-serif;
@@ -11,7 +11,7 @@
   font-weight: 450;
   font-size: 14px;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border: 1px solid #4d4d4d;
     background: #363636;
     color: #ccc;
@@ -35,7 +35,7 @@
     padding: 0 4px;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #ccc;
   }
 }

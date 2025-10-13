@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .instancePage {
   flex-grow: 1;
@@ -11,16 +11,18 @@
   margin: 0 8px 8px;
   border-radius: 12px;
   background: #fafafa;
-  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.04),
+  box-shadow:
+    0px 0px 8px 0px rgba(0, 0, 0, 0.04),
     0px 0px 4px 0px rgba(0, 0, 0, 0.06);
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey14, #242424);
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2),
+    box-shadow:
+      0px 0px 8px 0px rgba(0, 0, 0, 0.2),
       0px 0px 4px 0px rgba(0, 0, 0, 0.3);
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     margin: 0;
     border-radius: 0;
     padding: 16px;
@@ -47,7 +49,7 @@
   margin-top: 16px;
   padding: 0 4px;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #b3b3b3;
   }
 }

@@ -1,4 +1,4 @@
-@import "../../mixins.scss";
+@use "../../mixins.scss";
 
 .switch {
   width: 28px;
@@ -85,7 +85,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #141414;
 
     .radio {
@@ -135,7 +135,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey10);
     border-color: var(--Grey18);
 

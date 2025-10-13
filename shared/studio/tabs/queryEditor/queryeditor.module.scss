@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 $historyTransitionTime: 0.15s;
 
@@ -23,7 +23,7 @@ $historyTransitionTime: 0.15s;
       pointer-events: none;
     }
 
-    @include isMobile {
+    @include mixins.isMobile {
       margin: 0;
     }
   }
@@ -41,15 +41,18 @@ $historyTransitionTime: 0.15s;
 
   .showHistory & {
     width: 194px;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 0 8px rgba(0, 0, 0, 0.04),
+      0 0 4px rgba(0, 0, 0, 0.06);
 
-    @include darkTheme {
-      box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2),
+    @include mixins.darkTheme {
+      box-shadow:
+        0px 0px 8px 0px rgba(0, 0, 0, 0.2),
         0px 0px 4px 0px rgba(0, 0, 0, 0.3);
     }
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     position: fixed;
     width: 100vw !important;
     height: 100dvh;
@@ -69,7 +72,9 @@ $historyTransitionTime: 0.15s;
   flex-grow: 1;
   min-width: 0;
   background: var(--app_panel_background);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 8px rgba(0, 0, 0, 0.04),
+    0 0 4px rgba(0, 0, 0, 0.06);
   border-radius: 12px;
   overflow: clip;
   display: flex;
@@ -82,12 +87,13 @@ $historyTransitionTime: 0.15s;
     border-radius: 0 12px 12px 0;
   }
 
-  @include darkTheme {
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2),
+  @include mixins.darkTheme {
+    box-shadow:
+      0px 0px 8px 0px rgba(0, 0, 0, 0.2),
       0px 0px 4px 0px rgba(0, 0, 0, 0.3);
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     border-radius: 0 !important;
     margin: 0 !important;
   }
@@ -102,7 +108,7 @@ $historyTransitionTime: 0.15s;
   grid-template-rows: 40px;
   z-index: 5;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border-bottom-color: var(--Grey25);
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.3);
   }
@@ -127,7 +133,7 @@ $historyTransitionTime: 0.15s;
       background: var(--Grey93);
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: var(--Grey45);
 
       &:hover {
@@ -173,7 +179,7 @@ $historyTransitionTime: 0.15s;
         }
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         &:hover {
           background: var(--Grey25);
         }
@@ -204,7 +210,7 @@ $historyTransitionTime: 0.15s;
     display: contents;
   }
 
-  @include breakpoint(tablet) {
+  @include mixins.breakpoint(tablet) {
     grid-template-columns: 1fr auto 1fr;
     grid-template-rows: 40px 41px;
 
@@ -217,7 +223,7 @@ $historyTransitionTime: 0.15s;
     }
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     grid-template-rows: 40px;
 
     .controls {
@@ -253,7 +259,7 @@ $historyTransitionTime: 0.15s;
     .outputModeToggle {
       background: var(--Grey93);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: var(--Grey10);
         border-color: var(--Grey18);
       }
@@ -269,17 +275,20 @@ $historyTransitionTime: 0.15s;
   right: 0;
   bottom: 0;
   background: var(--app_panel_background);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 8px rgba(0, 0, 0, 0.04),
+    0 0 4px rgba(0, 0, 0, 0.06);
   border-radius: 12px;
   z-index: 1;
   overflow: hidden;
 
-  @include darkTheme {
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2),
+  @include mixins.darkTheme {
+    box-shadow:
+      0px 0px 8px 0px rgba(0, 0, 0, 0.2),
       0px 0px 4px 0px rgba(0, 0, 0, 0.3);
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     border-radius: 0;
   }
 }
@@ -306,7 +315,7 @@ $historyTransitionTime: 0.15s;
 }
 
 .inspector {
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 }
 
 .queryError {
@@ -339,7 +348,7 @@ $historyTransitionTime: 0.15s;
       color: #7c5e15;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       border-bottom-color: #8d6b16;
 
       .errorName {
@@ -381,7 +390,7 @@ $historyTransitionTime: 0.15s;
     z-index: 1;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     width: 100%;
   }
 }
@@ -393,11 +402,11 @@ $historyTransitionTime: 0.15s;
   --buttonTextColour: #fff;
   --buttonBg: #acacac;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --buttonTextColour: #141414;
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     display: none;
   }
 }
@@ -411,18 +420,18 @@ $historyTransitionTime: 0.15s;
     transparent 100%
   );
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     height: calc(100% - 30px);
   }
 }
 
 .historyList {
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 
   & > div {
     padding-bottom: 70px;
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       padding-bottom: 130px;
     }
   }
@@ -447,7 +456,7 @@ $historyTransitionTime: 0.15s;
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background-color: var(--Grey25);
     border-color: var(--Grey30);
 
@@ -456,11 +465,11 @@ $historyTransitionTime: 0.15s;
     }
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     height: 168px;
     background-color: var(--grey93);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: var(--grey18);
     }
 
@@ -485,7 +494,7 @@ $historyTransitionTime: 0.15s;
 
     --syntax-base: #444;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       --syntax-base: #e5e5e5;
     }
   }
@@ -501,14 +510,14 @@ $historyTransitionTime: 0.15s;
     line-height: 15px;
     padding: 3px 8px;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: #333333;
     }
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       background-color: var(--white);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background-color: var(--grey8);
       }
     }
@@ -517,7 +526,7 @@ $historyTransitionTime: 0.15s;
   &.draft {
     background-color: transparent;
     border-width: 0;
-    background-image: dashedBorderBg(#aaa);
+    background-image: mixins.dashedBorderBg(#aaa);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -530,22 +539,22 @@ $historyTransitionTime: 0.15s;
 
     &.selected {
       outline: none;
-      background-image: dashedBorderBg(#2cb88e, 2px);
+      background-image: mixins.dashedBorderBg(#2cb88e, 2px);
     }
 
-    @include darkTheme {
-      background-image: dashedBorderBg(#666);
+    @include mixins.darkTheme {
+      background-image: mixins.dashedBorderBg(#666);
 
       &:hover {
         background-color: var(--Grey22);
       }
 
       &.selected {
-        background-image: dashedBorderBg(#279474, 2px);
+        background-image: mixins.dashedBorderBg(#279474, 2px);
       }
     }
 
-    @include isMobile {
+    @include mixins.isMobile {
       margin-top: 24px;
     }
   }
@@ -577,7 +586,7 @@ $historyTransitionTime: 0.15s;
       margin-left: 8px;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: #808080;
 
       &:after,
@@ -595,14 +604,14 @@ $historyTransitionTime: 0.15s;
     opacity: 0;
     color: #fff;
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       div {
         border-radius: 6px;
         padding: 8px 18px;
       }
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: #242424;
     }
   }
@@ -649,7 +658,7 @@ $historyTransitionTime: 0.15s;
   }
 
   :global(.cm-scroller) {
-    @include hideScrollbar;
+    @include mixins.hideScrollbar;
   }
 
   :global(.cm-line) {

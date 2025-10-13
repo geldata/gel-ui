@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .postgisViewer {
   position: relative;
@@ -13,7 +13,7 @@
   }
 
   :global(.maplibregl-ctrl-attrib) {
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: var(--Grey30);
       color: var(--Grey85);
 
@@ -48,7 +48,9 @@
   width: var(--sidepanelWidth);
   background: var(--panel_background);
   border-radius: 12px 0 0 12px;
-  box-shadow: 0 0 4px #0000002e, 0 0 12px #00000012;
+  box-shadow:
+    0 0 4px #0000002e,
+    0 0 12px #00000012;
   margin-left: -12px;
   z-index: 1;
 
@@ -71,7 +73,7 @@
       border-radius: 3px;
       background: var(--Grey85);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: var(--Grey40);
       }
     }
@@ -110,7 +112,7 @@
     &:hover {
       background: var(--Grey97);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: var(--Grey25);
       }
     }
@@ -137,7 +139,9 @@
       position: absolute;
       background: var(--panel_background);
       border-radius: 12px;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.12), 0 0 8px rgba(0, 0, 0, 0.06);
+      box-shadow:
+        0 0 4px rgba(0, 0, 0, 0.12),
+        0 0 8px rgba(0, 0, 0, 0.06);
       display: flex;
       flex-direction: column;
       padding: 4px;
@@ -181,7 +185,7 @@
   --selectedBorderColor: #a565cd;
   --selectedBackgroundColor: #f8f2fc;
 
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 
   .listInner {
     display: grid;
@@ -195,7 +199,7 @@
     pointer-events: none;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --selectedBackgroundColor: #3b2d45;
   }
 }
@@ -243,7 +247,7 @@
         opacity: 1;
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: rgba(255, 255, 255, 0.08);
       }
     }
@@ -298,7 +302,7 @@
     .inner:hover {
       background: rgba(0, 0, 0, 0.02);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: rgba(255, 255, 255, 0.04);
       }
     }
@@ -358,7 +362,9 @@
     right: 0;
     background: var(--panel_background);
     border-radius: 10px;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.12), 0 0 8px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 0 4px rgba(0, 0, 0, 0.12),
+      0 0 8px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
     padding: 4px;
@@ -385,15 +391,17 @@
       &:hover {
         background: var(--Grey95);
 
-        @include darkTheme {
+        @include mixins.darkTheme {
           background: var(--Grey30);
         }
       }
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: var(--Grey25);
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.2), 0 0 8px rgba(0, 0, 0, 0.1);
+      box-shadow:
+        0 0 4px rgba(0, 0, 0, 0.2),
+        0 0 8px rgba(0, 0, 0, 0.1);
     }
   }
 }
@@ -489,7 +497,7 @@
         background: rgba(0, 0, 0, 0.06);
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         &:hover {
           background: rgba(255, 255, 255, 0.08);
         }
@@ -503,7 +511,7 @@
     &:hover {
       background: rgba(0, 0, 0, 0.04);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: rgba(255, 255, 255, 0.08);
       }
     }
@@ -566,7 +574,9 @@
   background: var(--panel_background);
   border-radius: 14px;
   pointer-events: auto;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.12), 0 0 8px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 4px rgba(0, 0, 0, 0.12),
+    0 0 8px rgba(0, 0, 0, 0.06);
   display: flex;
   padding: 2px;
   color: var(--secondary_text_color);
@@ -575,7 +585,7 @@
     border-left: 1px solid var(--Grey90);
     margin: 0 2px;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       border-left-color: var(--Grey30);
     }
   }
@@ -597,7 +607,7 @@
   > svg {
     color: var(--Grey50);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: var(--Grey65);
     }
   }
@@ -606,7 +616,7 @@
   &.selected {
     background-color: var(--Grey97);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: var(--Grey25);
     }
   }
@@ -614,7 +624,7 @@
   &.selected > svg {
     color: #1285de;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: #2a9df5;
     }
   }
@@ -640,7 +650,9 @@
     pointer-events: none;
     background: var(--panel_background);
     border-radius: 8px;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.12), 0 0 8px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 0 4px rgba(0, 0, 0, 0.12),
+      0 0 8px rgba(0, 0, 0, 0.06);
   }
 
   &:hover .tooltipLabel {
@@ -684,7 +696,7 @@
     transform: rotate(180deg);
     color: var(--Grey70);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: var(--Grey35);
     }
 
@@ -706,7 +718,7 @@
   &:hover {
     background-color: var(--Grey97);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: var(--Grey25);
     }
   }
@@ -718,7 +730,9 @@
   left: -40px;
   background: var(--panel_background);
   border-radius: 12px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.12), 0 0 8px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 4px rgba(0, 0, 0, 0.12),
+    0 0 8px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   padding: 4px;
@@ -745,7 +759,7 @@
       flex-shrink: 0;
       color: var(--Grey50);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         color: var(--Grey65);
       }
     }
@@ -761,7 +775,7 @@
     &:hover {
       background-color: var(--Grey97);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background-color: var(--Grey25);
       }
     }
@@ -770,7 +784,9 @@
 
 .mLegend {
   background: var(--header_background);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.12), 0 0 8px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 4px rgba(0, 0, 0, 0.12),
+    0 0 8px rgba(0, 0, 0, 0.06);
   border-radius: 8px;
   justify-self: start;
   padding: 6px 0;

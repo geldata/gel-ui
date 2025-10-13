@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .errorPage {
   background-color: var(--app-panel-bg);
@@ -26,7 +26,7 @@
   line-height: 32px;
   color: #4f4f4f;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #d8d8d8;
   }
 }
@@ -38,7 +38,7 @@
   color: #db5246;
   margin-bottom: 18px;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #af6963;
   }
 }

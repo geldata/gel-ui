@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .horizontalCardList {
   position: relative;
@@ -9,11 +9,12 @@
     display: flex;
     gap: 12px;
     overflow-x: auto;
-    @include hideScrollbar;
+    @include mixins.hideScrollbar;
     scroll-snap-type: x proximity;
     scroll-padding-left: 64px;
     overscroll-behavior-x: contain;
-    mask-image: linear-gradient(
+    mask-image:
+      linear-gradient(
         90deg,
         transparent,
         #000 64px,
@@ -60,7 +61,9 @@
   opacity: 0;
   pointer-events: none;
   transform: translateX(-32px);
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 
   > div {
     display: flex;
@@ -79,7 +82,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     > div {
       border-color: #4d4d4d;
       background: #363636;
@@ -97,7 +100,7 @@
     pointer-events: all;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     padding-left: 16px;
   }
 }
@@ -116,7 +119,7 @@
     pointer-events: all;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     padding-right: 16px;
   }
 }

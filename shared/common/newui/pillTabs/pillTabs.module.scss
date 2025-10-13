@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .tabs {
   grid-column: 2;
@@ -11,7 +11,7 @@
   align-self: flex-start;
   margin: 0 auto;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey18);
     border-color: var(--Grey22);
   }
@@ -42,7 +42,7 @@
         box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.16);
         z-index: -1;
 
-        @include darkTheme {
+        @include mixins.darkTheme {
           background: var(--Grey30);
           box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.4);
         }

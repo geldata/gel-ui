@@ -1,4 +1,4 @@
-@import "../../mixins.scss";
+@use "../../mixins.scss";
 
 .switcherButton {
   position: relative;
@@ -6,7 +6,7 @@
   --buttonBg: var(--Grey99);
   --buttonTextColour: #5e5e5e;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --buttonBg: #2f2f2f;
     --buttonTextColour: #cdcdcd;
   }
@@ -45,7 +45,7 @@
     z-index: -1;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #313131;
   }
 }
@@ -61,7 +61,7 @@
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: rgba(0, 0, 0, 0.3);
     }
   }

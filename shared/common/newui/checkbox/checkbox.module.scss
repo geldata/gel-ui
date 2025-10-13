@@ -1,5 +1,5 @@
 @use "@sass-fairy/url";
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .checkbox {
   display: flex;
@@ -51,7 +51,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #ccc;
 
     .check {

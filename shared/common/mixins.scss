@@ -1,5 +1,6 @@
+@use "sass:map";
 @use "@sass-fairy/url";
-@import "./hooks/useTheme/mixin.scss";
+@forward "./hooks/useTheme/mixin.scss";
 
 @mixin hideScrollbar {
   -ms-overflow-style: none; /* IE and Edge */
@@ -43,8 +44,8 @@ $breakpoints: (
 );
 
 @mixin breakpoint($breakpoint) {
-  @if map-has-key($breakpoints, $breakpoint) {
-    $breakpoint-value: map-get($breakpoints, $breakpoint);
+  @if map.has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map.get($breakpoints, $breakpoint);
     // Subtracts 0.5px to make breakpoint exclusive (width < x) instead of
     // inclusive (width <= x)
     // (Uses -0.5px instead of -1px due to incorrect behaviour on some

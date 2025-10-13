@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .schema {
   display: flex;
@@ -9,15 +9,18 @@
 
   & > :first-child {
     border-radius: 12px;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 0 8px rgba(0, 0, 0, 0.04),
+      0 0 4px rgba(0, 0, 0, 0.06);
 
-    @include darkTheme {
-      box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2),
+    @include mixins.darkTheme {
+      box-shadow:
+        0px 0px 8px 0px rgba(0, 0, 0, 0.2),
         0px 0px 4px 0px rgba(0, 0, 0, 0.3);
     }
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     margin-bottom: 0;
 
     & > :first-child {
@@ -74,7 +77,7 @@
   --schemaminimap-colour: #4c4c4c;
   --schemaminimap-button-background: #d4d4d4;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     // --schemagraph-background: #1f1f1f;
     --schemagraph-object-background: #313131;
     --schemagraph-object-colour: #c4c4c4;
@@ -134,7 +137,7 @@
   background: var(--Grey93);
   background-image: url("data:image/svg+xml,%3Csvg width='15' height='15' viewBox='0 0 15 15' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='7.5' cy='7.5' r='1.25' fill='%23e1e1e1'/%3E%3C/svg%3E%0A");
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey12);
     background-image: url("data:image/svg+xml,%3Csvg width='15' height='15' viewBox='0 0 15 15' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='7.5' cy='7.5' r='1.25' fill='%23292929'/%3E%3C/svg%3E%0A");
   }
@@ -176,7 +179,7 @@
     opacity: 1;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #272727;
   }
 }

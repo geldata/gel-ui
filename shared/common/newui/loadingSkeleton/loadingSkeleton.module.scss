@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .loadingSkeleton {
   border-radius: 8px;
@@ -13,7 +13,7 @@
   background-size: 100px 100%;
   animation: shimmer 2s infinite linear;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --skeletonBg: #2d2d2d;
     --skeletonShimmer: #3c3c3c;
   }

@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .scrollWrapper {
   display: flex;
@@ -10,12 +10,12 @@
 .scrollContent {
   overflow: auto;
   flex-grow: 1;
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 
   display: grid;
   grid-template-columns: 1fr minmax(0, 760px) 1fr;
 
-  @include isMobile {
+  @include mixins.isMobile {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
   }
@@ -39,7 +39,7 @@
     margin: 0;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     padding: 48px 24px;
   }
 }
@@ -94,7 +94,7 @@
       transform: rotate(180deg);
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       &:hover {
         background: var(--Grey30);
       }
@@ -118,10 +118,10 @@
   align-items: center;
   margin-top: 32px;
   border-radius: 8px;
-  background-image: dashedBorderBg(#ccc);
+  background-image: mixins.dashedBorderBg(#ccc);
 
-  @include darkTheme {
-    background-image: dashedBorderBg(#4d4d4d);
+  @include mixins.darkTheme {
+    background-image: mixins.dashedBorderBg(#4d4d4d);
   }
 }
 
@@ -146,7 +146,7 @@
       grid-auto-columns: 1fr;
     }
 
-    @include isMobile {
+    @include mixins.isMobile {
       flex-direction: column;
       gap: 8px;
 
@@ -253,7 +253,7 @@
         border-radius: 16px;
         border: 1px solid var(--Grey90);
 
-        @include darkTheme {
+        @include mixins.darkTheme {
           background: var(--Grey25);
           border-color: var(--Grey30);
         }
@@ -312,7 +312,7 @@
       border: 1px solid var(--Grey90);
       margin-left: 8px;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: var(--Grey25);
         border-color: var(--Grey30);
       }
@@ -386,7 +386,7 @@
     margin-top: -18px;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     grid-template-columns: auto;
     padding: 0;
     margin-top: 24px;
@@ -415,7 +415,7 @@
     box-shadow: none;
     opacity: 1;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #464646;
       border-color: #4d4d4d;
     }
@@ -428,7 +428,7 @@
   > div {
     height: 42px;
 
-    @include isMobile {
+    @include mixins.isMobile {
       height: auto;
     }
   }
@@ -511,7 +511,7 @@
       stroke: #9c56b4 !important;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       stroke: var(--Grey40);
     }
   }
@@ -543,7 +543,7 @@
   border-radius: 8px;
   border: 1px solid var(--Grey93);
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey16);
     border-color: var(--Grey25);
   }
@@ -552,7 +552,7 @@
     margin-top: 20px;
     margin-bottom: 12px;
 
-    @include isMobile {
+    @include mixins.isMobile {
       margin: 16px;
     }
   }
@@ -588,7 +588,7 @@
     flex-shrink: 0;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #453d2c;
     border: 1px solid #72623b;
     color: #d1bd8f;
@@ -623,7 +623,7 @@
     text-decoration: underline;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #453d2c;
     border: 1px solid #72623b;
     color: #d1bd8f;
@@ -667,7 +667,7 @@
     flex-shrink: 0;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #242a36;
     border-color: #2b406b;
   }
@@ -698,7 +698,7 @@
     user-select: text;
     min-width: 0;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: rgba(0, 0, 0, 0.3);
     }
 
@@ -708,7 +708,7 @@
       overflow: auto;
       flex-grow: 1;
 
-      @include hideScrollbar;
+      @include mixins.hideScrollbar;
     }
   }
 
@@ -720,7 +720,7 @@
     }
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     grid-template-columns: auto;
     gap: 4px;
 
@@ -771,7 +771,7 @@
       border: 1px solid rgba(0, 0, 0, 0.12);
       z-index: 1;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: rgba(50, 50, 50, 0.85);
         border-color: rgba(255, 255, 255, 0.12);
       }
@@ -818,7 +818,9 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
     transform: translateY(100%);
     opacity: 0;
-    transition: transform 0.2s, opacity 0.2s;
+    transition:
+      transform 0.2s,
+      opacity 0.2s;
 
     &:before {
       position: absolute;
@@ -831,7 +833,7 @@
       z-index: -1;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
   }
@@ -882,7 +884,7 @@
       opacity: 0.7;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       &:hover {
         background: rgba(255, 255, 255, 0.1);
       }
@@ -906,7 +908,7 @@
     z-index: 1;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border-color: #545454;
   }
 }

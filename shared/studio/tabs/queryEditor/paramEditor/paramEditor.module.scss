@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .paramEditorPanel {
   position: relative;
@@ -25,7 +25,7 @@
   overflow: auto;
   height: 100%;
 
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 }
 
 .dragHandle {
@@ -47,7 +47,7 @@
     top: 7px;
     left: calc(50% - 16px);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #656565;
     }
   }
@@ -130,7 +130,7 @@
   line-height: 18px;
   color: #333;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #c4c4c4;
   }
 }
@@ -144,7 +144,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: rgba(196, 196, 196, 0.5);
   }
 }
@@ -155,7 +155,7 @@
 
   color: rgb(51, 51, 51, 0.5);
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: rgba(196, 196, 196, 0.5);
   }
 }

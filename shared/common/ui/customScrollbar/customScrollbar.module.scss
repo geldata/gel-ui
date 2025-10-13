@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .customScrollbars {
   position: relative;
@@ -31,7 +31,7 @@
   background: var(--grey85);
   border-radius: 4px;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     // background: rgba(255, 255, 255, 0.1);
     background: var(--grey20);
   }

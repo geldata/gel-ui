@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .queryBuilder {
   font-family: "Roboto Mono", monospace;
@@ -8,7 +8,7 @@
   width: 100%;
   white-space: nowrap;
 
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 
   &.editingDisabled {
     pointer-events: none;
@@ -23,7 +23,7 @@
     color: #000;
     font-family: Roboto, sans-serif;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: #b3b3b3;
     }
 
@@ -42,7 +42,7 @@
     background: var(--Grey99);
     border: 1px solid var(--Grey90);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: var(--Grey18);
       border: 1px solid var(--Grey25);
       color: var(--Grey40);
@@ -142,7 +142,7 @@
       --inputBorderColour: var(--app-err-color);
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       --inputBorderColour: #4d4d4d;
     }
   }

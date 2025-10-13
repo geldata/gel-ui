@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .graphql {
   flex-grow: 1;
@@ -74,14 +74,16 @@
     &:hover {
       background: rgba(0, 0, 0, 0.03);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: rgba(255, 255, 255, 0.03);
       }
     }
 
     .error {
       text-transform: none;
-      font-family: Roboto Mono, monospace;
+      font-family:
+        Roboto Mono,
+        monospace;
       margin-left: auto;
       font-size: 12px;
       color: #d86060;
@@ -111,7 +113,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #363636;
     --code-editor-bg: #363636;
   }
@@ -120,7 +122,9 @@
 .output {
   overflow: auto;
   flex-grow: 1;
-  font-family: Roboto Mono, monospace;
+  font-family:
+    Roboto Mono,
+    monospace;
 }
 
 .resultJson {

@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 :root {
   --white: #fff;
@@ -48,7 +48,7 @@
   --fullscreenOverlayBg: var(--white);
   --pageBackground: var(--grey97);
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --fontHeaderGrey: var(--grey60);
     --baseText: var(--baseTextDarkTheme);
     --accentGreen: var(--accentGreenDarkTheme);

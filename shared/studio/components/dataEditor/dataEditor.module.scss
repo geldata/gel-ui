@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .dataEditor {
   position: relative;
@@ -15,7 +15,7 @@
     background: #f5f5f5;
     border-radius: 2px 0 0 2px;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #262626;
     }
   }
@@ -23,7 +23,7 @@
   & > .panel {
     max-height: calc(100vh - 230px);
     overflow: auto;
-    @include hideScrollbar;
+    @include mixins.hideScrollbar;
   }
 }
 
@@ -67,7 +67,7 @@
     background: #49d8ad;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #141414;
 
     .action svg {
@@ -100,7 +100,7 @@
     background: #d2d2d2;
     pointer-events: none;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: #656565;
       color: #e4e4e4;
     }
@@ -164,7 +164,7 @@
     min-height: 32px;
     max-height: 300px;
     white-space: pre;
-    @include hideScrollbar;
+    @include mixins.hideScrollbar;
 
     .dataEditor > & {
       resize: vertical;
@@ -175,7 +175,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     input,
     textarea {
       background: var(--inputBg, #141414);
@@ -237,7 +237,7 @@
   z-index: 1;
   display: none;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #af6963;
     color: #141414;
   }
@@ -260,7 +260,7 @@
     padding: 0 6px;
     border-radius: 4px 0 0 4px;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #141414;
     }
   }
@@ -277,7 +277,7 @@
       margin-right: 6px;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: #747474;
     }
   }
@@ -286,7 +286,7 @@
     background: #f5f5f5;
     color: #4c4c4c;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #747474;
       color: #141414;
     }
@@ -308,7 +308,7 @@
     background: #f7f7f7;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #262626;
     border-color: #656565;
 
@@ -338,7 +338,7 @@
     pointer-events: none;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #141414;
   }
 }
@@ -365,7 +365,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #656565;
 
     svg {
@@ -492,7 +492,9 @@
     line-height: 30px;
 
     & > span {
-      font-family: Roboto Mono, monospace;
+      font-family:
+        Roboto Mono,
+        monospace;
       opacity: 0.7;
     }
 
@@ -512,7 +514,7 @@
         opacity: 0.8;
         margin: 0 3px;
 
-        @include darkTheme {
+        @include mixins.darkTheme {
           border-color: rgba(255, 255, 255, 0.5);
         }
       }
@@ -545,7 +547,7 @@
     border-radius: 4px 0 0 4px;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--inputBg, #141414);
 
     &:hover {

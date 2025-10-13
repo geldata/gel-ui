@@ -1,4 +1,4 @@
-@import "../../mixins.scss";
+@use "../../mixins.scss";
 
 .tooltip {
   --tooltipBg: #1f8aed;
@@ -51,7 +51,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --tooltipBg: #3a82c4;
   }
 }

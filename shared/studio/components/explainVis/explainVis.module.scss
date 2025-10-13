@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .tooltipContent {
   font-weight: 400;
@@ -11,7 +11,7 @@
   margin: 0;
   font-family: Roboto;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #74a6fc;
     color: #141414;
   }
@@ -20,7 +20,7 @@
 .tooltipArrow {
   fill: #468bfe;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     fill: #74a6fc;
   }
 }
@@ -89,7 +89,7 @@
   flex-direction: column;
   background: #fff;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #141414;
   }
 
@@ -125,7 +125,7 @@
     border-right: 2px solid #d9d9d9;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     color: #b3b3b3;
     &:before,
     &:after {
@@ -143,7 +143,7 @@
   margin-bottom: 2px;
   --outline-color: #468bff;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #242424;
     --outline-color: #74a6fc;
   }
@@ -153,7 +153,7 @@
     background: #d5d8ef;
     margin: 2px;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #292235;
     }
   }
@@ -247,7 +247,7 @@
   line-height: 24px;
   font-weight: 500;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     flex-grow: 1;
   }
 
@@ -255,7 +255,7 @@
     padding: 4px 16px 4px 8px;
     background: #e5e5e5;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #383838;
     }
 
@@ -264,7 +264,7 @@
       margin-right: 4px;
       font-weight: 700;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         color: #999999;
       }
     }
@@ -277,7 +277,7 @@
         margin-left: 4px;
       }
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         color: #808080;
 
         .statsResults {
@@ -293,11 +293,11 @@
     column-gap: 32px;
     padding: 10px 16px 10px 8px;
 
-    @include breakpoint(mobile) {
+    @include mixins.breakpoint(mobile) {
       height: 100%;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #242424;
     }
 
@@ -310,7 +310,7 @@
         color: #999999;
         margin-right: 4px;
       }
-      @include darkTheme {
+      @include mixins.darkTheme {
         color: #c4c4c4;
 
         .label {
@@ -367,7 +367,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: #242424;
     .queryDuration {
       color: #c4c4c4;
@@ -381,11 +381,11 @@
   position: relative;
   margin: -2px;
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     height: calc(100% - 176px);
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --outline-color: #74a6fc;
     background: #1c1c1c;
   }
@@ -397,13 +397,17 @@
     box-sizing: border-box;
     border: 1px solid rgba(0, 0, 0, 0.03);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #292235;
       border: 1px solid rgba(255, 255, 255, 0.04);
     }
 
     &.transitionActive {
-      transition: top 0.2s, left 0.2s, width 0.2s, height 0.2s;
+      transition:
+        top 0.2s,
+        left 0.2s,
+        width 0.2s,
+        height 0.2s;
     }
 
     &.outmostItem {
@@ -429,7 +433,7 @@
       outline: 2px dotted var(--outline-color);
       outline-offset: -2px;
 
-      @include breakpoint(mobile) {
+      @include mixins.breakpoint(mobile) {
         outline: none;
         outline-offset: 0;
       }
@@ -503,7 +507,7 @@
     height: 0;
   }
 
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 
   .breadcrumbsWrapper {
     display: flex;
@@ -514,7 +518,7 @@
     width: 100%;
     min-width: max-content;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background: #242424;
       color: #b3b3b3;
     }
@@ -534,7 +538,7 @@
     &:hover {
       background: rgba(0, 0, 0, 0.05);
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: #383838;
       }
     }
@@ -553,7 +557,7 @@
   .breadcrumbArrow {
     color: #b3b3b3;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: #666666;
     }
   }
@@ -562,7 +566,7 @@
 .explainContextsContainer {
   --outline-color: #468bff;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --outline-color: #74a6fc;
   }
 

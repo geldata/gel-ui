@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .textViewer {
   display: flex;
@@ -18,6 +18,6 @@
   min-height: 0;
 
   :global(.cm-scroller) {
-    @include hideScrollbar;
+    @include mixins.hideScrollbar;
   }
 }

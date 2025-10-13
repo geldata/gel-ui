@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .dashboardWrapper,
 .firstDashboardWrapper {
@@ -11,17 +11,20 @@
   flex-grow: 1;
   background-color: var(--app_panel_background);
   border-radius: 12px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.04), 0 0 4px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 8px rgba(0, 0, 0, 0.04),
+    0 0 4px rgba(0, 0, 0, 0.06);
   overflow: auto;
   font-family: "Roboto Flex Variable", sans-serif;
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 
-  @include darkTheme {
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2),
+  @include mixins.darkTheme {
+    box-shadow:
+      0px 0px 8px 0px rgba(0, 0, 0, 0.2),
       0px 0px 4px 0px rgba(0, 0, 0, 0.3);
   }
 
-  @include breakpoint(mobile) {
+  @include mixins.breakpoint(mobile) {
     border-radius: 0;
   }
 }

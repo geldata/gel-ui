@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .branchGraphOuter {
   position: relative;
@@ -11,7 +11,7 @@
   --branchGraphBorder: var(--Grey85, #d9d9d9);
   --branchGraphLine: var(--Grey80, #ccc);
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --branchGraphBg: var(--Grey10, #1a1a1a);
     --branchGraphBorder: var(--Grey22, #363636);
     --branchGraphLine: var(--Grey30, #4d4d4d);
@@ -62,12 +62,12 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --panel_background: #363636;
     --secondary_text_color: #b3b3b3;
   }
 
-  @include isMobile {
+  @include mixins.isMobile {
     position: absolute;
     top: 0;
     right: 0;
@@ -96,7 +96,7 @@
   height: 100%;
   display: flex;
   border-radius: 11px;
-  @include hideScrollbar;
+  @include mixins.hideScrollbar;
 
   &::after {
     content: "";
@@ -125,7 +125,7 @@
     margin: auto;
     color: var(--Grey60, #999);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: var(--Grey40, #666);
     }
   }
@@ -139,7 +139,7 @@
     font-weight: 450;
     color: #b84444;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       color: #e26f6f;
     }
   }
@@ -242,7 +242,7 @@
     &.faded {
       --branchGraphLine: #dedede;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         --branchGraphLine: #343434;
       }
     }
@@ -293,7 +293,7 @@
     pointer-events: none;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     &:hover,
     &.highlighted {
       background: rgba(255, 255, 255, 0.06);
@@ -377,7 +377,7 @@
     fill: none;
     width: 31px;
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       stroke: var(--Grey40, #666);
     }
   }
@@ -401,7 +401,7 @@
     --branchButtonBg: #fafafa;
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     border: 1px solid var(--panel_border, #4d4d4d);
     --branchButtonBg: var(--panel_background, #363636);
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
@@ -444,7 +444,7 @@
       }
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       --main_text_color: #ccc;
 
       svg {
@@ -502,7 +502,7 @@
       color: var(--Grey30, #4d4d4d) !important;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       border-right-color: var(--Grey30, #4d4d4d);
 
       .githubIcon {
@@ -530,7 +530,7 @@
     color: var(--panel_background, #fff);
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --panel_background: #363636;
 
     filter: drop-shadow(0px 2px 8px rgba(0, 0, 0, 0.5))
@@ -572,7 +572,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --secondary_text_color: #b3b3b3;
     --main_text_color: #ccc;
 
@@ -596,7 +596,7 @@
     0px 0px 2px rgba(0, 0, 0, 0.06);
   z-index: 2;
 
-  @include isMobile {
+  @include mixins.isMobile {
     width: 100%;
   }
 }
@@ -631,7 +631,7 @@
   align-self: flex-start;
   margin: 0 auto;
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     background: var(--Grey16);
     border-color: var(--Grey14);
   }
@@ -658,7 +658,7 @@
       box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.16);
       z-index: -1;
 
-      @include darkTheme {
+      @include mixins.darkTheme {
         background: var(--Grey30);
         box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.4);
       }
@@ -829,7 +829,7 @@
         background: #fed9d9;
         color: #af4b4b;
 
-        @include darkTheme {
+        @include mixins.darkTheme {
           background: #502f2f;
           color: #f38b8b;
         }
@@ -838,7 +838,7 @@
         background: #d5edd7;
         color: #46724a;
 
-        @include darkTheme {
+        @include mixins.darkTheme {
           background: #273a29;
           color: #5d9662;
         }
@@ -937,7 +937,7 @@
         border-radius: 4px;
         padding: 2px 4px;
 
-        @include darkTheme {
+        @include mixins.darkTheme {
           background: var(--Grey20);
         }
       }
@@ -1000,7 +1000,7 @@
       pointer-events: none;
     }
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       &:hover {
         background: var(--Grey25, #404040);
       }
@@ -1011,7 +1011,7 @@
     }
   }
 
-  @include darkTheme {
+  @include mixins.darkTheme {
     --main_text_color: #ccc;
     --secondary_text_color: #b3b3b3;
     --tertiary_text_color: #999;

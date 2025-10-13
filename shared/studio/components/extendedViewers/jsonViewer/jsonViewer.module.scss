@@ -1,4 +1,4 @@
-@import "@edgedb/common/mixins.scss";
+@use "@edgedb/common/mixins.scss";
 
 .jsonViewer {
   display: flex;
@@ -18,7 +18,7 @@
     line-height: 5px;
     transform: translateY(-4px);
 
-    @include darkTheme {
+    @include mixins.darkTheme {
       background-color: #1a1a1a;
       border-color: #4b4b4b;
       color: #b7b7b7;
@@ -32,6 +32,6 @@
   min-height: 0;
 
   :global(.cm-scroller) {
-    @include hideScrollbar;
+    @include mixins.hideScrollbar;
   }
 }
