@@ -62,6 +62,7 @@ export class InstanceState extends Model({
   @observable instanceName: string | null = null;
   @observable.ref serverVersion: ServerVersion | null = null;
   @observable.ref databases: DatabaseInfo[] | null = null;
+  @observable roles: string[] | null = null;
   @observable currentRole: string | null = null;
   isSuperuser: boolean = true;
   permissions: string[] = [];
@@ -120,18 +121,27 @@ export class InstanceState extends Model({
       instanceName: string;
       version: ServerVersion;
       databases: DatabaseInfo[];
-      currentRole: string;
-      isSuperuser: boolean;
-      permissions: string[];
+      roles: string[];
+      currentRole?: string;
+      isSuperuser?: boolean;
+      permissions?: string[];
     }>(
       `
       select {
         instanceName := sys::get_instance_name(),
         version := sys::get_version(),
         databases := ${this.databasesQuery},
+        ${
+          !this.serverVersion || this.serverVersion.major >= 7
+            ? `
+        roles := sys::Role.name if global sys::perm::superuser else <str>{},
         currentRole := global sys::current_role,
         isSuperuser := global sys::perm::superuser,
-        permissions := global sys::current_permissions,
+        permissions := global sys::current_permissions,`
+            : `
+        roles := sys::Role.name,
+        `
+        }
       }`,
       true
     ))!;
@@ -140,9 +150,10 @@ export class InstanceState extends Model({
       this.instanceName = data.instanceName ?? "_localdev";
       this.serverVersion = data.version;
       this.databases = data.databases;
-      this.currentRole = data.currentRole;
-      this.isSuperuser = data.isSuperuser;
-      this.permissions = data.permissions;
+      this.roles = data.roles.length ? data.roles : null;
+      this.currentRole = data.currentRole ?? data.roles[0] ?? "admin";
+      this.isSuperuser = data.isSuperuser ?? true;
+      this.permissions = data.permissions ?? [];
     });
 
     cleanupOldSchemaDataForInstance(this.instanceId!, this.databaseNames!);

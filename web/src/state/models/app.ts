@@ -1,3 +1,4 @@
+import {runInAction} from "mobx";
 import {createContext, Model, model, prop} from "mobx-keystone";
 
 import {InstanceState} from "@edgedb/studio/state/instance";
@@ -64,10 +65,31 @@ export class App extends Model({
       getAuthUser: () => authUsername!,
       invalidateToken: () => clearAuthToken(),
     };
+    if (import.meta.env.DEV && import.meta.env.VITE_GEL_SERVER_VERSION) {
+      try {
+        const [major, minor] = (
+          import.meta.env.VITE_GEL_SERVER_VERSION as string
+        )
+          .split(".")
+          .map((n) => parseInt(n, 10));
+        if (major) {
+          runInAction(
+            () =>
+              (this.instanceState.serverVersion = {
+                major: major,
+                minor: minor ?? 0,
+              })
+          );
+        }
+      } catch {
+        // ignore error
+      }
+    }
 
     if (authToken) {
       this.instanceState.fetchInstanceInfo();
     }
+
     appCtx.set(this, this);
   }
 }
