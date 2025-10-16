@@ -11,5 +11,6 @@ yarn-error.log
 .env*.local
 
 .env
+!/web/.env
 .vscode
 .DS_Store

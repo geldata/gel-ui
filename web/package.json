@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "localdev-config": "edb cli query \"configure instance set cors_allow_origins := {'*'}\"",
     "dev": "vite",
     "build": "vite build",
     "typecheck": "tsc -b",

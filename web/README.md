@@ -16,31 +16,28 @@ yarn dev
 
 The app is served at `http://localhost:3002/ui`.
 
-The Gel server needs to be run separately with `cors_allow_origins`
-configured to allow the UI's `localhost:3002` origin:
+Gel server needs to be run separately, with the recommended way being to use a recent build of the local dev server (see the docs for more details: <https://docs.geldata.com/resources/guides/contributing/code>):
 
 ```sh
 edb server
-
-# Only needs to be run once:
-edb cli configure set cors_allow_origins '*'
-
 ```
 
-To customize the Gel server address (if it's not running at the
-default of `localhost:5656`):
-
+If using a non-dev Gel server instance (eg. installed using the `gel` cli), the instance first needs to be configured to allow the dev UI's origin:
 ```sh
-env VITE_GEL_SERVER_URL="192.168.0.123:5656" yarn dev
+# Only needs to be run once:
+gel configure set cors_allow_origins '*'
 ```
+
+Then the following env vars need to be configured when running the UI dev server (recommended to add them to a `.env.local` file in `web`):
+```
+GEL_SERVER_URL=localhost:10700
+GEL_SERVER_VERSION=6.8
+```
+Note: The values for your instance can be found from `gel instance list`. Also if you don't have username+password auth configured, an auth token for the UI can be created by running `gel ui --print-url`, and replacing the host/port in the url with `localhost:3002`.
 
 ## UI Tests
 
-> **Prerequisites**: The UI tests use Selenium WebDriver to run tests on Chrome.
-> You will need to have Chrome browser installed, and to have `chromedriver`
-> installed and available in the system `PATH`.
->
-> (Instructions to install `chromedriver`: https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/#3-the-path-environment-variable)
+> **Prerequisites**: The UI tests use Playwright, so you may need to run `yarn create playwright` to install the browser components Playwright needs.
 
 To run the UI tests:
 
@@ -53,17 +50,6 @@ or the UI dev server running on port 3000, then they will be used by the tests.
 If not (or the tests are running in CI), the test runner will start temporary
 instances of them for the duration of the tests.
 
-By default the tests run `chromedriver` in headless mode, but to see the
-Chrome window during the tests (eg. for debugging), run with the `--no-headless`
-flag:
-
-```sh
-yarn test --no-headless
-```
-
 ### Writing tests
 
-The tests use the [Jest](https://jestjs.io) framework, with a custom
-environment that provides an already configured instance of the `WebDriver`
-class as the global variable `driver`. The following common webdriver API's
-are also exposed as global variables: `By`, `until`, `Key`.
+The tests use the [Playwright](https://playwright.dev/) framework, with some custom setup/teardown in `web/playwright` to setup test databases in a local dev server instance. See the [Playwright docs](https://playwright.dev/docs/writing-tests) for more details on writing tests using Playwright.
